@@ -1,0 +1,28 @@
+# core
+httpx>=0.27 # async HTTP client
+tenacity>=8.2 # retries with backoff
+pydantic>=2.6 # typed records and validation
+python-dotenv>=1.0 # load API keys from .env
+sqlalchemy>=2.0 # storage layer
+sqlite-utils>=3.36 # quick CLI inspection of the DB
+
+# LLM + embeddings
+anthropic>=0.40 # Claude API; or openai>=1.30 if you prefer
+tiktoken>=0.7 # token counting
+
+# text + NLP
+beautifulsoup4>=4.12 # HTML parsing
+trafilatura>=1.10 # main-content extraction from web pages
+rapidfuzz>=3.6 # fast string similarity
+datasketch>=1.6 # MinHash LSH for blocking and shingled Jaccard
+sentence-transformers>=3.0 # local embeddings (all-MiniLM-L6-v2)
+
+# graph + clustering
+networkx>=3.2 # provenance graph + connected components
+scikit-learn>=1.4 # calibration and clustering helpers
+
+# evaluation + plotting
+numpy>=1.26
+pandas>=2.2
+matplotlib>=3.8
+jupyter>=1.0 # notebooks for the measurement section

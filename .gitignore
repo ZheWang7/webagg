@@ -1,0 +1,17 @@
+# environment
+.venv/
+.env
+
+# python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# project data / outputs
+data/runs/*.db
+html_cache/
+
+# IDE
+.idea/
