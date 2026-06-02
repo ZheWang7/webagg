@@ -17,9 +17,14 @@ def extract_mentions(source: Source, query: str) -> list[Mention]:
     payload = call_llm(system=EXTRACT_SYS, user=user, max_tokens=4096)["payload"]
     out = []
     for m in payload.get("mentions", []):
-        value_hash = hashlib.sha256(m["value"].encode()).hexdigest()[:8]
+        # Include the entity (and record_kind) in the hash, so two different
+        # entities on the same page that share an attribute+value get distinct IDs
+        # e.g. several companies each with round_type "Series A"
+        ident = f"{m['entity_surface']}|{m['record_kind']}|{m['value']}"
+        ident_hash = hashlib.sha256(ident.encode()).hexdigest()[:8]
+        # value_hash = hashlib.sha256(m["value"].encode()).hexdigest()[:8]
         out.append(Mention(
-            mention_id=f"{source.source_id}:{m['attribute']}:{value_hash}",
+            mention_id=f"{source.source_id}:{m['attribute']}:{ident_hash}",
             source_id=source.source_id,
             entity_surface=m["entity_surface"],
             record_kind=m["record_kind"],
