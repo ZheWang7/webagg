@@ -12,6 +12,7 @@ tiktoken>=0.7 # token counting
 
 # text + NLP
 beautifulsoup4>=4.12 # HTML parsing
+lxml_html_clean   # provides lxml.html.clean, split out of lxml 5.2+; needed by trafilatura
 trafilatura>=1.10 # main-content extraction from web pages
 rapidfuzz>=3.6 # fast string similarity
 datasketch>=1.6 # MinHash LSH for blocking and shingled Jaccard

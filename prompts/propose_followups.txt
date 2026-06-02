@@ -1,0 +1,4 @@
+Given a logical record just discovered, propose 1-5 new search formulations that
+would surface RELATED records that may have been missed. Be specific. Avoid
+formulations already in the "already_tried" list. Return STRICT JSON only:
+{"formulations": [{"query": "...", "expected_yield": 1-5}]}
