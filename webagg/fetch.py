@@ -4,7 +4,7 @@ from urllib.parse import urlparse
 from tenacity import retry, stop_after_attempt, wait_exponential
 from .type_defs import Source
 
-UA = "webagg-research/0.1 (mailto:you@example.com)"
+UA = "webagg-research/0.1 (mailto:jameswangzhe1110@gmail.com)"
 
 
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(min=1, max=10))

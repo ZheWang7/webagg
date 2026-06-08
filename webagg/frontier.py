@@ -6,11 +6,11 @@ import math
 @dataclass
 class Formulation:
     formulation_id: str
-    query: str
+    query: str                 # the actual search string, e.g. "Acme funding round"
     expected_yield: float                       # the LLM's initial estimate
-    issued: bool = False
-    realized_yield: int = 0                     # filled in after issuance
-    residual_yield: float = field(init=False)   # updated as we discover things
+    issued: bool = False                        # have we run this search yet?
+    realized_yield: int = 0                     # how many new records it actually found. Filled in after issuance
+    residual_yield: float = field(init=False)   # how promising it still looks。 Updated as we discover things
 
     def __post_init__(self):
         self.residual_yield = self.expected_yield
