@@ -96,7 +96,23 @@ def build_graph(mentions_for_value, source_lookup):
 
 def corroborate(mentions_by_value: dict[str, list],
                 source_lookup: dict[str, Source]) -> CorroboratedValue:
-    """Decide the adopted value across competing candidates."""
+    """
+    Decide the adopted value across competing candidates.
+
+    Args:
+    - mentions_by_value: Competing values for ONE attribute, each mapped to
+            the list of Mentions asserting it,
+            e.g. {"$40M": [m1, m2], "$50M": [m3]}. Buckets are assumed pre-grouped
+            (one per distinct candidate value) by the upstream resolution step.
+    - source_lookup: Maps each Mention's source_id to its full Source, so the
+            graph can read domains, timestamps, URLs, and text. Must contain an
+            entry for every source_id referenced in mentions_by_value.
+
+    Return:
+    - A CorroboratedValue for the adopted value, carrying its belief, nu (the
+        number of independent witnesses), component_sizes (sources per witness),
+        and competing (each rejected value mapped to its own belief).
+    """
     results = {}
     component_info = {}
     for value, mentions in mentions_by_value.items():
