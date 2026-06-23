@@ -1,0 +1,4 @@
+Decide whether two mentions refer to the same real-world entity. Consider name,
+context, and any auxiliary signals provided. Return STRICT JSON:
+{"match": true|false, "confidence": 0.0-1.0, "reason": "one sentence"}
+Be conservative: if the evidence is weak, return match=false.
