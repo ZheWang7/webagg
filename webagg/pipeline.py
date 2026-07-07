@@ -7,6 +7,12 @@ from .llm import call_llm
 from .metrics import log_measurement, log_formulation
 from .storage import get_session
 from .type_defs import Source, Mention
+from collections import defaultdict
+from .storage import load_sources, load_mentions
+from .canonicalize import canonicalize_value
+from .corroboration import corroborate
+from .fragmentation import classify_all_records, entity_mentioned
+
 
 
 def seed_formulations(query: str) -> list[Formulation]:
@@ -96,3 +102,126 @@ def run_query(query: str, *, run_id: str, eps: float = 0.10,
             break
 
     return state, session
+
+
+def resolve_and_aggregate(session, *, run_id: str, query_attributes: set[str],
+                          aggregate_attr: str = "amount",
+                          eps: float = 0.10, eps_er: float = 0.05,
+                          cluster_fn=None, matcher=None):
+    """Stages 2-5 of the pipeline (design Sec. 7.1) over an already-populated
+    run DB. Split out from end_to_end so it can run offline on a fixture DB
+    (no search, no LLM) and re-run on a finished live DB without re-fetching.
+
+    cluster_fn: optional (mentions, source_lookup) -> {mention_id: entity_id}.
+    Injectable like the ER adjudicator / schema relevance_fn, so tests can
+    bypass the real matcher (which needs sentence-transformers + torch).
+    """
+    # 0. reload what discovery persisted -- the DB is the source of truth,
+    # and every object still carries its provenance handle (impl Sec. 4.2)
+    mentions = load_mentions(session)
+    sources = {s.source_id: s for s in load_sources(session)}
+
+    # 1. entity resolution -> the inferred join key (design Sec. 5)
+    if cluster_fn is not None:
+        mention_to_entity = cluster_fn(mentions, sources)
+    else:
+        # lazy import: pulls in sentence-transformers/torch only when the
+        # real matcher is actually wanted
+        from .entity_resolution import cluster_entities, Matcher
+        mention_to_entity = cluster_entities(mentions, matcher or Matcher(),
+                                             sources)
+
+    # 2. re-group mentions by the RESOLVED key (entity_id, record_kind) --
+    # this replaces run_query's provisional pre-ER "surface|kind" key
+    by_record: dict[tuple, list] = defaultdict(list)
+    for m in mentions:
+        by_record[(mention_to_entity[m.mention_id], m.record_kind)].append(m)
+
+    # 3. fragmentation: build M(rho), pick scan/join/redundant per record
+    # (design Sec. 6, Algorithm 3); logs frag_case measurements (impl 10.8)
+    reports = classify_all_records(by_record, sources, query_attributes,
+                                   session=session, run_id=run_id)
+
+    # 4. corroborate one value per attribute (design Sec. 3), guarding
+    # fragmenting attributes against cross-entity contamination (Sec. 6.9)
+    resolved = []
+    for (eid, kind), rep, ms in reports:
+        entity_surfaces = list({m.entity_surface for m in ms})
+        record = {"entity_id": eid, "record_kind": kind,
+                  "frag_case": rep.case, "attributes": {}}
+        by_attr = defaultdict(list)
+        for m in ms:
+            if m.attribute in query_attributes:
+                by_attr[m.attribute].append(m)
+        for attr, attr_mentions in by_attr.items():
+            by_value = defaultdict(list)
+            for m in attr_mentions:
+                # canonicalize BEFORE grouping, so "$40M" and "40 million USD"
+                # are one candidate value, not two competitors (impl 16 #5)
+                by_value[canonicalize_value(m.value)].append(m)
+            cv = corroborate(by_value, sources)
+            if attr in rep.fragmenting_attrs:
+                # a fragmenting attribute rides on ER alone (single class, no
+                # cross-class corroboration): demand that at least one
+                # asserting page literally NAMES the entity, else halve
+                # belief (design Sec. 6.9).
+                # NOTE deviation from the guide: it checks only the FIRST
+                # mention's source; we accept ANY asserting source naming
+                # the entity, which is strictly less trigger-happy.
+                src_ids = {m.source_id for m in attr_mentions}  # pydantic models aren't hashable; dedupe on the id
+                if not any(entity_mentioned(sources[sid], entity_surfaces)
+                           for sid in src_ids):
+                    cv.belief = cv.belief * 0.5
+            record["attributes"][attr] = cv
+        resolved.append(record)
+
+    # 5. aggregate f_Q over distinct resolved records with the three-part
+    # interval (design Corollary 2); reuse Experiment 3's implementation
+    from .eval_er import aggregate_with_ci   # lazy: numpy/pandas only
+    rows = []
+    for r in resolved:
+        cv = r["attributes"].get(aggregate_attr)
+        if cv is None:
+            continue                      # record lacks the aggregate attr
+        try:
+            rows.append({"value": float(cv.value), "belief": cv.belief})
+        except ValueError:
+            continue                      # non-numeric value; skip, don't crash
+    ci = aggregate_with_ci(rows, eps=eps, eps_er=eps_er)
+    log_measurement(session, run_id, 0, "answer", ci["answer"], extra=ci)
+    session.commit()
+    return {"answer": ci["answer"], "ci": ci,
+            "records": resolved, "reports": reports}
+
+
+def end_to_end(query: str, *, run_id: str, query_attributes: set[str],
+               aggregate_attr: str = "amount", mode: str = "open_web",
+               schema_driver=None, query_filter=None,
+               eps: float = 0.10, delta: float = 0.10, eta: float = 0.5,
+               max_steps: int = 200, eps_er: float = 0.05,
+               cluster_fn=None, matcher=None):
+    """The full pipeline (impl Sec. 11.1): discovery, then resolve + aggregate.
+
+    mode="open_web" runs the frontier loop (probabilistic completeness,
+    Theorem 1); mode="schema" sweeps a key universe (deterministic
+    completeness, Theorem 3), in which case the completeness slack eps is 0
+    over the addressable closure -- the interval's recall term vanishes.
+    """
+    if mode == "schema":
+        from .schema_addressable import run_schema_addressable
+        out = run_schema_addressable(query, schema_driver,
+                                     query_filter=query_filter, run_id=run_id)
+        session, state = out["session"], None
+        eps_effective = 0.0               # Theorem 3: delta_F = 0 over K*
+    else:
+        state, session = run_query(query, run_id=run_id, eps=eps,
+                                   delta=delta, eta=eta, max_steps=max_steps)
+        eps_effective = eps
+
+    result = resolve_and_aggregate(session, run_id=run_id,
+                                   query_attributes=query_attributes,
+                                   aggregate_attr=aggregate_attr,
+                                   eps=eps_effective, eps_er=eps_er,
+                                   cluster_fn=cluster_fn, matcher=matcher)
+    result["state"] = state
+    return result

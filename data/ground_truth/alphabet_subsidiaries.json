@@ -1,106 +1,114 @@
 {
   "query": "Total funding raised across all subsidiaries of Alphabet Inc.",
   "records": [
-    {"record_id": "youtube/acq",
+    {
+      "record_id": "alphabet/google/series-a",
+      "entity_canonical": "Google LLC",
+      "entity_aliases": ["Google", "Google Inc.", "Google, Inc."],
+      "attributes": {"amount": "25000000", "date": "1999-06-07"}
+    },
+    {
+      "record_id": "alphabet/youtube/series-a",
       "entity_canonical": "YouTube LLC",
-      "entity_aliases": ["YouTube","YouTube Inc"],
-      "attributes": {"amount": "1650000000", "date": "2006-11-13"}},
-    {"record_id": "waymo/seriesA",
+      "entity_aliases": ["YouTube", "YouTube Inc", "YouTube, Inc.", "YouTube.com"],
+      "attributes": {"amount": "3500000", "date": "2005-11-07"}
+    },
+    {
+      "record_id": "alphabet/youtube/series-b",
+      "entity_canonical": "YouTube LLC",
+      "entity_aliases": ["YouTube", "YouTube Inc", "YouTube, Inc.", "YouTube.com"],
+      "attributes": {"amount": "8000000", "date": "2006-04-01"}
+    },
+    {
+      "record_id": "alphabet/fitbit/series-a",
+      "entity_canonical": "Fitbit, Inc.",
+      "entity_aliases": ["Fitbit", "Fitbit Inc", "Fitbit LLC"],
+      "attributes": {"amount": "2000000", "date": "2008-10-10"}
+    },
+    {
+      "record_id": "alphabet/fitbit/series-b",
+      "entity_canonical": "Fitbit, Inc.",
+      "entity_aliases": ["Fitbit", "Fitbit Inc", "Fitbit LLC"],
+      "attributes": {"amount": "9000000", "date": "2010-09-01"}
+    },
+    {
+      "record_id": "alphabet/fitbit/series-c",
+      "entity_canonical": "Fitbit, Inc.",
+      "entity_aliases": ["Fitbit", "Fitbit Inc", "Fitbit LLC"],
+      "attributes": {"amount": "12000000", "date": "2012-01-24"}
+    },
+    {
+      "record_id": "alphabet/fitbit/series-d",
+      "entity_canonical": "Fitbit, Inc.",
+      "entity_aliases": ["Fitbit", "Fitbit Inc", "Fitbit LLC"],
+      "attributes": {"amount": "43000000", "date": "2013-08-13"}
+    },
+    {
+      "record_id": "alphabet/waze/series-a",
+      "entity_canonical": "Waze Mobile Ltd.",
+      "entity_aliases": ["Waze", "Waze Mobile", "FreeMap Israel"],
+      "attributes": {"amount": "12000000", "date": "2008-03-01"}
+    },
+    {
+      "record_id": "alphabet/waze/series-b",
+      "entity_canonical": "Waze Mobile Ltd.",
+      "entity_aliases": ["Waze", "Waze Mobile", "FreeMap Israel"],
+      "attributes": {"amount": "25000000", "date": "2010-12-07"}
+    },
+    {
+      "record_id": "alphabet/waze/series-c",
+      "entity_canonical": "Waze Mobile Ltd.",
+      "entity_aliases": ["Waze", "Waze Mobile", "FreeMap Israel"],
+      "attributes": {"amount": "30000000", "date": "2011-10-18"}
+    },
+    {
+      "record_id": "alphabet/waymo/external-round-1",
       "entity_canonical": "Waymo LLC",
-      "entity_aliases": ["Waymo"],
-      "attributes": {"amount": "3000000000", "date": "2020-03-02"}},
-    {"record_id": "waymo/seriesB",
+      "entity_aliases": ["Waymo", "Google self-driving car project"],
+      "attributes": {"amount": "3200000000", "date": "2020-03-02"}
+    },
+    {
+      "record_id": "alphabet/waymo/external-round-2",
       "entity_canonical": "Waymo LLC",
-      "entity_aliases": ["Waymo"],
-      "attributes": {"amount": "2500000000", "date": "2021-06-16"}},
-    {"record_id": "waymo/seriesC",
+      "entity_aliases": ["Waymo", "Google self-driving car project"],
+      "attributes": {"amount": "2500000000", "date": "2021-06-16"}
+    },
+    {
+      "record_id": "alphabet/waymo/series-c",
       "entity_canonical": "Waymo LLC",
-      "entity_aliases": ["Waymo"],
-      "attributes": {"amount": "5600000000", "date": "2024-10-25"}},
-    {"record_id": "waymo/seriesD",
+      "entity_aliases": ["Waymo", "Google self-driving car project"],
+      "attributes": {"amount": "5600000000", "date": "2024-10-25"}
+    },
+    {
+      "record_id": "alphabet/waymo/series-d",
       "entity_canonical": "Waymo LLC",
-      "entity_aliases": ["Waymo"],
-      "attributes": {"amount": "16000000000", "date": "2026-02-02"}},
-    {"record_id": "verily/seriesA",
-      "entity_canonical": "Verily Life Sciences",
-      "entity_aliases": ["Verily","Google Life Sciences"],
-      "attributes": {"amount": "800000000",  "date": "2017-01-04"}},
-    {"record_id": "verily/seriesC",
-      "entity_canonical": "Verily Life Sciences",
-      "entity_aliases": ["Verily"],
-      "attributes": {"amount": "1000000000", "date": "2020-12-18"}},
-    {"record_id": "verily/seriesD",
-      "entity_canonical": "Verily Life Sciences",
-      "entity_aliases": ["Verily"],
-      "attributes": {"amount": "1000000000", "date": "2022-09-13"}},
-    {"record_id": "deepmind/acq",
-      "entity_canonical": "DeepMind Technologies",
-      "entity_aliases": ["DeepMind","Google DeepMind"],
-      "attributes": {"amount": "500000000",  "date": "2014-01-26"}},
-    {"record_id": "nest/acq",
-      "entity_canonical": "Nest Labs",
-      "entity_aliases": ["Nest","Nest Labs Inc"],
-      "attributes": {"amount": "3200000000", "date": "2014-01-13"}},
-    {"record_id": "fitbit/acq",
-      "entity_canonical": "Fitbit Inc",
-      "entity_aliases": ["Fitbit"],
-      "attributes": {"amount": "2100000000", "date": "2021-01-14"}},
-    {"record_id": "wing/seriesA",
-      "entity_canonical": "Wing Aviation LLC",
-      "entity_aliases": ["Wing","Project Wing"],
-      "attributes": {"amount": "150000000",  "date": "2018-07-12"}},
-    {"record_id": "calico/seed",
-      "entity_canonical": "Calico Life Sciences",
-      "entity_aliases": ["Calico"],
-      "attributes": {"amount": "750000000",  "date": "2014-09-03"}},
-    {"record_id": "calico/seriesB",
-      "entity_canonical": "Calico Life Sciences",
-      "entity_aliases": ["Calico"],
-      "attributes": {"amount": "1000000000", "date": "2018-04-10"}},
-    {"record_id": "intrinsic/seed",
-      "entity_canonical": "Intrinsic Innovation",
-      "entity_aliases": ["Intrinsic"],
-      "attributes": {"amount": "120000000",  "date": "2021-07-23"}},
-    {"record_id": "sidewalk/seriesA",
-      "entity_canonical": "Sidewalk Labs",
-      "entity_aliases": ["Sidewalk Labs","Sidewalk"],
-      "attributes": {"amount": "300000000",  "date": "2016-05-10"}},
-    {"record_id": "gv/fund2",
-      "entity_canonical": "GV Management Company",
-      "entity_aliases": ["GV","Google Ventures"],
-      "attributes": {"amount": "300000000",  "date": "2012-06-01"}},
-    {"record_id": "capitalg/fund1",
-      "entity_canonical": "CapitalG",
-      "entity_aliases": ["CapitalG","Google Capital"],
-      "attributes": {"amount": "1000000000", "date": "2013-01-01"}},
-    {"record_id": "x/loon/seriesA",
-      "entity_canonical": "Loon LLC",
-      "entity_aliases": ["Loon","Project Loon"],
-      "attributes": {"amount": "125000000",  "date": "2018-07-11"}},
-    {"record_id": "chronicle/seed",
-      "entity_canonical": "Chronicle Security",
-      "entity_aliases": ["Chronicle"],
-      "attributes": {"amount": "60000000",   "date": "2018-01-24"}},
-    {"record_id": "isomorphic/seriesA",
-      "entity_canonical": "Isomorphic Labs",
-      "entity_aliases": ["Isomorphic","Isomorphic Labs"],
-      "attributes": {"amount": "600000000",  "date": "2025-03-31"}},
-    {"record_id": "waze/acq",
-      "entity_canonical": "Waze Mobile",
-      "entity_aliases": ["Waze"],
-      "attributes": {"amount": "966000000",  "date": "2013-06-11"}},
-    {"record_id": "nest/seriesB",
-      "entity_canonical": "Nest Labs",
-      "entity_aliases": ["Nest"],
-      "attributes": {"amount": "80000000",   "date": "2013-01-09"}},
-    {"record_id": "fitbit/ipo",
-      "entity_canonical": "Fitbit Inc",
-      "entity_aliases": ["Fitbit"],
-      "attributes": {"amount": "732000000",  "date": "2015-06-18"}},
-    {"record_id": "deepmind/seed",
-      "entity_canonical": "DeepMind Technologies",
-      "entity_aliases": ["DeepMind"],
-      "attributes": {"amount": "23000000",   "date": "2012-10-01"}}
+      "entity_aliases": ["Waymo", "Google self-driving car project"],
+      "attributes": {"amount": "16000000000", "date": "2026-02-02"}
+    },
+    {
+      "record_id": "alphabet/verily/round-2017",
+      "entity_canonical": "Verily Life Sciences LLC",
+      "entity_aliases": ["Verily", "Verily Life Sciences", "Google Life Sciences"],
+      "attributes": {"amount": "800000000", "date": "2017-01-26"}
+    },
+    {
+      "record_id": "alphabet/verily/round-2019",
+      "entity_canonical": "Verily Life Sciences LLC",
+      "entity_aliases": ["Verily", "Verily Life Sciences", "Google Life Sciences"],
+      "attributes": {"amount": "1000000000", "date": "2019-01-03"}
+    },
+    {
+      "record_id": "alphabet/verily/round-2020",
+      "entity_canonical": "Verily Life Sciences LLC",
+      "entity_aliases": ["Verily", "Verily Life Sciences", "Google Life Sciences"],
+      "attributes": {"amount": "700000000", "date": "2020-12-17"}
+    },
+    {
+      "record_id": "alphabet/verily/round-2022",
+      "entity_canonical": "Verily Life Sciences LLC",
+      "entity_aliases": ["Verily", "Verily Life Sciences", "Google Life Sciences"],
+      "attributes": {"amount": "1000000000", "date": "2022-09-09"}
+    }
   ],
-  "notes": "ILLUSTRATIVE sample for harness dry-runs, NOT hand-verified. Replace with real Wikipedia + Crunchbase figures before reporting (impl §12.2)."
+  "notes": "Last modified 2026/7/7"
 }
