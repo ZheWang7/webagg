@@ -35,3 +35,28 @@ class FrontierState:
         if self.N == 0:
             return 1.0
         return self.singletons() / self.N + beta * self.active_frontier_size() / self.N
+
+
+# ---------------------------------------------------------------------------
+# Single-class frontier prune (design doc Definition 17 / Sec. 6.6)
+# Called from the pipeline once single_class_sufficiency() fires.
+# ---------------------------------------------------------------------------
+
+def prune_for_single_class(state: FrontierState, keep_class,
+                           formulation_class_predictor) -> int:
+    """Prune pending formulations not expected to yield keep_class.
+
+    We zero residual_yield instead of deleting: the formulation stays in the
+    log (auditable, per the design doc's data contracts) but argmax-by-
+    residual in the loop will never pick it, and active_frontier_size() no
+    longer counts it -- so U_hat's frontier-credit term drops accordingly.
+    Returns how many formulations were pruned.
+    """
+    dropped = 0
+    for f in state.formulations.values():
+        if f.issued:
+            continue  # already spent; nothing to save
+        if formulation_class_predictor(f.query) != keep_class:
+            f.residual_yield = 0.0
+            dropped += 1
+    return dropped
