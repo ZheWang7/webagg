@@ -1,0 +1,336 @@
+{
+  "query": "How many points did LeBron James score in each game of the 2018 NBA Playoffs, and what was his playoff total points?",
+  "records": [
+    {
+      "record_id": "lebron2018playoffs/first-round/g1",
+      "entity_canonical": "LeBron James",
+      "entity_aliases": [
+        "LeBron",
+        "L. James",
+        "King James",
+        "LeBron Raymone James"
+      ],
+      "attributes": {
+        "points": "24",
+        "date": "2018-04-15",
+        "opponent": "Indiana Pacers"
+      }
+    },
+    {
+      "record_id": "lebron2018playoffs/first-round/g2",
+      "entity_canonical": "LeBron James",
+      "entity_aliases": [
+        "LeBron",
+        "L. James",
+        "King James",
+        "LeBron Raymone James"
+      ],
+      "attributes": {
+        "points": "46",
+        "date": "2018-04-18",
+        "opponent": "Indiana Pacers"
+      }
+    },
+    {
+      "record_id": "lebron2018playoffs/first-round/g3",
+      "entity_canonical": "LeBron James",
+      "entity_aliases": [
+        "LeBron",
+        "L. James",
+        "King James",
+        "LeBron Raymone James"
+      ],
+      "attributes": {
+        "points": "28",
+        "date": "2018-04-20",
+        "opponent": "Indiana Pacers"
+      }
+    },
+    {
+      "record_id": "lebron2018playoffs/first-round/g4",
+      "entity_canonical": "LeBron James",
+      "entity_aliases": [
+        "LeBron",
+        "L. James",
+        "King James",
+        "LeBron Raymone James"
+      ],
+      "attributes": {
+        "points": "32",
+        "date": "2018-04-22",
+        "opponent": "Indiana Pacers"
+      }
+    },
+    {
+      "record_id": "lebron2018playoffs/first-round/g5",
+      "entity_canonical": "LeBron James",
+      "entity_aliases": [
+        "LeBron",
+        "L. James",
+        "King James",
+        "LeBron Raymone James"
+      ],
+      "attributes": {
+        "points": "44",
+        "date": "2018-04-25",
+        "opponent": "Indiana Pacers"
+      }
+    },
+    {
+      "record_id": "lebron2018playoffs/first-round/g6",
+      "entity_canonical": "LeBron James",
+      "entity_aliases": [
+        "LeBron",
+        "L. James",
+        "King James",
+        "LeBron Raymone James"
+      ],
+      "attributes": {
+        "points": "22",
+        "date": "2018-04-27",
+        "opponent": "Indiana Pacers"
+      }
+    },
+    {
+      "record_id": "lebron2018playoffs/first-round/g7",
+      "entity_canonical": "LeBron James",
+      "entity_aliases": [
+        "LeBron",
+        "L. James",
+        "King James",
+        "LeBron Raymone James"
+      ],
+      "attributes": {
+        "points": "45",
+        "date": "2018-04-29",
+        "opponent": "Indiana Pacers"
+      }
+    },
+    {
+      "record_id": "lebron2018playoffs/conf-semis/g1",
+      "entity_canonical": "LeBron James",
+      "entity_aliases": [
+        "LeBron",
+        "L. James",
+        "King James",
+        "LeBron Raymone James"
+      ],
+      "attributes": {
+        "points": "26",
+        "date": "2018-05-01",
+        "opponent": "Toronto Raptors"
+      }
+    },
+    {
+      "record_id": "lebron2018playoffs/conf-semis/g2",
+      "entity_canonical": "LeBron James",
+      "entity_aliases": [
+        "LeBron",
+        "L. James",
+        "King James",
+        "LeBron Raymone James"
+      ],
+      "attributes": {
+        "points": "43",
+        "date": "2018-05-03",
+        "opponent": "Toronto Raptors"
+      }
+    },
+    {
+      "record_id": "lebron2018playoffs/conf-semis/g3",
+      "entity_canonical": "LeBron James",
+      "entity_aliases": [
+        "LeBron",
+        "L. James",
+        "King James",
+        "LeBron Raymone James"
+      ],
+      "attributes": {
+        "points": "38",
+        "date": "2018-05-05",
+        "opponent": "Toronto Raptors"
+      }
+    },
+    {
+      "record_id": "lebron2018playoffs/conf-semis/g4",
+      "entity_canonical": "LeBron James",
+      "entity_aliases": [
+        "LeBron",
+        "L. James",
+        "King James",
+        "LeBron Raymone James"
+      ],
+      "attributes": {
+        "points": "29",
+        "date": "2018-05-07",
+        "opponent": "Toronto Raptors"
+      }
+    },
+    {
+      "record_id": "lebron2018playoffs/conf-finals/g1",
+      "entity_canonical": "LeBron James",
+      "entity_aliases": [
+        "LeBron",
+        "L. James",
+        "King James",
+        "LeBron Raymone James"
+      ],
+      "attributes": {
+        "points": "15",
+        "date": "2018-05-13",
+        "opponent": "Boston Celtics"
+      }
+    },
+    {
+      "record_id": "lebron2018playoffs/conf-finals/g2",
+      "entity_canonical": "LeBron James",
+      "entity_aliases": [
+        "LeBron",
+        "L. James",
+        "King James",
+        "LeBron Raymone James"
+      ],
+      "attributes": {
+        "points": "42",
+        "date": "2018-05-15",
+        "opponent": "Boston Celtics"
+      }
+    },
+    {
+      "record_id": "lebron2018playoffs/conf-finals/g3",
+      "entity_canonical": "LeBron James",
+      "entity_aliases": [
+        "LeBron",
+        "L. James",
+        "King James",
+        "LeBron Raymone James"
+      ],
+      "attributes": {
+        "points": "27",
+        "date": "2018-05-19",
+        "opponent": "Boston Celtics"
+      }
+    },
+    {
+      "record_id": "lebron2018playoffs/conf-finals/g4",
+      "entity_canonical": "LeBron James",
+      "entity_aliases": [
+        "LeBron",
+        "L. James",
+        "King James",
+        "LeBron Raymone James"
+      ],
+      "attributes": {
+        "points": "44",
+        "date": "2018-05-21",
+        "opponent": "Boston Celtics"
+      }
+    },
+    {
+      "record_id": "lebron2018playoffs/conf-finals/g5",
+      "entity_canonical": "LeBron James",
+      "entity_aliases": [
+        "LeBron",
+        "L. James",
+        "King James",
+        "LeBron Raymone James"
+      ],
+      "attributes": {
+        "points": "26",
+        "date": "2018-05-23",
+        "opponent": "Boston Celtics"
+      }
+    },
+    {
+      "record_id": "lebron2018playoffs/conf-finals/g6",
+      "entity_canonical": "LeBron James",
+      "entity_aliases": [
+        "LeBron",
+        "L. James",
+        "King James",
+        "LeBron Raymone James"
+      ],
+      "attributes": {
+        "points": "46",
+        "date": "2018-05-25",
+        "opponent": "Boston Celtics"
+      }
+    },
+    {
+      "record_id": "lebron2018playoffs/conf-finals/g7",
+      "entity_canonical": "LeBron James",
+      "entity_aliases": [
+        "LeBron",
+        "L. James",
+        "King James",
+        "LeBron Raymone James"
+      ],
+      "attributes": {
+        "points": "35",
+        "date": "2018-05-27",
+        "opponent": "Boston Celtics"
+      }
+    },
+    {
+      "record_id": "lebron2018playoffs/finals/g1",
+      "entity_canonical": "LeBron James",
+      "entity_aliases": [
+        "LeBron",
+        "L. James",
+        "King James",
+        "LeBron Raymone James"
+      ],
+      "attributes": {
+        "points": "51",
+        "date": "2018-05-31",
+        "opponent": "Golden State Warriors"
+      }
+    },
+    {
+      "record_id": "lebron2018playoffs/finals/g2",
+      "entity_canonical": "LeBron James",
+      "entity_aliases": [
+        "LeBron",
+        "L. James",
+        "King James",
+        "LeBron Raymone James"
+      ],
+      "attributes": {
+        "points": "29",
+        "date": "2018-06-03",
+        "opponent": "Golden State Warriors"
+      }
+    },
+    {
+      "record_id": "lebron2018playoffs/finals/g3",
+      "entity_canonical": "LeBron James",
+      "entity_aliases": [
+        "LeBron",
+        "L. James",
+        "King James",
+        "LeBron Raymone James"
+      ],
+      "attributes": {
+        "points": "33",
+        "date": "2018-06-06",
+        "opponent": "Golden State Warriors"
+      }
+    },
+    {
+      "record_id": "lebron2018playoffs/finals/g4",
+      "entity_canonical": "LeBron James",
+      "entity_aliases": [
+        "LeBron",
+        "L. James",
+        "King James",
+        "LeBron Raymone James"
+      ],
+      "attributes": {
+        "points": "23",
+        "date": "2018-06-08",
+        "opponent": "Golden State Warriors"
+      }
+    }
+  ],
+  "notes": "Source: landofbasketball.com 2018 LeBron James game log, cross-checked against Basketball-Reference, StatMuse, and Wikipedia; hand-verified 2026-06-29. Points sum to 748 over 22 games = 34.0 PPG. Single-entity query: entity_canonical is 'LeBron James' on every record; game/record resolution keys on date+opponent (each game has a unique date), analogous to resolving funding rounds by amount+date."
+}

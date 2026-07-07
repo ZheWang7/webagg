@@ -20,7 +20,7 @@ for _d in (RUNS_DIR, GROUND_TRUTH_DIR, HTML_CACHE_DIR):
 # --- secrets ----------------------------------------------------------------
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
 SERPER_API_KEY = os.environ.get("SERPER_API_KEY", "")
-USER_AGENT = os.environ.get("USER_AGENT", "webagg-research/0.1")
+USER_AGENT = os.environ.get("USER_AGENT", "webagg-research/0.1 (mailto:jameswangzhe1110@gmail.com)")
 
 # --- stopping-rule / frontier constants (design doc §3) ---------------------
 EPSILON = 0.10     # target unseen-mass threshold
