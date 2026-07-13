@@ -27,3 +27,9 @@ numpy>=1.26
 pandas>=2.2
 matplotlib>=3.8
 jupyter>=1.0 # notebooks for the measurement section
+
+orjson>=3.9        # fast JSON serialization for logs/storage
+dateparser>=1.2    # parse messy as-of dates for bi-temporal mentions
+scipy>=1.12        # stats for certificates (Clopper-Pearson, etc.)
+faiss-cpu>=1.8     # vector blocking / near-dup detection in er.py
+pytest>=8.0        # unit tests locked to the paper's worked run

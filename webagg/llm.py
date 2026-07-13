@@ -7,7 +7,7 @@ from . import config  # importing config runs load_dotenv(), so the key below is
 _client_anthropic = Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
 _client_openai = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 DEFAULT_MODEL = "claude-haiku-4-5-20251001"   # cheap; bump for harder prompts
-DEFAULT_MODEL_OPENAI = "gpt-5-nano"
+DEFAULT_MODEL_OPENAI = "gpt-5.5"
 
 # Anthropic
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(min=1, max=10))

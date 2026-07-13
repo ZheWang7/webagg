@@ -138,4 +138,8 @@ def corroborate(mentions_by_value: dict[str, list],
         nu=component_info[v_star]["nu"],
         component_sizes=component_info[v_star]["comp_sizes"],
         competing={v: b for v, b in results.items() if v != v_star},
+        # Provenance discipline: record exactly which mentions
+        # asserted the adopted value, so a wrong number can be walked back
+        # CorroboratedValue -> Mentions -> Sources -> URL in seconds.
+        supporting_mention_ids=[m.mention_id for m in mentions_by_value[v_star]],
     )
