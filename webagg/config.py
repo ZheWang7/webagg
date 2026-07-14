@@ -22,6 +22,12 @@ ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
 SERPER_API_KEY = os.environ.get("SERPER_API_KEY", "")
 USER_AGENT = os.environ.get("USER_AGENT", "webagg-research/0.1 (mailto:jameswangzhe1110@gmail.com)")
 
+# --- LLM model keys (impl guide ch. 5) ---------------------------------------
+# Cheap model for high-volume yes/no work (relevance, ER adjudication);
+# stronger model for structured extraction. Both overridable via .env.
+MODEL_CHEAP = os.environ.get("WEBAGG_MODEL_CHEAP", "gpt-5.5-mini")
+MODEL_STRONG = os.environ.get("WEBAGG_MODEL_STRONG", "gpt-5.5")
+
 # --- stopping-rule / frontier constants (design doc §3) ---------------------
 EPSILON = 0.10     # target unseen-mass threshold
 DELTA = 0.10       # confidence parameter

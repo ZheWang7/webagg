@@ -142,7 +142,7 @@ def adjudicate_llm(m_a, m_b, source_lookup) -> float:
             "B:\n"
             f"surface: {m_b.entity_surface}\ndomain: {s_b.domain}\n"
             f"context: {m_b.passage}")
-    out = call_llm(system=sys, user=user)["payload"]
+    out = call_llm(system=sys, user=user, purpose="er_adjudication")["payload"]
     return float(out["confidence"]) if out["match"] else 1 - float(out["confidence"])
 
 

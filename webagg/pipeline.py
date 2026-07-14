@@ -3,7 +3,8 @@ from .frontier import FrontierState, Formulation
 from .search import SerperBackend
 from .fetch import fetch_url
 from .extract import is_relevant, extract_mentions
-from .llm import call_llm
+from .llm import call_llm, set_llm_logger, set_llm_step
+from .fetch import clear_fetch_cache
 from .metrics import log_measurement, log_formulation
 from .storage import get_session
 from .type_defs import Source, Mention
@@ -40,6 +41,8 @@ def propose_followups(record_kind: str, entity_surface: str,
 def run_query(query: str, *, run_id: str, eps: float = 0.10,
               delta: float = 0.10, eta: float = 0.5, max_steps: int = 200):
     session = get_session(f"data/runs/{run_id}.sqlite")
+    set_llm_logger(session, run_id)   # ch. 5: every LLM call -> measurements
+    clear_fetch_cache()               # ch. 5: URL cache is per-run
     search = SerperBackend()
     state = FrontierState()
     for f in seed_formulations(query):
@@ -53,13 +56,14 @@ def run_query(query: str, *, run_id: str, eps: float = 0.10,
             break
         f = max(candidates, key=lambda x: x.residual_yield)
 
-        # 2. issue search
-        results = search.search(f.query, k=10)
-        new_records_this_step = 0
+        set_llm_step(step)            # cost rows carry the agent step
+        # 2. issue search -- one call = one capture occasion
+        # results come back tagged with the formulation that surfaced them.
+        results = search.search(f.query, k=10, formulation_id=f.formulation_id)
 
         # 3. fetch + extract
         for r in results:
-            src = fetch_url(r["url"], formulation_id=f.formulation_id)
+            src = fetch_url(r["url"], formulation_id=r["formulation_id"])
             if src is None or not is_relevant(src, query):
                 continue
             session.add(src.to_row())
