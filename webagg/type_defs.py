@@ -134,6 +134,23 @@ class Claim(BaseModel):
     tolerance: float = 0.0         # Implied by stated precision: "$63M" means +/- 0.5e6, not exact.
     passage: str = ""                   # verbatim supporting text
 
+    def to_row(self):
+        # Same persistence pattern as Source/Mention (ClaimRow in storage.py).
+        from .storage import ClaimRow      # lazy: keeps import graph acyclic
+        return ClaimRow(
+            claim_id=self.claim_id,
+            source_id=self.source_id,
+            stratum_surface=self.stratum_surface,
+            functional=self.functional,
+            attribute=self.attribute,
+            value_num=self.value_num,
+            currency=self.currency,
+            t_asof=self.t_asof,
+            scope=self.scope,
+            tolerance=self.tolerance,
+            passage=self.passage,
+        )
+
 
 class ResolvedEntity(BaseModel):
     """An entity-resolution cluster: many surface forms -> one entity_id.
