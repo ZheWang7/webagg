@@ -31,7 +31,6 @@ class MentionRow(Base):
     value = Column(String)
     passage = Column(String)
     extracted_at = Column(DateTime)
-    # --- NEW (guide §4.1/§4.2): bi-temporal + typed + dual extraction + gate ---
     t_asof = Column(DateTime)                       # valid time: when the fact HOLDS
     value_num = Column(Float)                       # canonical numeric, base units (USD)
     currency = Column(String)                       # ISO code; required for money attrs

@@ -83,15 +83,11 @@ class Mention(BaseModel):
     accepted: bool = False              # Set by the split-conformal gate (guide §6).
 
     @classmethod
-    def make_id(cls, source_id: str, attribute: str,
-                value: str, extractor_id: str) -> str:
-        # Identifier convention (guide §4.3):
-        #   source_id:attribute:value_hash[:8]:extractor_id
-        # The extractor suffix is what prevents the two dual-extraction
-        # mentions of the same value from colliding (this fixes the
-        # mention_id collision bug from the earlier implementation).
-        vh = hashlib.sha256(value.encode()).hexdigest()[:8]
-        return f"{source_id}:{attribute}:{vh}:{extractor_id}"
+    def make_id(cls, source_id: str, entity_surface: str, record_kind: str,
+                attribute: str, value: str, extractor_id: str) -> str:
+        ident = f"{entity_surface}|{record_kind}|{value}"
+        h = hashlib.sha256(ident.encode()).hexdigest()[:8]
+        return f"{source_id}:{attribute}:{h}:{extractor_id}"
 
     def to_row(self):
         return MentionRow(
@@ -134,22 +130,26 @@ class Claim(BaseModel):
     tolerance: float = 0.0         # Implied by stated precision: "$63M" means +/- 0.5e6, not exact.
     passage: str = ""                   # verbatim supporting text
 
+    @classmethod
+    def make_id(cls, source_id: str, functional: str,
+                stratum_surface: str) -> str:
+        # Identifier convention (guide §4.3):
+        #   source_id:CLAIM:functional:stratum_hash[:8]
+        # The literal "CLAIM" keeps claims greppably distinct from mentions;
+        # functional (SUM/COUNT) is in the ID because one sentence
+        # ("three rounds totaling $63M") yields BOTH kinds of claim.
+        sh = hashlib.sha256(stratum_surface.encode()).hexdigest()[:8]
+        return f"{source_id}:CLAIM:{functional}:{sh}"
+
     def to_row(self):
         # Same persistence pattern as Source/Mention (ClaimRow in storage.py).
         from .storage import ClaimRow      # lazy: keeps import graph acyclic
-        return ClaimRow(
-            claim_id=self.claim_id,
-            source_id=self.source_id,
-            stratum_surface=self.stratum_surface,
-            functional=self.functional,
-            attribute=self.attribute,
-            value_num=self.value_num,
-            currency=self.currency,
-            t_asof=self.t_asof,
-            scope=self.scope,
-            tolerance=self.tolerance,
-            passage=self.passage,
-        )
+        return ClaimRow(claim_id=self.claim_id, source_id=self.source_id,
+                        stratum_surface=self.stratum_surface,
+                        functional=self.functional, attribute=self.attribute,
+                        value_num=self.value_num, currency=self.currency,
+                        t_asof=self.t_asof, scope=self.scope,
+                        tolerance=self.tolerance, passage=self.passage)
 
 
 class ResolvedEntity(BaseModel):
@@ -192,13 +192,10 @@ class CorroboratedValue(BaseModel):
     # adopted value. A DIAGNOSTIC only -- never enters interval arithmetic
     # (explicit pitfall in the paper).
 
-    # --- Provenance discipline (guide §4.1 box) ---
+    # --- Provenance discipline---
     supporting_mention_ids: list[str] = Field(default_factory=list)
     # FK list -> Mention: exactly the mentions that asserted the ADOPTED
-    # value. NOTE: this field is our addition, not in the guide's verbatim
-    # model -- but the guide's discipline ("every object carries a foreign
-    # key back to a Mention or Source") requires it, otherwise
-    # CorroboratedValue is the one object that cannot be walked back.
+    # value.
 
 
 class ResolvedRecord(BaseModel):

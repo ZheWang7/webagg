@@ -325,9 +325,11 @@ def _sources_from_corpus(corpus: dict) -> dict[str, Source]:
 
 def _mention_obj(m: dict, attr: str) -> Mention:
     """A repo Mention asserting this record's aggregate value, for corroborate()."""
-    h = hashlib.sha256(f"{m['source_id']}|{m['agg_value']}".encode()).hexdigest()[:8]
+    # ID convention (guide §4.3): even harness code goes through make_id.
     return Mention(
-        mention_id=f"{m['source_id']}:{attr}:{h}", source_id=m["source_id"],
+        mention_id=Mention.make_id(m["source_id"], m["entity_surface"],
+                                   "record", attr, str(m["agg_value"]), "A"),
+        source_id=m["source_id"],
         entity_surface=m["entity_surface"], record_kind="record",
         attribute=attr, value=str(m["agg_value"]), passage=m["passage"],
         extracted_at=datetime.utcnow(),
