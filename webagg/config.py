@@ -25,8 +25,8 @@ USER_AGENT = os.environ.get("USER_AGENT", "webagg-research/0.1 (mailto:jameswang
 # --- LLM model keys (impl guide ch. 5) ---------------------------------------
 # Cheap model for high-volume yes/no work (relevance, ER adjudication);
 # stronger model for structured extraction. Both overridable via .env.
-MODEL_CHEAP = os.environ.get("WEBAGG_MODEL_CHEAP", "gpt-5.5-mini")
-MODEL_STRONG = os.environ.get("WEBAGG_MODEL_STRONG", "gpt-5.5")
+MODEL_CHEAP = os.environ.get("WEBAGG_MODEL_CHEAP", "gpt-5-nano")
+MODEL_STRONG = os.environ.get("WEBAGG_MODEL_STRONG", "gpt-5")
 
 # --- reader gate / audit constants (impl guide ch. 6) ------------------------
 DELTA_E = 0.05      # conformal miscoverage level (paper Prop. 2)

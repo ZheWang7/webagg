@@ -56,6 +56,7 @@ def run_query(query: str, *, run_id: str, eps: float = 0.10,
 
     search = SerperBackend()
     state = FrontierState()
+    seen_urls: set[str] = set()
     for f in seed_formulations(query):
         state.formulations[f.formulation_id] = f
         log_formulation(session, run_id, f, step=0)
@@ -75,6 +76,9 @@ def run_query(query: str, *, run_id: str, eps: float = 0.10,
 
         # 3. fetch + extract
         for r in results:
+            if r["url"] in seen_urls:
+                continue          # already processed this run (any verdict)
+            seen_urls.add(r["url"])
             src = fetch_url(r["url"], formulation_id=r["formulation_id"])
             if src is None:
                 continue
@@ -94,8 +98,9 @@ def run_query(query: str, *, run_id: str, eps: float = 0.10,
             log_measurement(session, run_id, step, "extract_agreed",
                             info["agreed"], extra=info)
             log_measurement(session, run_id, step, "extract_abstained",
-                            info["disagreed"] + info["b_only"]
-                            + info["gate_abstains"])
+                            # each contested slot counted once (A-side);
+                            # b_only is informational, in extract_agreed.extra
+                            info["disagreed"] + info["gate_abstains"])
             for m in mentions:
                 session.add(m.to_row())
                 record_key = f"{m.entity_surface}|{m.record_kind}"

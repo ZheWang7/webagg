@@ -113,10 +113,16 @@ def _norm_surface(s: str) -> str:
     return re.sub(r"[^a-z0-9 ]", "", s.lower()).strip()
 
 
-def _pair_key(m: Mention) -> tuple[str, str, str]:
-    """A and B mentions describe the same slot when entity (normalized),
-    record kind, and attribute coincide."""
-    return (_norm_surface(m.entity_surface), m.record_kind, m.attribute)
+def _pair_key(m: Mention) -> tuple[str, str, str, str]:
+    """A and B mentions AGREE when entity (normalized), record kind,
+    attribute AND canonical value coincide. The value must be in the key:
+    one (entity, kind, attribute) slot can legitimately hold several
+    mentions per reader (e.g. a round amount AND a cumulative echo on the
+    same page), so slot-only pairing mismatches them -- a bug caught by
+    the ch. 3-6 integration test. Unpaired mentions simply abstain, which
+    subsumes the old explicit disagreement check."""
+    return (_norm_surface(m.entity_surface), m.record_kind, m.attribute,
+            canonicalize_value(m.value))
 
 
 def extract_certified(source: Source, query: str,
@@ -137,7 +143,9 @@ def extract_certified(source: Source, query: str,
     gate = gate or ConformalGate()          # unfitted -> bootstrap accept-all
     ment_a, claims_a = extract_mentions(source, query, extractor_id="A")
     ment_b, claims_b = extract_mentions(source, query, extractor_id="B")
-    b_by_key = {_pair_key(m): m for m in ment_b}
+    b_by_key: dict[tuple, list[Mention]] = {}
+    for m in ment_b:                        # lists: duplicates are possible
+        b_by_key.setdefault(_pair_key(m), []).append(m)
 
     accepted: list[Mention] = []
     info = {"n_a": len(ment_a), "n_b": len(ment_b), "agreed": 0,
@@ -145,12 +153,14 @@ def extract_certified(source: Source, query: str,
             "gate_abstains": 0}
 
     for ma in ment_a:
-        mb = b_by_key.pop(_pair_key(ma), None)
-        # -- stage 2: agreement = same canonical value from both readers.
-        if mb is None or canonicalize_value(ma.value) != canonicalize_value(mb.value):
-            info["disagreed"] += 1
-            continue                        # abstain: A/B failure modes differ,
-                                            # so agreement is the evidence
+        # -- stage 2: agreement = the OTHER reader independently produced
+        # the same (entity, kind, attribute, canonical value).
+        matches = b_by_key.get(_pair_key(ma))
+        if not matches:
+            info["disagreed"] += 1          # A-side abstention: no partner
+            continue                        # (A/B failure modes differ, so
+                                            # agreement is the evidence)
+        mb = matches.pop()
         info["agreed"] += 1
         # the agreed mention proceeds as A's copy, carrying the MIN of the
         # two self-confidences (the cautious reader sets the score)
@@ -171,7 +181,7 @@ def extract_certified(source: Source, query: str,
         else:
             info["gate_abstains"] += 1
 
-    info["b_only"] = len(b_by_key)          # slots only B saw: no agreement
+    info["b_only"] = sum(len(v) for v in b_by_key.values())  # B-side leftovers
 
     # Claims: dual-extracted like mentions -- keep those where A and B agree
     # on (stratum, functional) within tolerance; claim corroboration proper
