@@ -2,11 +2,13 @@ import uuid
 from .frontier import FrontierState, Formulation
 from .search import SerperBackend
 from .fetch import fetch_url
-from .extract import is_relevant, extract_mentions
+from .extract import is_relevant, extract_certified
 from .llm import call_llm, set_llm_logger, set_llm_step
 from .fetch import clear_fetch_cache
 from .metrics import log_measurement, log_formulation
-from .storage import get_session
+from .storage import get_session, RejectedSourceRow
+from .calibration import ConformalGate, load_calibration_set
+from . import config
 from .type_defs import Source, Mention
 from collections import defaultdict
 from .storage import load_sources, load_mentions
@@ -43,6 +45,15 @@ def run_query(query: str, *, run_id: str, eps: float = 0.10,
     session = get_session(f"data/runs/{run_id}.sqlite")
     set_llm_logger(session, run_id)   # ch. 5: every LLM call -> measurements
     clear_fetch_cache()               # ch. 5: URL cache is per-run
+
+    # ch. 6: the conformal gate. Unfitted (no calibration file yet) it runs
+    # in bootstrap accept-all mode and stamps 'gate_uncalibrated' on every
+    # mention -- see ConformalGate.accept.
+    gate = ConformalGate(delta_E=config.DELTA_E)
+    cal = load_calibration_set(config.CALIBRATION_SET)
+    if cal:
+        gate.fit(cal)
+
     search = SerperBackend()
     state = FrontierState()
     for f in seed_formulations(query):
@@ -60,14 +71,31 @@ def run_query(query: str, *, run_id: str, eps: float = 0.10,
         # 2. issue search -- one call = one capture occasion
         # results come back tagged with the formulation that surfaced them.
         results = search.search(f.query, k=10, formulation_id=f.formulation_id)
+        new_records_this_step = 0
 
         # 3. fetch + extract
         for r in results:
             src = fetch_url(r["url"], formulation_id=r["formulation_id"])
-            if src is None or not is_relevant(src, query):
+            if src is None:
+                continue
+            # -- stage 1 (guide §6.1): rejections are LOGGED, not dropped.
+            ok, conf = is_relevant(src, query)
+            if not ok:
+                session.merge(RejectedSourceRow(
+                    source_id=src.source_id, url=str(src.url),
+                    rejection_score=conf,       # audit stratifies on this
+                    main_text=src.main_text))   # audit RE-READS this later
                 continue
             session.add(src.to_row())
-            mentions = extract_mentions(src, query)
+            # -- stages 2-4: dual extraction -> validators -> conformal gate.
+            mentions, claims, info = extract_certified(src, query, gate=gate)
+            for c in claims:
+                session.merge(c.to_row())       # merge: same claim can recur
+            log_measurement(session, run_id, step, "extract_agreed",
+                            info["agreed"], extra=info)
+            log_measurement(session, run_id, step, "extract_abstained",
+                            info["disagreed"] + info["b_only"]
+                            + info["gate_abstains"])
             for m in mentions:
                 session.add(m.to_row())
                 record_key = f"{m.entity_surface}|{m.record_kind}"

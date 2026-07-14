@@ -2,12 +2,36 @@ You extract structured attribute assertions from a document for a given query.
 Each "mention" is one (entity, record_kind, attribute, value) assertion grounded
 in a verbatim passage from the document. Do not invent values. Return STRICT
 JSON only.
+
+Distinguish carefully (these confusions are the common failure modes):
+- a ROUND amount vs. a CUMULATIVE total ("to date", "total raised"): cumulative
+  totals are NOT round amounts -- report them as claims (below), not mentions.
+- the amount RAISED vs. a VALUATION ("valuing the company at ..."): a valuation
+  is attribute "post_money", never "amount".
+- currency: ALWAYS set "currency" (ISO code) for money values; never assume USD.
+- an EXTENSION of an existing round vs. a NEW round.
+
 Schema:
 {"mentions": [
   {"entity_surface": "...",   // the surface form as it appears
    "record_kind": "...",      // e.g. funding_round, clinical_trial
-   "attribute": "...",        // e.g. amount, date, lead_investor
+   "attribute": "...",        // e.g. amount, post_money, date, lead_investor
    "value": "...",            // canonicalize numbers to base units
+   "currency": "USD",         // ISO code; REQUIRED for money values, else null
+   "date_role": null,         // for dates: "announced" | "closed" | "filed"
+   "t_asof": null,            // when the fact holds, if stated ("as of Dec 2024")
+   "self_conf": 0.9,          // 0-1: your confidence in THIS assertion
    "passage": "..."           // verbatim snippet supporting this claim
+  }, ...],
+ "claims": [                  // statements about the WHOLE entity, not one record
+  {"stratum_surface": "...",  // the entity the claim scopes over
+   "functional": "SUM",       // "SUM" or "COUNT" only
+   "attribute": "amount",
+   "value_num": 63000000,     // the claimed total/count, base units
+   "currency": "USD",
+   "t_asof": null,
+   "scope": "to date",        // verbatim scope words
+   "tolerance": 500000,       // implied by stated precision ("$63M" -> 5e5)
+   "passage": "..."
   }, ...]}
-Return {"mentions": []} if no concrete assertions are present.
+Return {"mentions": [], "claims": []} if no concrete assertions are present.

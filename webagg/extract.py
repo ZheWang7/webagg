@@ -1,32 +1,73 @@
+"""Extraction: the four-stage gate (impl guide §6.1, paper §7.1).
+
+The reader is the dominant error in deployment, so extraction is a gate,
+not a single call:
+
+    1. relevance phi      is_relevant() -> (bool, conf); False is LOGGED
+                          (RejectedSourceRow), never silently dropped
+    2. dual extraction    two readers with independent failure modes
+                          (prompts A and B); agreement passes,
+                          disagreement abstains
+    3. typed validators   validators.validate_mention() -- deterministic,
+                          free, run before any probability is spent
+    4. conformal gate     calibration.ConformalGate.accept() -- accepted
+                          mentions carry miscoverage <= delta_E (Prop. 2)
+
+extract_certified() orchestrates all four and returns only mentions with
+accepted=True, plus the Claims both readers emitted. Abstentions and
+rejections are returned as counts (an abstention is a COST, not an error)
+so the pipeline can log them to measurements.
+"""
 from .llm import call_llm
-from .type_defs import Mention, Source
+from .type_defs import Mention, Source, Claim
+from .validators import validate_mention, ExtractionContext, Reject
+from .calibration import ConformalGate
+from .canonicalize import canonicalize_value
 from . import config
 from datetime import datetime
-import hashlib
+import dateparser
 
 RELEVANCE_SYS = open("prompts/relevance.txt").read()
-EXTRACT_SYS = open("prompts/extract.txt").read()
+EXTRACT_SYS_A = open("prompts/extract.txt").read()
+EXTRACT_SYS_B = open("prompts/extract_b.txt").read()
 
 
-def is_relevant(source: Source, query: str) -> bool:
+def is_relevant(source: Source, query: str) -> tuple[bool, float]:
+    """Stage 1. NOW RETURNS (relevant, confidence) -- guide §6.1.
+
+    The confidence is stored as rejection_score on RejectedSourceRow so
+    the phi-audit can stratify its sample (near-threshold rejections are
+    where false negatives live)."""
     user = f"QUERY:\n{query}\n\nDOCUMENT:\n{source.main_text[:8000]}"
     # cheap model: relevance is a high-volume yes/no (guide ch. 5)
-    return bool(call_llm(system=RELEVANCE_SYS, user=user,
-                         purpose="relevance")["payload"].get("relevant"))
+    out = call_llm(system=RELEVANCE_SYS, user=user,
+                   purpose="relevance")["payload"]
+    return bool(out.get("relevant")), float(out.get("confidence", 0.5))
+
+
+def _parse_t_asof(raw) -> datetime | None:
+    """LLM-reported as-of date string -> UTC-naive datetime (or None)."""
+    if not raw:
+        return None
+    dt = dateparser.parse(str(raw))
+    return dt.replace(tzinfo=None) if dt else None
 
 
 def extract_mentions(source: Source, query: str,
-                     extractor_id: str = "A") -> list[Mention]:
+                     extractor_id: str = "A") -> tuple[list[Mention], list[Claim]]:
+    """One reader pass (stage 2 primitive). NOW RETURNS (mentions, claims):
+    the SIGMOD prompts emit whole-stratum Claims ("three rounds totaling
+    $63M" -> COUNT + SUM) alongside per-record mentions."""
+    system = EXTRACT_SYS_A if extractor_id == "A" else EXTRACT_SYS_B
     user = f"QUERY:\n{query}\n\nDOCUMENT (id={source.source_id}):\n{source.main_text[:12000]}"
     # strong model: structured extraction is where quality pays (guide ch. 5)
-    payload = call_llm(system=EXTRACT_SYS, user=user, max_tokens=4096,
-                       model=config.MODEL_STRONG, purpose="extraction")["payload"]
-    out = []
+    payload = call_llm(system=system, user=user, max_tokens=4096,
+                       model=config.MODEL_STRONG,
+                       purpose=f"extraction_{extractor_id}")["payload"]
+    mentions = []
     for m in payload.get("mentions", []):
-        # ID convention (guide §4.3): ALWAYS via Mention.make_id -- never
-        # hand-format. The entity-aware hash (distinct IDs for two entities
-        # sharing attribute+value on one page) now lives inside make_id.
-        out.append(Mention(
+        # ID convention (guide §4.3): ALWAYS via Mention.make_id.
+        mentions.append(Mention(
             mention_id=Mention.make_id(source.source_id, m["entity_surface"],
                                        m["record_kind"], m["attribute"],
                                        m["value"], extractor_id),
@@ -37,6 +78,111 @@ def extract_mentions(source: Source, query: str,
             value=m["value"],
             passage=m["passage"],
             extracted_at=datetime.utcnow(),
-            extractor_id=extractor_id,     # which dual-extraction pass (A/B)
+            # typed, bi-temporal fields (guide §4.1) now come from the prompt:
+            t_asof=_parse_t_asof(m.get("t_asof")) or source.publish_time,
+            currency=m.get("currency"),
+            date_role=m.get("date_role"),
+            self_conf=float(m.get("self_conf", 0.5)),
+            extractor_id=extractor_id,
         ))
-    return out
+    claims = []
+    for c in payload.get("claims", []):
+        claims.append(Claim(
+            claim_id=Claim.make_id(source.source_id, c["functional"],
+                                   c["stratum_surface"]),
+            source_id=source.source_id,
+            stratum_surface=c["stratum_surface"],
+            functional=c["functional"],
+            attribute=c["attribute"],
+            value_num=float(c["value_num"]),
+            currency=c.get("currency"),
+            t_asof=_parse_t_asof(c.get("t_asof")) or source.publish_time,
+            scope=c.get("scope", ""),
+            tolerance=float(c.get("tolerance", 0.0)),
+            passage=c.get("passage", ""),
+        ))
+    return mentions, claims
+
+
+def _norm_surface(s: str) -> str:
+    """Light normalization for A/B pairing ONLY: lowercase, strip punctuation
+    and legal suffixes' commas ("Acme, Inc." == "Acme Inc"). Real aliasing
+    ("Acme" vs "Acme Robotics") stays ER's job -- here both readers saw the
+    SAME passage, so punctuation is the only legitimate variation."""
+    import re
+    return re.sub(r"[^a-z0-9 ]", "", s.lower()).strip()
+
+
+def _pair_key(m: Mention) -> tuple[str, str, str]:
+    """A and B mentions describe the same slot when entity (normalized),
+    record kind, and attribute coincide."""
+    return (_norm_surface(m.entity_surface), m.record_kind, m.attribute)
+
+
+def extract_certified(source: Source, query: str,
+                      ctx: ExtractionContext | None = None,
+                      gate: ConformalGate | None = None
+                      ) -> tuple[list[Mention], list[Claim], dict]:
+    """Stages 2-4 (guide §6.1): dual extraction -> validators -> gate.
+
+    Returns (accepted_mentions, claims, info). info counts the casualties
+    per stage -- the pipeline logs them as measurements. NOTE: the guide's
+    stated contract is `-> (mentions, claims)`; the info dict is our
+    addition so abstention (an observable cost, Prop. 2) actually gets
+    observed. Disagreement handling: we ABSTAIN (the guide allows
+    "adjudication or abstention"; an adjudicator is a later, optional
+    upgrade -- abstention is the conservative choice and never injects a
+    wrong value).
+    """
+    gate = gate or ConformalGate()          # unfitted -> bootstrap accept-all
+    ment_a, claims_a = extract_mentions(source, query, extractor_id="A")
+    ment_b, claims_b = extract_mentions(source, query, extractor_id="B")
+    b_by_key = {_pair_key(m): m for m in ment_b}
+
+    accepted: list[Mention] = []
+    info = {"n_a": len(ment_a), "n_b": len(ment_b), "agreed": 0,
+            "disagreed": 0, "b_only": 0, "validator_rejects": 0,
+            "gate_abstains": 0}
+
+    for ma in ment_a:
+        mb = b_by_key.pop(_pair_key(ma), None)
+        # -- stage 2: agreement = same canonical value from both readers.
+        if mb is None or canonicalize_value(ma.value) != canonicalize_value(mb.value):
+            info["disagreed"] += 1
+            continue                        # abstain: A/B failure modes differ,
+                                            # so agreement is the evidence
+        info["agreed"] += 1
+        # the agreed mention proceeds as A's copy, carrying the MIN of the
+        # two self-confidences (the cautious reader sets the score)
+        ma.self_conf = min(ma.self_conf, mb.self_conf)
+
+        # -- stage 3: typed validators (deterministic, free).
+        try:
+            ma = validate_mention(ma, ctx)
+        except Reject as r:
+            info["validator_rejects"] += 1
+            ma.validator_flags = list(ma.validator_flags) + [f"reject:{r.reason}"]
+            continue                        # never reaches corroboration; the
+                                            # flag records WHY (audit material)
+        # -- stage 4: conformal gate.
+        if gate.accept(ma):
+            ma.accepted = True
+            accepted.append(ma)
+        else:
+            info["gate_abstains"] += 1
+
+    info["b_only"] = len(b_by_key)          # slots only B saw: no agreement
+
+    # Claims: dual-extracted like mentions -- keep those where A and B agree
+    # on (stratum, functional) within tolerance; claim corroboration proper
+    # is the claims-engine chapter.
+    claims: list[Claim] = []
+    b_claims = {(canonicalize_value(c.stratum_surface), c.functional): c
+                for c in claims_b}
+    for ca in claims_a:
+        cb = b_claims.get((canonicalize_value(ca.stratum_surface), ca.functional))
+        if cb and abs(ca.value_num - cb.value_num) <= max(ca.tolerance,
+                                                          cb.tolerance,
+                                                          0.005 * abs(cb.value_num)):
+            claims.append(ca)
+    return accepted, claims, info

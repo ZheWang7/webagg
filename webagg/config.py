@@ -28,7 +28,12 @@ USER_AGENT = os.environ.get("USER_AGENT", "webagg-research/0.1 (mailto:jameswang
 MODEL_CHEAP = os.environ.get("WEBAGG_MODEL_CHEAP", "gpt-5.5-mini")
 MODEL_STRONG = os.environ.get("WEBAGG_MODEL_STRONG", "gpt-5.5")
 
-# --- stopping-rule / frontier constants (design doc §3) ---------------------
+# --- reader gate / audit constants (impl guide ch. 6) ------------------------
+DELTA_E = 0.05      # conformal miscoverage level (paper Prop. 2)
+DELTA_A = 0.05      # confidence level of the phi-audit Clopper-Pearson bound
+CALIBRATION_SET = DATA_DIR / "calibration" / "extraction_cal.json"
+
+# --- stopping-rule / frontier constants (design doc ch. 3) ---------------------
 EPSILON = 0.10     # target unseen-mass threshold
 DELTA = 0.10       # confidence parameter
 ETA = 0.5          # frontier exploration parameter
