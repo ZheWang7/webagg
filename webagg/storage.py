@@ -133,12 +133,30 @@ class FrontierFormulationRow(Base):
     expected_yield = Column(Float)
     issued = Column(Integer)               # 0 / 1
     realized_yield = Column(Integer)
+    p_success = Column(Float)              # LLM estimate P(>=1 new record)
+    yield_if_success = Column(Float)       # LLM estimate E[new | success]
+    stratum = Column(String, index=True)   # None = generic formulation
+    gap_directed = Column(Integer, default=0)   # 1 if from the claims engine
 
+    #   TODO: To be added when their pydantic models are defined in later chapters:
+    #   DerivationEdgeRow (corroboration chapter: copy/derivation edges)
+    #   MatchDecisionRow  (ER chapter: pairwise match adjudications)
 
-#   TODO: To be added when their pydantic models are defined in later chapters:
-#   StratumStateRow   (frontier chapter: per-stratum stopping state)
-#   DerivationEdgeRow (corroboration chapter: copy/derivation edges)
-#   MatchDecisionRow  (ER chapter: pairwise match adjudications)
+class StratumStateRow(Base):
+    """One row per (run, stratum): the certificate's terms, recomputable from provenance
+    but snapshotted here so a report never re-runs the loop."""
+    __tablename__ = "stratum_states"
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    run_id = Column(String, index=True)
+    stratum = Column(String, index=True)
+    certified = Column(String)             # None | "checksum" | "registry"
+    claimed_count = Column(Integer)        # cardinality brake (App. E), if any
+    n_records = Column(Integer)            # N_g at snapshot
+    f1 = Column(Integer)                   # singletons
+    f2 = Column(Integer)                   # doubletons
+    u_hat = Column(Float)
+    psi = Column(Float)
+    step = Column(Integer)                 # loop step of the snapshot
 
 
 def get_session(db_path: str):

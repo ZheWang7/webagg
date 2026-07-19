@@ -1,11 +1,15 @@
 import uuid
-from .frontier import FrontierState, Formulation
+from .frontier import (FrontierState, Formulation, StratumState,
+                       stratum_of, stratum_pools, uncertified_strata, w_g,
+                       add_if_novel, update_yield_estimates,
+                       prune_formulations, normalize_surface)
 from .search import SerperBackend
 from .fetch import fetch_url
 from .extract import is_relevant, extract_certified
 from .llm import call_llm, set_llm_logger, set_llm_step
 from .fetch import clear_fetch_cache
-from .metrics import log_measurement, log_formulation
+from .metrics import (log_measurement, log_formulation, log_stop,
+                      persist_stratum_states)
 from .storage import get_session, RejectedSourceRow
 from .calibration import ConformalGate, load_calibration_set
 from . import config
@@ -15,69 +19,140 @@ from .storage import load_sources, load_mentions
 from .canonicalize import canonicalize_value
 from .corroboration import corroborate
 from .fragmentation import classify_all_records, entity_mentioned
+from .claims import ClaimsEngine, CoverageView
 
 
 
 def seed_formulations(query: str) -> list[Formulation]:
+    """Ask the LLM for initial searches, priced with the two-point yield
+    model (guide ch. 7 / paper App. B): p_success = P(>=1 new record),
+    yield_if_success = E[new records | success]."""
     sys = ("Propose 5 diverse initial search formulations for the user's query. "
-           'Return JSON: {"formulations":[{"query":"...","expected_yield":1-10}]}')
+           "For each, estimate p_success (probability in [0,1] that the search "
+           "surfaces at least one NEW relevant record) and yield_if_success "
+           "(expected number of new records if it succeeds, 1-10). Return JSON: "
+           '{"formulations":[{"query":"...","p_success":0.0,"yield_if_success":1}]}')
     out = call_llm(system=sys, user=query)["payload"]
-    return [Formulation(formulation_id=str(uuid.uuid4())[:8],
-                        query=f["query"],
-                        expected_yield=float(f["expected_yield"]))
-            for f in out["formulations"]]
+    fs = []
+    for f in out["formulations"]:
+        fs.append(Formulation(
+            formulation_id=str(uuid.uuid4())[:8],
+            query=f["query"],
+            # tolerate old-style replies: expected_yield -> p=1, y=value
+            p_success=float(f.get("p_success", 1.0)),
+            yield_if_success=float(f.get("yield_if_success",
+                                         f.get("expected_yield", 1.0))),
+            cost=config.SEARCH_COST_USD))
+    return fs
 
 
 def propose_followups(record_kind: str, entity_surface: str,
                       already_tried: list[str]) -> list[Formulation]:
+    """Frontier growth after a discovery. Signature kept from ch. 5/6 (the
+    e2e harness patches this seam); the guide's pseudocode passes (m, state)
+    but only uses these three fields."""
     sys = open("prompts/propose_followups.txt").read()
     user = (f"record_kind: {record_kind}\nentity: {entity_surface}\n"
             f"already_tried: {already_tried[-20:]}")      # cap context
     out = call_llm(system=sys, user=user)["payload"]
     return [Formulation(formulation_id=str(uuid.uuid4())[:8],
                         query=f["query"],
-                        expected_yield=float(f["expected_yield"]))
+                        p_success=float(f.get("p_success", 1.0)),
+                        yield_if_success=float(f.get("yield_if_success",
+                                               f.get("expected_yield", 1.0))),
+                        cost=config.SEARCH_COST_USD)
             for f in out.get("formulations", [])]
 
 
-def run_query(query: str, *, run_id: str, eps: float = 0.10,
-              delta: float = 0.10, eta: float = 0.5, max_steps: int = 200):
+def all_strata_pass(state: FrontierState, eps_g: float, delta_M: float,
+                    eta: float, max_steps: int) -> bool:
+    """The per-stratum stop test (guide ch. 7 / paper §3.3, Def. in §3.3).
+
+    For every uncertified stratum g, BOTH conjuncts must hold:
+      (i)  U_hat_g + psi_g < eps_g      -- the anytime-valid certificate
+      (ii) no pending formulation that could serve g still promises
+           residual yield >= eta        -- frontier exhausted for g
+    Plus two brakes that can only FORBID stopping:
+      * cardinality (App. E, wired early per the guide): a corroborated
+        COUNT claim of n while N_g < n is a hard no.
+      * Chao capture-recapture (App. C), behind config.USE_CHAO_BRAKE.
+    """
+    for g, pool in stratum_pools(state):
+        S = state.strata[g]
+        if S.certified:
+            continue                    # closed by checksum/registry: exempt
+        if S.claimed_count is not None and state.N(pool) < S.claimed_count:
+            return False                # cardinality hard brake (App. E)
+        U = state.U_hat(pool)
+        psi = state.psi(pool, delta_M, w_g(state, g), max_steps,
+                        V_realized=S.V or None)
+        hot = any(not f.issued and f.residual_yield >= eta
+                  and f.stratum in (g, None)
+                  for f in state.formulations.values())
+        ok = (U + psi < eps_g) and (not hot)   # the TWO conjuncts (paper §3.3)
+        if config.USE_CHAO_BRAKE:              # optional third (App. C)
+            m0 = state.chao_m0(pool)
+            ok = ok and m0 / (state.N(pool) + m0 + 1e-9) <= eps_g
+        if not ok:
+            return False
+    return True
+
+
+def run_query(query: str, *, run_id: str, eps: float = config.EPS_G,
+              delta: float = config.DELTA_M, eta: float = config.ETA,
+              max_steps: int = 200, budget_usd: float = config.BUDGET_USD):
+    """The frontier loop (guide ch. 7 / paper §3): maintain a frontier of
+    intended searches, track discovery per capture occasion, stop PER
+    STRATUM by the two-conjunct rule. eps/delta/eta keep their ch. 5/6
+    kwarg names but now mean eps_g / delta_M / the hot-frontier threshold."""
     session = get_session(f"data/runs/{run_id}.sqlite")
     set_llm_logger(session, run_id)   # ch. 5: every LLM call -> measurements
     clear_fetch_cache()               # ch. 5: URL cache is per-run
 
     # ch. 6: the conformal gate. Unfitted (no calibration file yet) it runs
-    # in bootstrap accept-all mode and stamps 'gate_uncalibrated' on every
-    # mention -- see ConformalGate.accept.
+    # in bootstrap accept-all mode and stamps 'gate_uncalibrated'.
     gate = ConformalGate(delta_E=config.DELTA_E)
     cal = load_calibration_set(config.CALIBRATION_SET)
     if cal:
         gate.fit(cal)
 
     search = SerperBackend()
-    state = FrontierState()
+    state = FrontierState(Y_CAP=config.Y_CAP, BETA=config.BETA)
+    claims_engine = ClaimsEngine(session)     # ch. 7 stub; full engine in §11
     seen_urls: set[str] = set()
-    for f in seed_formulations(query):
-        state.formulations[f.formulation_id] = f
-        log_formulation(session, run_id, f, step=0)
+    for fm in seed_formulations(query):
+        state.formulations[fm.formulation_id] = fm
+        log_formulation(session, run_id, fm, step=0)
+    spent = 0.0
+    step = 0
 
     for step in range(1, max_steps + 1):
-        # 1. pick highest-residual unissued formulation
-        candidates = [f for f in state.formulations.values() if not f.issued]
-        if not candidates:
+        # ---- 1. pick the next search --------------------------------------
+        # Reservation-index ordering (App. B, behind a flag). lam = value of
+        # one new record; once every stratum is certified, lam := 0 makes all
+        # indices negative -> exploration halts ECONOMICALLY (not a
+        # certificate -- log_stop records the difference).
+        cands = [f for f in state.formulations.values() if not f.issued]
+        if not cands:
+            log_stop(session, run_id, step, reason="frontier_exhausted")
             break
-        f = max(candidates, key=lambda x: x.residual_yield)
+        if config.USE_ECONOMIC_ORDER:
+            lam = config.LAMBDA_PER_RECORD if uncertified_strata(state) else 0.0
+            fm = max(cands, key=lambda x: x.reservation_index(lam))
+            if fm.reservation_index(lam) <= 0:
+                log_stop(session, run_id, step, reason="economic")   # NOT a certificate
+                break
+        else:
+            fm = max(cands, key=lambda x: x.residual_yield)
 
         set_llm_step(step)            # cost rows carry the agent step
-        # 2. issue search -- one call = one capture occasion
-        # results come back tagged with the formulation that surfaced them.
-        results = search.search(f.query, k=10, formulation_id=f.formulation_id)
-        new_records_this_step = 0
 
-        # 3. fetch + extract
-        for r in results:
+        # ---- 2. issue the search = ONE capture occasion -------------------
+        state.T += 1
+        new = 0
+        for r in search.search(fm.query, k=10, formulation_id=fm.formulation_id):
             if r["url"] in seen_urls:
-                continue          # already processed this run (any verdict)
+                continue              # already processed this run (any verdict)
             seen_urls.add(r["url"])
             src = fetch_url(r["url"], formulation_id=r["formulation_id"])
             if src is None:
@@ -91,53 +166,78 @@ def run_query(query: str, *, run_id: str, eps: float = 0.10,
                     main_text=src.main_text))   # audit RE-READS this later
                 continue
             session.add(src.to_row())
-            # -- stages 2-4: dual extraction -> validators -> conformal gate.
+            # -- stages 2-4 (ch. 6): dual extraction -> validators -> gate.
             mentions, claims, info = extract_certified(src, query, gate=gate)
             for c in claims:
-                session.merge(c.to_row())       # merge: same claim can recur
+                claims_engine.ingest(c)         # persisted + indexed (ch. 7)
             log_measurement(session, run_id, step, "extract_agreed",
                             info["agreed"], extra=info)
             log_measurement(session, run_id, step, "extract_abstained",
-                            # each contested slot counted once (A-side);
-                            # b_only is informational, in extract_agreed.extra
                             info["disagreed"] + info["gate_abstains"])
             for m in mentions:
                 session.add(m.to_row())
-                record_key = f"{m.entity_surface}|{m.record_kind}"
-                was_new = record_key not in state.covered_records
-                state.covered_records[record_key].add(src.source_id)
-                if was_new:
-                    new_records_this_step += 1
-                    state.N += 1
-                    # grow the frontier
+                # record key AND stratum key share one normalizer (§7.3:
+                # never keep two stratum vocabularies)
+                rk = f"{normalize_surface(m.entity_surface)}|{m.record_kind}"
+                state.record_stratum[rk] = stratum_of(m, state)
+                was_new = rk not in state.covered
+                state.covered[rk].add(fm.formulation_id)   # OCCASIONS, not sources!
+                if was_new and new < state.Y_CAP:          # per-occasion novelty cap
+                    new += 1
                     for nf in propose_followups(
                             m.record_kind, m.entity_surface,
                             already_tried=[x.query for x in state.formulations.values()]):
-                        if nf.query not in {x.query for x in state.formulations.values()}:
-                            state.formulations[nf.formulation_id] = nf
+                        if add_if_novel(state, nf):
+                            log_formulation(session, run_id, nf, step=step)
+        fm.issued, fm.realized_yield = True, new
+        spent += fm.cost
+        log_formulation(session, run_id, fm, step=step)    # update issued/realized
+        # realized-V tightening (guide: track V_t = sum c_t^2 in lieu of V_max)
+        for g, pool in stratum_pools(state):
+            n = max(state.N(pool), 1)
+            c = state.Y_CAP * (1 + state.BETA) / n
+            state.strata[g].V += c * c
+        update_yield_estimates(state, fm)     # calibrate pending p_success (our hook)
 
-        f.issued = True
-        f.realized_yield = new_records_this_step
-        f.residual_yield = 0.0
+        # ---- 3. claims engine: cardinality brake + gap direction ----------
+        # (checksum CERTIFICATION is a §11 feature; the ch.-7 stub can only
+        # arm the App. E brake and point searches at known count gaps.)
+        claims_engine.update_cardinality_brakes(state)
+        for g in uncertified_strata(state):
+            st = claims_engine.checksum(g, CoverageView(n_records=state.N({g})))
+            if st.certified:                   # unreachable until §11; kept for shape
+                state.strata[g].certified = "checksum"
+                prune_formulations(state, g)
+            elif st.gap:
+                for gf in claims_engine.gap_formulations(g, st.gap):
+                    if add_if_novel(state, gf):
+                        log_formulation(session, run_id, gf, step=step)
 
-        # 4. log measurements
-        U = state.U_hat()
-        log_measurement(session, run_id, step, "U_hat", U,
-                        extra={"r": state.singletons(),
-                               "N": state.N,
-                               "frontier_active": state.active_frontier_size(),
-                               "formulation": f.query,
-                               "new_records": new_records_this_step})
+        # ---- 4. per-stratum measurements (the §15 calibration plot eats these)
+        for g, pool in stratum_pools(state):
+            S = state.strata[g]
+            log_measurement(
+                session, run_id, step, "U_hat", state.U_hat(pool), stratum=g,
+                extra={"N": state.N(pool), "f1": state.f(1, pool),
+                       "f2": state.f(2, pool),
+                       "psi": state.psi(pool, delta, w_g(state, g), max_steps,
+                                        V_realized=S.V or None),
+                       "m0": state.chao_m0(pool), "T": state.T, "new": new,
+                       "claimed_count": S.claimed_count,
+                       "formulation": fm.query})
         session.commit()
 
-        # 5. stopping test
-        best_residual = max((x.residual_yield for x in state.formulations.values()
-                             if not x.issued), default=0.0)
-        if U < eps / 2 and best_residual < eta:
-            log_measurement(session, run_id, step, "stop", 1.0,
-                            extra={"reason": "U<eps/2 and frontier exhausted"})
+        # ---- 5. stop test -------------------------------------------------
+        if spent >= budget_usd:
+            log_stop(session, run_id, step, reason="budget",
+                     extra={"spent": spent})               # NOT a certificate
+            break
+        if all_strata_pass(state, eps, delta, eta, max_steps):
+            log_stop(session, run_id, step, reason="certified")   # the real thing
             break
 
+    persist_stratum_states(session, run_id, state, step)   # snapshot certificates
+    session.commit()
     return state, session
 
 

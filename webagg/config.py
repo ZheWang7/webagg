@@ -33,11 +33,23 @@ DELTA_E = 0.05      # conformal miscoverage level (paper Prop. 2)
 DELTA_A = 0.05      # confidence level of the phi-audit Clopper-Pearson bound
 CALIBRATION_SET = DATA_DIR / "calibration" / "extraction_cal.json"
 
-# --- stopping-rule / frontier constants (design doc ch. 3) ---------------------
-EPSILON = 0.10     # target unseen-mass threshold
-DELTA = 0.10       # confidence parameter
-ETA = 0.5          # frontier exploration parameter
-MAX_STEPS = 200    # hard cap on agent steps
+# --- stopping-rule / frontier constants (impl guide ch. 7, paper §3.3) --------
+EPS_G = 0.10       # per-stratum unseen-mass threshold eps_g (conjunct i)
+DELTA_M = 0.10     # confidence budget for the psi radii (union-bounded via w_g)
+ETA = 0.20         # "hot frontier" residual-yield threshold, in records (conjunct ii)
+MAX_STEPS = 200    # hard cap on agent steps (= max capture occasions)
+Y_CAP = 12         # per-occasion novelty cap (paper Assumption (b))
+BETA = 1.0         # frontier-credit weight in U_hat
+LAMBDA_PER_RECORD = 0.50   # $ value of one new record (paper App. B; sane at Serper prices)
+SEARCH_COST_USD = 0.02     # $ per search issuance
+BUDGET_USD = 5.0           # default per-run spend cap
+# Optional refinements (paper appendices), behind flags per guide §7:
+USE_CHAO_BRAKE = False       # App. C capture-recapture brake (can only FORBID stopping)
+USE_ECONOMIC_ORDER = True    # App. B reservation-index ordering + economic stop
+
+# Backward-compat aliases (pre-SIGMOD names; do not use in new code)
+EPSILON = EPS_G
+DELTA = DELTA_M
 
 # --- politeness -------------------------------------------------------------
 MAX_REQUESTS_PER_SEC_PER_DOMAIN = 1.0

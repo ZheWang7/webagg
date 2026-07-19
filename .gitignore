@@ -9,9 +9,9 @@ __pycache__/
 .pytest_cache/
 .ipynb_checkpoints/
 
-# project data / outputs
+# project data
 data/runs/
-html_cache/
+data/cache/
 
 # IDE
 .idea/
