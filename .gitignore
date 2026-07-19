@@ -10,8 +10,11 @@ __pycache__/
 .ipynb_checkpoints/
 
 # project data / outputs
-data/runs/*.db
+data/runs/
 html_cache/
 
 # IDE
 .idea/
+
+# if your JSON logs live in a specific place, prefer scoping it:
+data/runs/*.json
