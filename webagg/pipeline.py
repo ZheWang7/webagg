@@ -137,7 +137,12 @@ def run_query(query: str, *, run_id: str, eps: float = config.EPS_G,
             log_stop(session, run_id, step, reason="frontier_exhausted")
             break
         if config.USE_ECONOMIC_ORDER:
-            lam = config.LAMBDA_PER_RECORD if uncertified_strata(state) else 0.0
+            # lam -> 0 only once strata EXIST and are ALL certified (App. B).
+            # COLD-START FIX: before the first mention arrives, state.strata
+            # is empty -- an empty set means "not started", not "all done";
+            # reading it as done zeroed lam and economic-stopped at step 1.
+            all_done = bool(state.strata) and not uncertified_strata(state)
+            lam = 0.0 if all_done else config.LAMBDA_PER_RECORD
             fm = max(cands, key=lambda x: x.reservation_index(lam))
             if fm.reservation_index(lam) <= 0:
                 log_stop(session, run_id, step, reason="economic")   # NOT a certificate
@@ -232,7 +237,10 @@ def run_query(query: str, *, run_id: str, eps: float = config.EPS_G,
             log_stop(session, run_id, step, reason="budget",
                      extra={"spent": spent})               # NOT a certificate
             break
-        if all_strata_pass(state, eps, delta, eta, max_steps):
+        # COLD-START GUARD: with zero strata all_strata_pass is vacuously
+        # True; require at least one discovered stratum before a
+        # "certified" stop can fire (an empty run cannot certify anything).
+        if state.strata and all_strata_pass(state, eps, delta, eta, max_steps):
             log_stop(session, run_id, step, reason="certified")   # the real thing
             break
 
