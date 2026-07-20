@@ -17,7 +17,7 @@ from .type_defs import Source, Mention
 from collections import defaultdict
 from .storage import load_sources, load_mentions
 from .canonicalize import canonicalize_value
-from .corroboration import corroborate
+from .corroboration import corroborate, QTable
 from .fragmentation import classify_all_records, entity_mentioned
 from .claims import ClaimsEngine, CoverageView
 
@@ -290,6 +290,9 @@ def resolve_and_aggregate(session, *, run_id: str, query_attributes: set[str],
     # 4. corroborate one value per attribute (design Sec. 3), guarding
     # fragmenting attributes against cross-entity contamination (Sec. 6.9)
     resolved = []
+    # One fixed-prior reliability table for the whole pass (guide 8.3)
+    # class priors + the qbar=0.30 adversarial cap, no learning.
+    qtable = QTable()
     for (eid, kind), rep, ms in reports:
         entity_surfaces = list({m.entity_surface for m in ms})
         record = {"entity_id": eid, "record_kind": kind,
@@ -304,7 +307,7 @@ def resolve_and_aggregate(session, *, run_id: str, query_attributes: set[str],
                 # canonicalize BEFORE grouping, so "$40M" and "40 million USD"
                 # are one candidate value, not two competitors (impl 16 #5)
                 by_value[canonicalize_value(m.value)].append(m)
-            cv = corroborate(by_value, sources)
+            cv = corroborate(by_value, sources, qtable)
             if attr in rep.fragmenting_attrs:
                 # a fragmenting attribute rides on ER alone (single class, no
                 # cross-class corroboration): demand that at least one
