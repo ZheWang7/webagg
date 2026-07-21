@@ -1,11 +1,27 @@
 """
-Section 9 -- Schema-Addressable Mode.
+SIGMOD implementation guide Sec. 10 -- Schema-Addressable Mode.
 
 Each registry is wrapped in a driver exposing two methods:
-    enumerate_keys(query_filter) -> yields the keys to sweep  (the "K" of Def 11)
-    fetch_for_key(key)           -> the documents for one key (the "mu(k)" of Def 11)
+    enumerate_keys(query_filter) -> yields the keys to sweep  (the key universe K)
+    fetch_for_key(key)           -> the documents for one key (the access mu(k))
 A thin runner sweeps the keys, runs the same relevance + extraction as the
-open-web path, and stamps the delta_F = 0 completeness certificate.
+open-web path, and stamps the deterministic-completeness certificate
+(delta_F = 0 over the swept closure; the certificate IS the sweep log).
+
+Three duties specific to the SIGMOD version (guide Sec. 10):
+  1. STAMP PROVENANCE on every fetched Source: authority_chain_id, doc_type,
+     identity_anchored, source_class. The stamps hand the corroboration layer
+     its supersession edges for free (a Form D/A arrives pre-chained to its
+     Form D) and exempt registry origins from the adversarial q-bar cap.
+  2. RECORD KEY BLOCKING: sweeping only K' subset-of K under a cheap predicate
+     trades delta_F = 0 for a controllable delta_B (same blocking bound as
+     ER). The runner logs the predicate so the report layer can say WHICH
+     closure the certificate covers.
+  3. ONE PARSER, TWO ROLES ("the driver moonlights as the grader"): the same
+     driver, run with as_oracle=True and OUTSIDE the agent (no denylist ever
+     applies to this path), builds the ground-truth table for evaluation
+     Sec. 15. One implementation avoids two parsers that would disagree on
+     some amendment.
 """
 from __future__ import annotations
 
@@ -276,6 +292,25 @@ class EDGARDriver:
                 # formulation_id records WHICH key surfaced this doc -- the
                 # schema-mode analogue of "which search formulation produced it".
                 formulation_id=f"edgar:CIK{cik}",
+                # --- Sec. 10 provenance stamps (the point of this chapter) ---
+                # source_class: hits the "regulatory" 0.95 prior in
+                # corroboration.CLASS_PRIOR directly (no domain lookup needed).
+                source_class="regulatory",
+                # doc_type: "Form D/A" matches corroboration._AMENDMENT_RX
+                # ("/A"), so the amendment is recognized structurally.
+                doc_type=f"Form {filing['form']}",
+                # authority_chain_id: chain by FORM FAMILY within the filer
+                # ("Form D" and "Form D/A" share chain "edgar:{cik}:D").
+                # supersession_edges() sorts a chain by time and adds an edge
+                # only when the NEWER adjacent doc is an amendment, so two
+                # unrelated Form Ds in the same chain never supersede each
+                # other -- only a D/A supersedes the D it follows.
+                authority_chain_id=(
+                    f"edgar:{cik}:{filing['form'].removesuffix('/A')}"),
+                # identity_anchored: SEC controls this origin, so it is exempt
+                # from the q-bar forgery cap (paper Sec. 4.4). Without this
+                # stamp a registry filing would be capped at 0.30 reliability.
+                identity_anchored=True,
             ))
         return sources
 
@@ -371,7 +406,7 @@ class ClinicalTrialsDriver:
                 break  # no more pages -> the sweep of K is complete
 
     @staticmethod
-    def _flatten_study(study: dict) -> tuple[str, Optional[datetime], str]:
+    def _flatten_study(study: dict) -> tuple[str, Optional[datetime], str, Optional[str]]:
         """Turn the nested v2 study JSON into (title, publish_time, main_text).
 
         We linearize just the modules an analyst query cares about (phase,
@@ -397,7 +432,14 @@ class ClinicalTrialsDriver:
             f"{iv.get('type', '')}: {iv.get('name', '')}".strip(": ")
             for iv in arms.get("interventions", []) or []
         )
-        posted = (status.get("studyFirstPostDateStruct", {}) or {}).get("date") \
+        # Sec. 10 change: prefer the LAST-UPDATE date. A trial record is
+        # mutable in place, so publish_time must date THIS VERSION of the
+        # record, not the trial's first posting -- supersession compares
+        # publish_time along a chain, and two fetches of the same NCT must
+        # order correctly.
+        last_update = (status.get("lastUpdatePostDateStruct", {}) or {}).get("date")
+        posted = last_update \
+                 or (status.get("studyFirstPostDateStruct", {}) or {}).get("date") \
                  or (status.get("startDateStruct", {}) or {}).get("date")
 
         lines = [
@@ -411,7 +453,7 @@ class ClinicalTrialsDriver:
             "",
             (desc.get("briefSummary") or "").strip(),
         ]
-        return title, _parse_date(posted), "\n".join(lines).strip()
+        return title, _parse_date(posted), "\n".join(lines).strip(), last_update
 
     def fetch_for_key(self, nct: str) -> list[Source]:
         """One NCT id -> one Source (a trial is a single logical document)."""
@@ -419,7 +461,7 @@ class ClinicalTrialsDriver:
             data = self._get_json(self.STUDY_URL.format(nct=nct))
         except httpx.HTTPError:
             return []  # transient miss; re-run retries (Theorem 3)
-        title, publish_time, main_text = self._flatten_study(data)
+        title, publish_time, main_text, last_update = self._flatten_study(data)
         fetch_time = datetime.utcnow()
         url = self.STUDY_URL.format(nct=nct)
         return [Source(
@@ -431,6 +473,20 @@ class ClinicalTrialsDriver:
             title=title,
             main_text=main_text[:20000],
             formulation_id=f"ctgov:{nct}",
+            # --- Sec. 10 provenance stamps ---
+            source_class="regulatory",
+            # A trial record is mutable in place: every version is an
+            # "update" of the last, so the word "updated" in doc_type makes
+            # corroboration.is_amendment() true, and any LATER fetch of the
+            # same NCT structurally supersedes an earlier one within the
+            # per-trial chain below. That is exactly the right semantics for
+            # a mutable registry record.
+            doc_type=(f"registry record (updated {last_update})"
+                      if last_update else "registry record (updated)"),
+            # one chain per trial: versions of NCT X can only supersede
+            # other versions of NCT X, never a different trial
+            authority_chain_id=f"ctgov:{nct}",
+            identity_anchored=True,        # registry origin: exempt from q-bar
         )]
 
 
@@ -446,9 +502,23 @@ def run_schema_addressable(
         relevance_fn: Optional[Callable[[Source, str], bool]] = None,
         extract_fn: Optional[Callable[[Source, str], list]] = None,
         max_keys: Optional[int] = None,
+        as_oracle: bool = False,
 ):
     """Enumerate K, fetch mu(k) for each key, run the SAME relevance + extraction
-    as the open-web path, and log progress plus the Theorem 3 certificate.
+    as the open-web path, and log progress plus the deterministic certificate.
+
+    as_oracle=True is "the driver moonlights as the grader" (guide Sec. 10):
+    the SAME sweep, but playing examiner instead of agent. Differences:
+      * results go to a separate '{run_id}_truth.sqlite' -- the answer key
+        must never sit in the DB the agent is graded on;
+      * the relevance gate defaults to accept-everything (the oracle keeps
+        every filing in the cohort; nothing is screened out);
+      * extract_fn is REQUIRED and must be a deterministic registry parser
+        (built in Sec. 15's build_truth.py). Falling back to the LLM
+        extractor is refused: the answer key must not be produced by the
+        same student it will grade;
+      * no denylist ever applies here -- Sec. 15's --deny only restricts the
+        agent's OPEN-WEB search path, never the oracle's registry access.
 
     relevance_fn / extract_fn are injectable (default to the real LLM-backed
     ones in extract.py) so this runner is unit-testable offline -- the same
@@ -463,12 +533,34 @@ def run_schema_addressable(
     from .storage import get_session
     from .metrics import log_measurement
 
+    role = "oracle" if as_oracle else "agent"
+    if as_oracle:
+        if extract_fn is None:
+            raise ValueError(
+                "as_oracle=True requires a deterministic extract_fn (the "
+                "registry parser from build_truth.py). The LLM extractor is "
+                "refused here: the answer key must not be produced by the "
+                "student it grades.")
+        relevance_fn = relevance_fn or (lambda src, q: True)  # keep everything
     if relevance_fn is None or extract_fn is None:
         from .extract import is_relevant, extract_mentions  # lazy (see docstring)
         relevance_fn = relevance_fn or is_relevant
         extract_fn = extract_fn or extract_mentions
 
-    session = get_session(str(config.RUNS_DIR / f"{run_id}.sqlite"))
+    # KEY BLOCKING (guide Sec. 10): any non-empty filter or key cap means we
+    # sweep K' subset-of K, not K. delta_F = 0 then holds over the CLOSURE OF
+    # K' only; the miss risk of the predicate itself is a delta_B (same
+    # blocking bound as ER). We record the predicate verbatim so the report
+    # layer can state which closure the certificate covers.
+    blocking_predicate = {k: v for k, v in (query_filter or {}).items()
+                          if v not in (None, "", [], {})}
+    if max_keys is not None:
+        blocking_predicate["max_keys"] = max_keys
+    blocked = bool(blocking_predicate)
+
+    db_path = str(config.RUNS_DIR /
+                  (f"{run_id}_truth.sqlite" if as_oracle else f"{run_id}.sqlite"))
+    session = get_session(db_path)
     keys_swept = 0
     mentions_found = 0           # guide calls this 'records_found'; it's really
     # a mention count -- renamed for honesty
@@ -491,21 +583,33 @@ def run_schema_addressable(
             log_measurement(session, run_id, keys_swept, "keys_swept",
                             keys_swept,
                             extra={"mentions_found": mentions_found,
-                                   "distinct_records": len(distinct_records)})
+                                   "distinct_records": len(distinct_records),
+                                   "role": role})
             session.commit()
         if max_keys is not None and keys_swept >= max_keys:
             break
 
-    # Theorem 3 certificate: over the addressable closure K*, delta_F = 0.
+    # Deterministic-completeness certificate: delta_F = 0 over the swept
+    # closure. The certificate is the sweep log itself -- keys, counts, and
+    # (if blocked) the exact predicate that carved K' out of K.
     log_measurement(session, run_id, keys_swept, "schema_complete", 1.0,
                     extra={"delta_F": 0.0,
                            "keys_swept": keys_swept,
                            "mentions_found": mentions_found,
-                           "distinct_records": len(distinct_records)})
+                           "distinct_records": len(distinct_records),
+                           "role": role,
+                           "blocked": blocked,
+                           # blocked=True: certificate covers closure(K'),
+                           # and a delta_B rides on this predicate.
+                           "blocking_predicate": blocking_predicate})
     session.commit()
     return {
         "keys_swept": keys_swept,
         "mentions_found": mentions_found,
         "distinct_records": len(distinct_records),
         "session": session,
+        "db_path": db_path,
+        "role": role,
+        "blocked": blocked,
+        "blocking_predicate": blocking_predicate,
     }
