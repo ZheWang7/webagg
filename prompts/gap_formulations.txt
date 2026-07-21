@@ -1,0 +1,6 @@
+A corroborated claim implies records are MISSING from our table for one entity.
+Propose 1-4 search formulations targeted at exactly the missing records, using every
+constraint: value_gap (their total value), count_gap (how many), eras_covered (search
+years NOT in this list), stages (round types NOT in this list). Be concrete: entity
+name, a year range, a round stage, and a dollar magnitude where known.
+Return STRICT JSON: {"formulations":[{"query":"...","p_success":0.5,"yield_if_success":1}]}
