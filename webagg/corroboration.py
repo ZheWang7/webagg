@@ -260,8 +260,13 @@ def live_values(mentions_by_value: dict[str, list],
 # not implemented here). No core theorem depends on the specific q values;
 # the cap is a SECURITY control against forged origins.
 
-CLASS_PRIOR = {"registry": 0.95, "vendor": 0.80, "news": 0.60,
-               "blog": 0.40, "other": 0.50}
+CLASS_PRIOR = {
+    "registry": 0.95, "vendor": 0.80, "news": 0.60,
+    "blog": 0.40, "other": 0.50,
+    "regulatory": 0.95,     # = registry
+    "investor": 0.60,       # company/VC announcement pages ~ news-grade
+    "social": 0.40,         # = blog
+}
 
 
 class QTable:

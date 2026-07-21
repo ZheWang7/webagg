@@ -9,6 +9,18 @@ Four behavioural guarantees, straight from the guide:
   4. unanchored cap           -- a copy farm agreeing with itself never
                                  exceeds a qbar-belief contribution.
 Plus the helper-level checks kept from the previous version of this file.
+OR = {
+    # guide 8.3's canonical table (kept verbatim so the 8.4 tests still bind)
+    "registry": 0.95, "vendor": 0.80, "news": 0.60,
+    "blog": 0.40, "other": 0.50,
+    # aliases for fragmentation.SourceClass labels produced on LIVE data --
+    # deviation from the guide's verbatim table, forced by classify()'s
+    # vocabulary. No core theorem depends on specific q values (paper 4.4);
+    # the qbar cap remains the security control.
+    "regulatory": 0.95,     # = registry
+    "investor": 0.60,       # company/VC announcement pages ~ news-grade
+    "social": 0.40,         # = blog
+}
 """
 import hashlib
 from datetime import datetime
