@@ -84,8 +84,24 @@ class Mention(BaseModel):
 
     @classmethod
     def make_id(cls, source_id: str, entity_surface: str, record_kind: str,
-                attribute: str, value: str, extractor_id: str) -> str:
-        ident = f"{entity_surface}|{record_kind}|{value}"
+                attribute: str, value: str, extractor_id: str,
+                passage: str = "") -> str:
+        """Identifier convention (guide §4.3), with a DELIBERATE DEVIATION
+        (second of its kind; the first made the hash entity-aware):
+
+        the hash now also covers the supporting PASSAGE. Reason, found on
+        live data: a funding-HISTORY page can list two genuinely distinct
+        rounds of the SAME company with the SAME amount (Perplexity's
+        Series D and Series E-extension are both $500M), so
+        entity|kind|value alone collides two real records into one primary
+        key -- a silent false merge, exactly what the system must never do.
+        The verbatim passage is the minimal evidence that separates them.
+
+        `passage` is optional so pre-existing call sites (harness, tests)
+        keep their ids; the extraction boundary always supplies it. Two
+        assertions with identical (entity, kind, attribute, value, passage)
+        remain identical ids on purpose: those ARE duplicates."""
+        ident = f"{entity_surface}|{record_kind}|{value}|{passage}"
         h = hashlib.sha256(ident.encode()).hexdigest()[:8]
         return f"{source_id}:{attribute}:{h}:{extractor_id}"
 

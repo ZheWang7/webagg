@@ -66,16 +66,27 @@ def extract_mentions(source: Source, query: str,
                        purpose=f"extraction_{extractor_id}")["payload"]
     mentions = []
     for m in payload.get("mentions", []):
-        # ID convention (guide §4.3): ALWAYS via Mention.make_id.
+        # BOUNDARY COERCION: the prompt says "canonicalize numbers to base
+        # units", so the model often emits value as a JSON NUMBER
+        # (500000000), while Mention.value is strictly typed str. Coerce
+        # ONCE here -- the one place untrusted LLM JSON enters -- rather
+        # than loosening the model's type. Coercing before make_id keeps
+        # the identifier convention (guide §4.3) byte-identical for both
+        # extractors regardless of which JSON type the model chose.
+        val = str(m["value"])
+        # ID convention (guide §4.3): ALWAYS via Mention.make_id -- now
+        # passage-aware, so two same-valued rounds on one list page stay
+        # two mentions (see make_id's deviation note).
         mentions.append(Mention(
             mention_id=Mention.make_id(source.source_id, m["entity_surface"],
                                        m["record_kind"], m["attribute"],
-                                       m["value"], extractor_id),
+                                       val, extractor_id,
+                                       passage=m["passage"]),
             source_id=source.source_id,
             entity_surface=m["entity_surface"],
             record_kind=m["record_kind"],
             attribute=m["attribute"],
-            value=m["value"],
+            value=val,
             passage=m["passage"],
             extracted_at=datetime.utcnow(),
             # typed, bi-temporal fields (guide §4.1) now come from the prompt:
@@ -85,6 +96,11 @@ def extract_mentions(source: Source, query: str,
             self_conf=float(m.get("self_conf", 0.5)),
             extractor_id=extractor_id,
         ))
+    # a model sometimes repeats the SAME assertion verbatim (identical
+    # entity/kind/attribute/value/passage). Those share an id BY DESIGN --
+    # they are duplicates, not two records -- so collapse them here rather
+    # than crash the primary key at persist time.
+    mentions = list({m.mention_id: m for m in mentions}.values())
     claims = []
     for c in payload.get("claims", []):
         claims.append(Claim(

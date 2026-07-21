@@ -55,7 +55,7 @@ def embedder():
     `entity_resolution._embed` with a fake encoder."""
     global _embed
     if _embed is None:
-        from sentence_transformers import SentenceTransformer  # lazy: torch
+        from sentence_transformers import SentenceTransformer
         _embed = SentenceTransformer("all-MiniLM-L6-v2")
     return _embed
 
@@ -257,7 +257,7 @@ class Matcher:
 def adjudicate_llm(m_a, m_b, source_lookup) -> float:
     """Spend an LLM call only on band pairs. Returns a probability in [0,1]:
     confidence if match, else 1 - confidence."""
-    from .llm import call_llm  # lazy: keeps API-key/client construction out of import
+    from .llm import call_llm
     sys = open("prompts/match_adjudicator.txt").read()
     s_a = source_lookup[m_a.source_id]
     s_b = source_lookup[m_b.source_id]
