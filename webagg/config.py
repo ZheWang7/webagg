@@ -47,6 +47,12 @@ BUDGET_USD = 5.0           # default per-run spend cap
 USE_CHAO_BRAKE = False       # App. C capture-recapture brake (can only FORBID stopping)
 USE_ECONOMIC_ORDER = True    # App. B reservation-index ordering + economic stop
 
+# --- claims engine / checksums (impl guide §11, design paper §5.2) -----------
+CLAIM_TOL_REL = 0.02           # SUM certifies when Delta+ <= CLAIM_TOL_REL * V
+CLAIM_BRAKE_MIN_BELIEF = 0.50  # corroborated-COUNT belief needed to arm the App. E
+CLAIM_SCOPE_FORBID = ("debt", "to date")   # scope words that DEMOTE a claim (never certify)
+CLAIM_SCOPE_REQUIRE = ("equity", "round")  # a STATED scope must contain one of these
+
 # Backward-compat aliases (pre-SIGMOD names; do not use in new code)
 EPSILON = EPS_G
 DELTA = DELTA_M

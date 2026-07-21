@@ -89,6 +89,11 @@ class StratumState:
     certified: str | None = None     # None | "checksum" | "registry"
     claimed_count: int | None = None  # corroborated cardinality claim (App. E brake)
     V: float = 0.0                   # running sum of realized c_t^2 (tighter psi than V_max)
+    # --- §11 certification terms (discipline rule 1: certification is ---
+    # --- conditional AND SAYS SO; (1 - cert_belief) enters the interval) ---
+    cert_kind: str | None = None        # "COUNT" | "SUM" when certified == "checksum"
+    cert_belief: float | None = None    # b_n / b_V of the certifying claim
+    cert_delta_plus: float | None = None  # SUM value-gap bound Delta+_g (Thm 4a)
 
 
 @dataclass

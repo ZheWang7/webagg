@@ -53,6 +53,8 @@ def persist_stratum_states(session, run_id, state, step):
         session.add(StratumStateRow(
             run_id=run_id, stratum=g, certified=S.certified,
             claimed_count=S.claimed_count,
+            cert_kind=S.cert_kind, cert_belief=S.cert_belief,
+            cert_delta_plus=S.cert_delta_plus,
             n_records=state.N(pool), f1=state.f(1, pool), f2=state.f(2, pool),
             u_hat=state.U_hat(pool),
             psi=state.psi(pool, config.DELTA_M, w_g(state, g),

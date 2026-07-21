@@ -1,3 +1,6 @@
+import math
+import re
+import statistics
 import uuid
 from .frontier import (FrontierState, Formulation, StratumState,
                        stratum_of, stratum_pools, uncertified_strata, w_g,
@@ -19,8 +22,50 @@ from .storage import load_sources, load_mentions
 from .canonicalize import canonicalize_value
 from .corroboration import corroborate, QTable
 from .fragmentation import classify_all_records, entity_mentioned
-from .claims import ClaimsEngine, CoverageView
+from .claims import ClaimsEngine, CoverageView, implied_value_tolerance
 
+
+# ---------------------------------------------------------------------------
+# §11 helpers: build the checksum's CoverageView from what the loop has seen
+# ---------------------------------------------------------------------------
+_YEAR_RX = re.compile(r"(19|20)\d{2}")
+
+
+def _year_of(m) -> int | None:
+    """Year covered by a date-ish mention (feeds eras_covered: the gap
+    prompt targets years NOT in this list, guide §11 / paper Def. 12)."""
+    if m.attribute in ("date", "announced", "closed", "year") or m.date_role:
+        hit = _YEAR_RX.search(str(m.value))
+        return int(hit.group()) if hit else None
+    return None
+
+
+def _stage_of(m) -> str | None:
+    """Round stage covered by a stage-ish mention (feeds `stages`: the gap
+    prompt targets stages NOT in this list)."""
+    if any(w in m.attribute for w in ("stage", "round", "series")):
+        return str(m.value).lower().strip()
+    return None
+
+
+def _stratum_sum_view(amounts_by_record: dict[str, list[float]]):
+    """Provisional assembled SUM + extraction tolerance E_g for one stratum.
+
+    Runs DURING discovery, i.e. before corroboration has adopted one value
+    per attribute, so per record we take the MEDIAN asserted amount (robust
+    to a single misread). E_g sums the precision each stated figure implies
+    ("$12M" ~ +/- min(0.5e6, 1%)) -- the "assembled values are within
+    extraction tolerance E_g" term Theorem 4 conditions on. Deliberately
+    conservative: an overestimated E_g can only DELAY a SUM certification,
+    never fake one. Mixed currencies are not converted (out of scope);
+    comparisons assume the claim and the mentions share a currency.
+    """
+    total = e_g = 0.0
+    for vals in amounts_by_record.values():
+        v = statistics.median(vals)
+        total += v
+        e_g += implied_value_tolerance(v)
+    return total, e_g
 
 
 def seed_formulations(query: str) -> list[Formulation]:
@@ -118,7 +163,16 @@ def run_query(query: str, *, run_id: str, eps: float = config.EPS_G,
 
     search = SerperBackend()
     state = FrontierState(Y_CAP=config.Y_CAP, BETA=config.BETA)
-    claims_engine = ClaimsEngine(session)     # ch. 7 stub; full engine in §11
+    claims_engine = ClaimsEngine(session)     # §11: the FULL engine (checksums,
+                                              # gap-direction, App. E brake)
+    # §11 SUM-checksum bookkeeping, maintained incrementally as mentions
+    # arrive so step 3 never re-reads the DB:
+    #   sum_acc[g][record_key] = value_nums asserted for that record's "amount"
+    #   years_acc[g] / stages_acc[g] = eras & stages COVERED so far (the gap
+    #   prompt targets their complement, paper Definition 12)
+    sum_acc: dict[str, dict[str, list[float]]] = defaultdict(lambda: defaultdict(list))
+    years_acc: dict[str, set] = defaultdict(set)
+    stages_acc: dict[str, set] = defaultdict(set)
     seen_urls: set[str] = set()
     for fm in seed_formulations(query):
         state.formulations[fm.formulation_id] = fm
@@ -171,6 +225,10 @@ def run_query(query: str, *, run_id: str, eps: float = config.EPS_G,
                     main_text=src.main_text))   # audit RE-READS this later
                 continue
             session.add(src.to_row())
+            # §11: the engine needs the Source behind each claim so claim
+            # corroboration can run the FULL §8 machinery (derivation
+            # components, authority chains, class priors, the qbar cap)
+            claims_engine.register_source(src)
             # -- stages 2-4 (ch. 6): dual extraction -> validators -> gate.
             mentions, claims, info = extract_certified(src, query, gate=gate)
             for c in claims:
@@ -184,7 +242,18 @@ def run_query(query: str, *, run_id: str, eps: float = config.EPS_G,
                 # record key AND stratum key share one normalizer (§7.3:
                 # never keep two stratum vocabularies)
                 rk = f"{normalize_surface(m.entity_surface)}|{m.record_kind}"
-                state.record_stratum[rk] = stratum_of(m, state)
+                g_m = stratum_of(m, state)
+                state.record_stratum[rk] = g_m
+                # §11: feed the checksum's view -- amounts per record for the
+                # provisional SUM, plus covered eras/stages for gap-direction
+                if m.attribute == "amount" and m.value_num:
+                    sum_acc[g_m][rk].append(float(m.value_num))
+                y = _year_of(m)
+                if y:
+                    years_acc[g_m].add(y)
+                stg = _stage_of(m)
+                if stg:
+                    stages_acc[g_m].add(stg)
                 was_new = rk not in state.covered
                 state.covered[rk].add(fm.formulation_id)   # OCCASIONS, not sources!
                 if was_new and new < state.Y_CAP:          # per-occasion novelty cap
@@ -204,19 +273,52 @@ def run_query(query: str, *, run_id: str, eps: float = config.EPS_G,
             state.strata[g].V += c * c
         update_yield_estimates(state, fm)     # calibrate pending p_success (our hook)
 
-        # ---- 3. claims engine: cardinality brake + gap direction ----------
-        # (checksum CERTIFICATION is a §11 feature; the ch.-7 stub can only
-        # arm the App. E brake and point searches at known count gaps.)
+        # ---- 3. claims engine: checksums, brake, gap direction (§11) ------
+        # The full engine: corroborate the stratum's claims, evaluate the
+        # checksum against the assembled view (Theorem 4), certify strata
+        # whose checksums close, emit gap-directed formulations for
+        # residuals (Definition 12), keep the App. E brake armed.
         claims_engine.update_cardinality_brakes(state)
         for g in uncertified_strata(state):
-            st = claims_engine.checksum(g, CoverageView(n_records=state.N({g})))
-            if st.certified:                   # unreachable until §11; kept for shape
-                state.strata[g].certified = "checksum"
-                prune_formulations(state, g)
+            s_total, e_g = _stratum_sum_view(sum_acc.get(g, {}))
+            m0 = state.chao_m0({g})
+            view = CoverageView(
+                n_records=state.N({g}),
+                sum=s_total, E_g=e_g,
+                # inf means "too few occasions to estimate" -- that must not
+                # read as a screaming remainder, so pass 0 (no veto signal)
+                chao_m0=m0 if math.isfinite(m0) else 0.0,
+                years=tuple(sorted(years_acc.get(g, ()))),
+                stages=tuple(sorted(stages_acc.get(g, ()))))
+            st = claims_engine.checksum(g, view)
+            if st.certified:
+                # Theorem 4: the stratum closes BY CONSTRAINT -- no unseen-
+                # mass statistics needed. Rule R1: the cert is conditional
+                # on belief b, so store its terms on the stratum; (1 - b)
+                # [+ Delta+ for SUM] is this stratum's interval contribution.
+                S = state.strata[g]
+                S.certified = "checksum"
+                S.cert_kind, S.cert_belief = st.kind, st.belief
+                S.cert_delta_plus = st.delta_plus
+                prune_formulations(state, g)    # closed strata buy no searches
+                log_measurement(session, run_id, step, "checksum_certified",
+                                st.belief, stratum=g,
+                                extra={"kind": st.kind,
+                                       "delta_plus": st.delta_plus})
             elif st.gap:
+                # Definition 12: the residual is a query
                 for gf in claims_engine.gap_formulations(g, st.gap):
                     if add_if_novel(state, gf):
                         log_formulation(session, run_id, gf, step=step)
+            if st.conflict:
+                # rule R3: conflicts outrank both sides -> verification item
+                log_measurement(session, run_id, step, "claim_conflict", 1.0,
+                                stratum=g,
+                                extra={"conflicts": claims_engine.conflicts[-3:]})
+        # rule R2: the measured demotion rate is the claim-semantics
+        # limitation the paper owns in its §11
+        log_measurement(session, run_id, step, "claim_demotion_rate",
+                        claims_engine.demotion_rate)
 
         # ---- 4. per-stratum measurements (the §15 calibration plot eats these)
         for g, pool in stratum_pools(state):
@@ -315,6 +417,7 @@ def resolve_and_aggregate(session, *, run_id: str, query_attributes: set[str],
         # checksum ER's fragile pairs. A count that matches only because a
         # borderline ER decision fell one way must not certify.
         ce = ClaimsEngine(session)
+        ce.sources.update(sources)     # §11: full corroboration path post-ER
         for c in load_claims(session):
             ce.ingest(c)
         ce.rekey(s2e)
@@ -327,6 +430,16 @@ def resolve_and_aggregate(session, *, run_id: str, query_attributes: set[str],
                 log_measurement(session, run_id, 0, "count_sensitivity_veto",
                                 1.0, extra={"stratum": g,
                                             "queued": len(ce.verification_queue)})
+            elif st.certified and state.strata[g].certified is None:
+                # §11 at the RESOLVED key: Thm 4(b) with |D_g| == n_g and no
+                # fragile pair -> recall 1. Discovery may have missed this
+                # (claims under two surfaces only meet after re-keying), so
+                # record it now -- belief stored, per rule R1.
+                S = state.strata[g]
+                S.certified, S.cert_kind, S.cert_belief = \
+                    "checksum", st.kind, st.belief
+                log_measurement(session, run_id, 0, "checksum_certified_post_er",
+                                st.belief, extra={"stratum": g, "kind": st.kind})
 
     # 3. fragmentation: build M(rho), pick scan/join/redundant per record
     # (design Sec. 6, Algorithm 3); logs frag_case measurements (impl 10.8)

@@ -81,10 +81,10 @@ def call_llm(*, system: str, user: str, model: str | None = None,
         system = (system + "\n\nReturn ONLY a JSON object matching this "
                   "schema exactly:\n" + json.dumps(schema))
 
-    def _once(messages):
+    def _once(messages, budget):
         kwargs = dict(
             model=model,
-            max_completion_tokens=max_tokens,   # GPT-5 uses this, NOT max_tokens
+            max_completion_tokens=budget,       # GPT-5 uses this, NOT max_tokens
             reasoning_effort="low",             # extraction doesn't need deep reasoning
             messages=messages,
         )
@@ -95,48 +95,65 @@ def call_llm(*, system: str, user: str, model: str | None = None,
     t0 = time.time()
     messages = [{"role": "system", "content": system},
                 {"role": "user", "content": user}]
-    resp = _once(messages)
-    choice = resp.choices[0]
-    text = (choice.message.content or "").strip()
-    in_tok, out_tok = resp.usage.prompt_tokens, resp.usage.completion_tokens
+    in_tok = out_tok = 0
     reprompted = False
+    budget = max_tokens
+    escalations = 0
 
-    if not text:
-        # a reasoning model can burn the whole budget on hidden reasoning tokens
-        raise ValueError(
-            f"Empty response (finish_reason={choice.finish_reason}); "
-            f"raise max_tokens so there's room for output after reasoning.")
+    # BUDGET-ESCALATION LOOP. A reasoning model shares ONE completion cap
+    # between hidden reasoning and visible output, so a dense page can fail
+    # two ways with the same cause: (a) the whole cap goes to reasoning and
+    # the text comes back EMPTY, or (b) the JSON is TRUNCATED mid-object.
+    # Same disease, same cure: double the cap and call again -- paid only
+    # when a page actually needs it. Tenacity (outside) still handles
+    # transport errors; this loop handles budget errors; the corrective
+    # re-prompt below handles malformed-but-complete JSON (guide ch. 5).
+    while True:
+        resp = _once(messages, budget)
+        choice = resp.choices[0]
+        text = (choice.message.content or "").strip()
+        in_tok += resp.usage.prompt_tokens       # every attempt is real spend
+        out_tok += resp.usage.completion_tokens
+        truncated = (choice.finish_reason == "length")
 
-    if json_mode:
-        try:
-            payload = _parse_strict_json(text)
-        except json.JSONDecodeError as e:
-            if choice.finish_reason == "length":
-                raise ValueError(
-                    f"LLM output was truncated at max_tokens={max_tokens}; "
-                    f"raise max_tokens or reduce the input size.") from e
-            # Guide ch. 5: re-prompt ONCE on parse failure, showing the
-            # model its own output and the error. (tenacity's retry above
-            # is for transport errors; this is the CORRECTIVE retry.)
-            reprompted = True
-            messages += [
-                {"role": "assistant", "content": text},
-                {"role": "user", "content":
-                    f"That was not valid JSON ({e}). Reply again with ONLY "
-                    f"the corrected JSON object -- no prose, no code fences."},
-            ]
-            resp = _once(messages)
-            choice = resp.choices[0]
-            text = (choice.message.content or "").strip()
-            in_tok += resp.usage.prompt_tokens        # both calls count as cost
-            out_tok += resp.usage.completion_tokens
+        if text and not json_mode:
+            payload = {"text": text}
+            break
+        if text and json_mode:
             try:
                 payload = _parse_strict_json(text)
-            except json.JSONDecodeError as e2:
-                raise ValueError(
-                    f"LLM did not return JSON after re-prompt: {text[:300]}") from e2
-    else:
-        payload = {"text": text}
+                break
+            except json.JSONDecodeError as e:
+                if not truncated:
+                    # complete but malformed -> corrective re-prompt ONCE,
+                    # showing the model its own output and the error
+                    if reprompted:
+                        raise ValueError(
+                            f"LLM did not return JSON after re-prompt: "
+                            f"{text[:300]}") from e
+                    reprompted = True
+                    messages += [
+                        {"role": "assistant", "content": text},
+                        {"role": "user", "content":
+                            f"That was not valid JSON ({e}). Reply again with "
+                            f"ONLY the corrected JSON object -- no prose, no "
+                            f"code fences."},
+                    ]
+                    continue
+                # truncated JSON: fall through to budget escalation
+        elif not text and not truncated:
+            # empty for a reason money can't fix
+            raise ValueError(
+                f"Empty response (finish_reason={choice.finish_reason}).")
+
+        # empty-or-truncated because of the cap -> escalate: base -> 2x -> 4x
+        if escalations >= 2:
+            raise ValueError(
+                f"Empty/truncated response even at max_tokens={budget} "
+                f"(finish_reason={choice.finish_reason}); the input may be "
+                f"too large for one call.")
+        escalations += 1
+        budget *= 2
 
     latency = time.time() - t0
     _log_call(purpose, model, in_tok, out_tok, latency, reprompted)

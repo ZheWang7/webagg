@@ -151,6 +151,9 @@ class StratumStateRow(Base):
     stratum = Column(String, index=True)
     certified = Column(String)             # None | "checksum" | "registry"
     claimed_count = Column(Integer)        # cardinality brake (App. E), if any
+    cert_kind = Column(String)             # "COUNT" | "SUM" for checksum certs
+    cert_belief = Column(Float)            # b of the certifying claim; (1-b) -> interval
+    cert_delta_plus = Column(Float)        # SUM value-gap bound Delta+_g (Thm 4a)
     n_records = Column(Integer)            # N_g at snapshot
     f1 = Column(Integer)                   # singletons
     f2 = Column(Integer)                   # doubletons

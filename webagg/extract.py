@@ -60,8 +60,11 @@ def extract_mentions(source: Source, query: str,
     $63M" -> COUNT + SUM) alongside per-record mentions."""
     system = EXTRACT_SYS_A if extractor_id == "A" else EXTRACT_SYS_B
     user = f"QUERY:\n{query}\n\nDOCUMENT (id={source.source_id}):\n{source.main_text[:12000]}"
-    # strong model: structured extraction is where quality pays (guide ch. 5)
-    payload = call_llm(system=system, user=user, max_tokens=4096,
+    # strong model: structured extraction is where quality pays (guide ch. 5).
+    # Base budget 8192: funding-HISTORY pages routinely need >4096 tokens of
+    # visible JSON alone (found live: a table page emptied a 4096 cap); the
+    # wrapper escalates 2x/4x beyond this only when a page needs it.
+    payload = call_llm(system=system, user=user, max_tokens=8192,
                        model=config.MODEL_STRONG,
                        purpose=f"extraction_{extractor_id}")["payload"]
     mentions = []
