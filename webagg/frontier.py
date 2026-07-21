@@ -289,3 +289,96 @@ def prune_for_single_class(state: FrontierState, keep_class,
             f._p0 = 0.0
             dropped += 1
     return dropped
+
+
+# ---------------------------------------------------------------------------
+# Ch.-9 integration duty #1: RE-KEY STRATA after entity resolution.
+# ---------------------------------------------------------------------------
+
+def rekey_strata(state: FrontierState, mention_to_entity: dict[str, str],
+                 mentions: list) -> dict:
+    """Map every record's stratum from SURFACE FORM to entity_id and rebuild
+    the frontier's bookkeeping in one pass (guide ch. 9: "Re-key strata").
+
+    Why this moves the statistics: if "Acme Corp" and "ACME" merge, their
+    capture histories merge -- a record covered once under each key becomes
+    a DOUBLETON (occasion sets are UNIONED), so f1 drops, f2 rises, and both
+    U_hat and Chao move. N also drops when two surface records collapse into
+    one entity record. The per-stratum methods (N, f, U_hat, psi) read
+    `covered` / `record_stratum` directly, so re-keying those maps IS the
+    recomputation.
+
+    Merge semantics for StratumState (flagged repo choices -- the guide
+    specifies the re-key, not the merged-state fields):
+      * V             -> SUMMED (both histories contributed occasion
+                         variance; a larger, conservative radius).
+      * claimed_count -> MAX of members (the strongest cardinality brake).
+      * certified     -> kept only if EVERY merged member carried the SAME
+                         certificate; any mixed merge RESETS to None --
+                         a certificate issued for half an entity says
+                         nothing about the union. (Sec.-13 revalidation
+                         re-derives certificates post-ER; resetting here is
+                         the conservative direction.)
+
+    Surfaces with no resolved mention keep their surface key (nothing to
+    re-key). If ER SPLIT one surface across several entities, the surface
+    maps to the entity that owns the majority of its mentions, and the
+    ambiguity is reported in the returned info dict.
+
+    Returns an info dict for the mandated `strata_rekey` log event:
+    {n_strata_before, n_strata_after, n_merges, ambiguous_surfaces}.
+    """
+    # 1. surface -> entity_id, by majority vote over that surface's mentions
+    votes: dict[str, dict[str, int]] = defaultdict(lambda: defaultdict(int))
+    for m in mentions:
+        eid = mention_to_entity.get(m.mention_id)
+        if eid is not None:
+            votes[normalize_surface(m.entity_surface)][eid] += 1
+    surface_to_entity: dict[str, str] = {}
+    ambiguous: list[str] = []
+    for surf, tally in votes.items():
+        # deterministic winner: highest count, ties broken by entity id
+        winner = sorted(tally.items(), key=lambda kv: (-kv[1], kv[0]))[0][0]
+        surface_to_entity[surf] = winner
+        if len(tally) > 1:
+            ambiguous.append(surf)          # ER split this surface: report it
+
+    n_before = len(state.strata)
+
+    # 2. re-key covered + record_stratum in ONE pass, unioning occasion sets
+    new_covered: dict[str, set[str]] = defaultdict(set)
+    new_record_stratum: dict[str, str] = {}
+    for rk, occs in state.covered.items():
+        surf, _, kind = rk.rpartition("|")   # record key = "surface|kind" (§7.3)
+        g_new = surface_to_entity.get(surf, surf)   # unresolved: keep surface
+        nrk = f"{g_new}|{kind}"
+        new_covered[nrk] |= occs             # the union IS the doubleton effect
+        new_record_stratum[nrk] = g_new
+
+    # 3. merge StratumState objects under their new keys
+    new_strata: dict[str, StratumState] = {}
+    members: dict[str, list[StratumState]] = defaultdict(list)
+    for g, S in state.strata.items():
+        members[surface_to_entity.get(g, g)].append(S)
+    for g_new, group in members.items():
+        certs = {S.certified for S in group}
+        new_strata[g_new] = StratumState(
+            name=g_new,
+            # unanimous certificate survives; any disagreement resets (see above)
+            certified=certs.pop() if len(certs) == 1 else None,
+            claimed_count=max((S.claimed_count for S in group
+                               if S.claimed_count is not None), default=None),
+            V=sum(S.V for S in group),
+        )
+
+    state.covered = new_covered
+    state.record_stratum = new_record_stratum
+    state.strata = new_strata
+    return {"n_strata_before": n_before,
+            "n_strata_after": len(new_strata),
+            "n_merges": n_before - len(new_strata),
+            "ambiguous_surfaces": ambiguous,
+            # the map itself, so downstream indexes keyed by surface (the
+            # claims engine's, ch. 9) can follow the same re-key. Callers
+            # should drop it from log extras -- it can be large.
+            "surface_to_entity": surface_to_entity}

@@ -252,7 +252,7 @@ def run_query(query: str, *, run_id: str, eps: float = config.EPS_G,
 def resolve_and_aggregate(session, *, run_id: str, query_attributes: set[str],
                           aggregate_attr: str = "amount",
                           eps: float = 0.10, eps_er: float = 0.05,
-                          cluster_fn=None, matcher=None):
+                          cluster_fn=None, matcher=None, state=None):
     """Stages 2-5 of the pipeline (design Sec. 7.1) over an already-populated
     run DB. Split out from end_to_end so it can run offline on a fixture DB
     (no search, no LLM) and re-run on a finished live DB without re-fetching.
@@ -260,27 +260,73 @@ def resolve_and_aggregate(session, *, run_id: str, query_attributes: set[str],
     cluster_fn: optional (mentions, source_lookup) -> {mention_id: entity_id}.
     Injectable like the ER adjudicator / schema relevance_fn, so tests can
     bypass the real matcher (which needs sentence-transformers + torch).
+    NOTE: a plain cluster_fn dict carries no fragile pairs, so the ch.-9
+    count-sensitivity check is inert on that path (empty pairs = honest:
+    we do not know which decisions were borderline).
+
+    state: the run's FrontierState, if the caller still has it (end_to_end
+    does). When supplied, ch. 9's two integration duties run: strata are
+    RE-KEYED by entity_id (frontier.rekey_strata, `strata_rekey` logged)
+    and each re-keyed stratum's COUNT checksum is re-evaluated with ER's
+    fragile pairs (count-sensitivity check).
     """
     # 0. reload what discovery persisted -- the DB is the source of truth,
     # and every object still carries its provenance handle (impl Sec. 4.2)
     mentions = load_mentions(session)
     sources = {s.source_id: s for s in load_sources(session)}
 
-    # 1. entity resolution -> the inferred join key (design Sec. 5)
+    # 1. entity resolution -> the inferred join key (design Sec. 5 / ch. 9)
+    er_fragile, er_result = [], None
     if cluster_fn is not None:
         mention_to_entity = cluster_fn(mentions, sources)
     else:
         # lazy import: pulls in sentence-transformers/torch only when the
         # real matcher is actually wanted
-        from .entity_resolution import cluster_entities, Matcher
-        mention_to_entity = cluster_entities(mentions, matcher or Matcher(),
-                                             sources)
+        from .entity_resolution import resolve_entities, Matcher
+        er_result = resolve_entities(mentions, matcher or Matcher(), sources)
+        mention_to_entity = er_result.mention_to_entity
+        er_fragile = er_result.fragile_pairs
+        # ch. 9 bookkeeping: how many decisions were one flip from changing
+        # a count, and the matcher's calibrated per-pair error (-> Sec. 13)
+        log_measurement(session, run_id, 0, "er_fragile_pairs",
+                        float(len(er_fragile)),
+                        extra={"alpha": er_result.alpha})
 
     # 2. re-group mentions by the RESOLVED key (entity_id, record_kind) --
     # this replaces run_query's provisional pre-ER "surface|kind" key
     by_record: dict[tuple, list] = defaultdict(list)
     for m in mentions:
         by_record[(mention_to_entity[m.mention_id], m.record_kind)].append(m)
+
+    # 2b. ch.-9 integration duties (need the live FrontierState) -----------
+    if state is not None:
+        from .frontier import rekey_strata
+        from .storage import load_claims
+        # RE-KEY STRATA: surface strata -> entity_id strata, occasion sets
+        # unioned in one pass (singletons under two merged surfaces become
+        # one doubleton; U_hat and Chao move). Mandated log event:
+        info = rekey_strata(state, mention_to_entity, mentions)
+        s2e = info.pop("surface_to_entity")     # too big for a log row
+        log_measurement(session, run_id, 0, "strata_rekey",
+                        float(info["n_merges"]), extra=info)
+        # COUNT-SENSITIVITY CHECK on the re-keyed strata: rebuild a claims
+        # view from the DB (claims persisted during discovery), re-key its
+        # index by the SAME surface->entity map, then hand each stratum's
+        # checksum ER's fragile pairs. A count that matches only because a
+        # borderline ER decision fell one way must not certify.
+        ce = ClaimsEngine(session)
+        for c in load_claims(session):
+            ce.ingest(c)
+        ce.rekey(s2e)
+        frag_by = er_result.fragile_by_stratum() if er_result else {}
+        for g in state.strata:
+            st = ce.checksum(g, CoverageView(
+                n_records=state.N({g}),
+                fragile_pairs=tuple(frag_by.get(g, ()))))
+            if st.conflict:
+                log_measurement(session, run_id, 0, "count_sensitivity_veto",
+                                1.0, extra={"stratum": g,
+                                            "queued": len(ce.verification_queue)})
 
     # 3. fragmentation: build M(rho), pick scan/join/redundant per record
     # (design Sec. 6, Algorithm 3); logs frag_case measurements (impl 10.8)
@@ -370,6 +416,9 @@ def end_to_end(query: str, *, run_id: str, query_attributes: set[str],
                                    query_attributes=query_attributes,
                                    aggregate_attr=aggregate_attr,
                                    eps=eps_effective, eps_er=eps_er,
-                                   cluster_fn=cluster_fn, matcher=matcher)
+                                   cluster_fn=cluster_fn, matcher=matcher,
+                                   # ch. 9: state present -> strata re-key +
+                                   # count-sensitivity run post-ER
+                                   state=state)
     result["state"] = state
     return result
