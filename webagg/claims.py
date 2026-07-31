@@ -422,7 +422,7 @@ class ClaimsEngine:
         try:
             out = call_llm(system=GAP_PROMPT_PATH.read_text(),
                            user=json.dumps(payload),
-                           purpose="gap_formulations")["formulations"]
+                           purpose="gap_formulations")["payload"]["formulations"]
             return [Formulation(str(uuid.uuid4())[:8], f["query"],
                                 float(f.get("p_success", 0.5)),
                                 float(f.get("yield_if_success", 1.0)),
