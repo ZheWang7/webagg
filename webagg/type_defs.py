@@ -213,6 +213,10 @@ class CorroboratedValue(BaseModel):
     # FK list -> Mention: exactly the mentions that asserted the ADOPTED
     # value.
 
+    # --- Fragmentation ---
+    validator_flags: list[str] = Field(default_factory=list)
+    # Routing/guard flags on the ADOPTED value -- e.g. "weak_entity_link"
+
 
 class ResolvedRecord(BaseModel):
     """A logical record (e.g. one funding round) after ER + corroboration.

@@ -21,7 +21,8 @@ from collections import defaultdict
 from .storage import load_sources, load_mentions
 from .canonicalize import canonicalize_value
 from .corroboration import corroborate, QTable
-from .fragmentation import classify_all_records, entity_mentioned
+from .fragmentation import (classify_all_records, contamination_guard,
+                            maybe_prune_single_class)
 from .claims import ClaimsEngine, CoverageView, implied_value_tolerance
 
 
@@ -145,7 +146,8 @@ def all_strata_pass(state: FrontierState, eps_g: float, delta_M: float,
 
 def run_query(query: str, *, run_id: str, eps: float = config.EPS_G,
               delta: float = config.DELTA_M, eta: float = config.ETA,
-              max_steps: int = 200, budget_usd: float = config.BUDGET_USD):
+              max_steps: int = 200, budget_usd: float = config.BUDGET_USD,
+              query_attributes: set[str] | None = None):
     """The frontier loop (guide ch. 7 / paper §3): maintain a frontier of
     intended searches, track discovery per capture occasion, stop PER
     STRATUM by the two-conjunct rule. eps/delta/eta keep their ch. 5/6
@@ -173,6 +175,8 @@ def run_query(query: str, *, run_id: str, eps: float = config.EPS_G,
     sum_acc: dict[str, dict[str, list[float]]] = defaultdict(lambda: defaultdict(list))
     years_acc: dict[str, set] = defaultdict(set)
     stages_acc: dict[str, set] = defaultdict(set)
+    frag_acc: dict[str, dict[str, set[str]]] = defaultdict(lambda: defaultdict(set))
+    pruned_class = None
     seen_urls: set[str] = set()
     for fm in seed_formulations(query):
         state.formulations[fm.formulation_id] = fm
@@ -244,8 +248,10 @@ def run_query(query: str, *, run_id: str, eps: float = config.EPS_G,
                 rk = f"{normalize_surface(m.entity_surface)}|{m.record_kind}"
                 g_m = stratum_of(m, state)
                 state.record_stratum[rk] = g_m
-                # §11: feed the checksum's view -- amounts per record for the
-                # provisional SUM, plus covered eras/stages for gap-direction
+
+                if query_attributes is None or m.attribute in query_attributes:
+                    frag_acc[rk][m.attribute].add(src.source_class or "other")
+
                 if m.attribute == "amount" and m.value_num:
                     sum_acc[g_m][rk].append(float(m.value_num))
                 y = _year_of(m)
@@ -319,6 +325,21 @@ def run_query(query: str, *, run_id: str, eps: float = config.EPS_G,
         # limitation the paper owns in its §11
         log_measurement(session, run_id, step, "claim_demotion_rate",
                         claims_engine.demotion_rate)
+
+        # ---- 3.5 single-class sufficiency -> frontier prune (Fragmentation) ---------
+        # If >= GAMMA_SCAN of the records seen so far are scan-sufficient
+        # under ONE class, formulations aimed at other classes buy nothing:
+        # zero them out.
+        if pruned_class is None:
+            keep, dropped = maybe_prune_single_class(
+                state, frag_acc, gamma=config.GAMMA_SCAN,
+                min_records=config.MIN_RECORDS_FOR_PRUNE)
+            if keep is not None:
+                pruned_class = keep
+                log_measurement(session, run_id, step, "single_class_prune",
+                                float(dropped),
+                                extra={"keep_class": keep.value,
+                                       "n_records": len(frag_acc)})
 
         # ---- 4. per-stratum measurements (the §15 calibration plot eats these)
         for g, pool in stratum_pools(state):
@@ -468,17 +489,19 @@ def resolve_and_aggregate(session, *, run_id: str, query_attributes: set[str],
                 by_value[canonicalize_value(m.value)].append(m)
             cv = corroborate(by_value, sources, qtable)
             if attr in rep.fragmenting_attrs:
-                # a fragmenting attribute rides on ER alone (single class, no
-                # cross-class corroboration): demand that at least one
-                # asserting page literally NAMES the entity, else halve
-                # belief (design Sec. 6.9).
-                # NOTE deviation from the guide: it checks only the FIRST
-                # mention's source; we accept ANY asserting source naming
-                # the entity, which is strictly less trigger-happy.
-                src_ids = {m.source_id for m in attr_mentions}  # pydantic models aren't hashable; dedupe on the id
-                if not any(entity_mentioned(sources[sid], entity_surfaces)
-                           for sid in src_ids):
-                    cv.belief = cv.belief * 0.5
+                # Ch.12 contamination guard: a fragmenting attribute rides on
+                # ER alone (single class, no cross-class corroboration), so
+                # before it commits, an asserting page must literally NAME
+                # the entity; else belief is halved AND the value carries
+                # "weak_entity_link" so the Ch.14 verification allocator can
+                # see it. The guard keeps the ANY-source deviation noted at
+                # its pre-SIGMOD introduction (less trigger-happy than the
+                # guide's first-mention sketch).
+                if contamination_guard(cv, attr_mentions, sources,
+                                       entity_surfaces):
+                    log_measurement(session, run_id, 0, "weak_entity_link",
+                                    1.0, extra={"record_id": f"{eid}/{kind}",
+                                    "attribute": attr})
             record["attributes"][attr] = cv
         resolved.append(record)
 
@@ -522,7 +545,8 @@ def end_to_end(query: str, *, run_id: str, query_attributes: set[str],
         eps_effective = 0.0               # Theorem 3: delta_F = 0 over K*
     else:
         state, session = run_query(query, run_id=run_id, eps=eps,
-                                   delta=delta, eta=eta, max_steps=max_steps)
+                                   delta=delta, eta=eta, max_steps=max_steps,
+                                   query_attributes=query_attributes)
         eps_effective = eps
 
     result = resolve_and_aggregate(session, run_id=run_id,

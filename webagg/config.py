@@ -53,6 +53,14 @@ CLAIM_BRAKE_MIN_BELIEF = 0.50  # corroborated-COUNT belief needed to arm the App
 CLAIM_SCOPE_FORBID = ("debt", "to date")   # scope words that DEMOTE a claim (never certify)
 CLAIM_SCOPE_REQUIRE = ("equity", "round")  # a STATED scope must contain one of these
 
+# --- fragmentation: scan-vs-join routing (impl guide §12, paper App. D) ------
+GAMMA_SCAN = 0.90          # single-class sufficiency: prune when >= this fraction
+                           # of records are scan-sufficient under ONE class (Cor. 2)
+MIN_RECORDS_FOR_PRUNE = 8  # REPO DEVIATION (documented in fragmentation.py): the
+                           # guide states no floor, but gamma over 1-2 records
+                           # fires trivially (1/1 = 100%). Waiting is conservative:
+                           # a late prune costs only fetches, never the answer.
+
 # Backward-compat aliases (pre-SIGMOD names; do not use in new code)
 EPSILON = EPS_G
 DELTA = DELTA_M
