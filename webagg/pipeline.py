@@ -366,6 +366,8 @@ def run_query(query: str, *, run_id: str, eps: float = config.EPS_G,
         if state.strata and all_strata_pass(state, eps, delta, eta, max_steps):
             log_stop(session, run_id, step, reason="certified")   # the real thing
             break
+    else:
+        log_stop(session, run_id, step, reason="max_steps")
 
     persist_stratum_states(session, run_id, state, step)   # snapshot certificates
     session.commit()

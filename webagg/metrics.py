@@ -18,6 +18,8 @@ def log_stop(session, run_id, step, *, reason, stratum=None, extra=None):
     'certified'  -- every stratum passed the two-conjunct rule (a certificate)
     'economic'   -- best reservation index <= 0 (App. B; NOT a certificate)
     'budget'     -- spend cap hit (NOT a certificate)
+    'max_steps'  -- step cap exhausted with no other stop firing (NOT a
+                    certificate; same abandonment family as 'budget')
     'frontier_exhausted' -- no unissued formulations left (NOT a certificate)
     The report layer (§13) reads this to decide which interval to print."""
     e = {"reason": reason}

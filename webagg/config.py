@@ -67,3 +67,25 @@ DELTA = DELTA_M
 
 # --- politeness -------------------------------------------------------------
 MAX_REQUESTS_PER_SEC_PER_DOMAIN = 1.0
+
+# --- fidelity certificate ---------
+# The completeness/fidelity deviation split of Theorem 6: the two-term
+# interval holds with probability >= 1 - (DELTA_C + DELTA_F).
+DELTA_C = 0.05        # completeness deviation share
+DELTA_F = 0.05        # fidelity deviation share (Learn-Then-Test level)
+EPS_F_TARGET = 0.10   # the fidelity level we ATTEMPT to certify; the stored
+# certificate records what was actually achieved
+FIDELITY_CERT_DIR = DATA_DIR / "fidelity_certs"   # one JSON per domain
+FIDELITY_CERT_DIR.mkdir(parents=True, exist_ok=True)
+
+# The pre-committed lambda grid for Learn-Then-Test, CHEAPEST-FIRST.
+# Each lambda bundles the knobs that trade fidelity against abstention/cost:
+# ER thresholds tau+/-, conformal level delta_E, reliability cap qbar.
+# Order matters and is frozen BEFORE calibration (fixed-sequence testing);
+# re-ordering after seeing losses voids the certificate (guide pitfall 8).
+LTT_GRID = [
+    {"tau_plus": 0.85, "tau_minus": 0.15, "delta_E": 0.05, "qbar": 0.30},  # paper defaults
+    {"tau_plus": 0.90, "tau_minus": 0.10, "delta_E": 0.05, "qbar": 0.30},  # wider adjudication band
+    {"tau_plus": 0.90, "tau_minus": 0.10, "delta_E": 0.02, "qbar": 0.30},  # + stricter reader gate
+    {"tau_plus": 0.95, "tau_minus": 0.05, "delta_E": 0.02, "qbar": 0.20},  # most conservative
+]
