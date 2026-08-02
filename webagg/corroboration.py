@@ -272,19 +272,68 @@ CLASS_PRIOR = {
 class QTable:
     """Default reliability model: fixed class priors + qbar cap. No EM.
 
-    (Optional refinements -- learning q from certified strata, or EM --
-    are guide Sec. 8.5 and deliberately NOT implemented yet.)
+    NEW in §14 (paper §4.4 / App. F, behind config.USE_CERTIFIED_REFINE):
+    a per-source override table `q_refined`, filled by
+    refine_from_certified() from CERTIFIED strata acting as labels. The
+    default path is untouched -- with the flag off the table stays empty
+    and q() behaves exactly as before. (Unsupervised truth-discovery /
+    EM remains deliberately NOT implemented.)
     """
 
     def __init__(self, qbar: float = 0.30):
         self.qbar = qbar    # adversarial cap: max reliability without an identity anchor
+        self.q_refined: dict[str, float] = {}   # source_id -> Beta-posterior q
 
     def q(self, source: Source) -> float:
-        """Reliability prior for one source, capped if unanchored."""
-        base = CLASS_PRIOR.get(source.source_class or "other", 0.50)
+        """Reliability for one source: refined posterior if we have one,
+        else the class prior -- capped at qbar either way when the origin
+        lacks an identity anchor (the cap is a SECURITY control against
+        forged origins; supervised agreement evidence does not lift it,
+        because an adversary can also manufacture agreement)."""
+        base = self.q_refined.get(
+            source.source_id,
+            CLASS_PRIOR.get(source.source_class or "other", 0.50))
         # identity_anchored = registry / known publisher / entity's own
         # domain. Anything else could be a forged origin -> cap at qbar.
         return base if source.identity_anchored else min(base, self.qbar)
+
+
+def refine_from_certified(qtable: QTable, labeled_cells, source_lookup,
+                          *, prior_strength: float | None = None) -> int:
+    """Closed-form supervised reliability refinement (paper §4.4).
+
+    Where the run has CERTIFIED values -- cells in registry-enumerated or
+    checksum-closed strata -- those adopted values act as labels: a source
+    asserting the adopted value scored an agreement, a source asserting a
+    competitor scored a disagreement. Each source's q becomes the mean of
+    a Beta posterior anchored at its class prior:
+
+        q_hat = (agrees + k * q0) / (agrees + disagrees + k)
+
+    with k = prior_strength pseudo-counts (no latent-variable iteration,
+    no EM -- one pass of counting).
+
+    labeled_cells: iterable of (adopted_canonical_key, mentions_by_value)
+        pairs, one per certified cell -- the same by-value grouping the
+        corroborator consumed, so agreement is judged on CANONICAL keys.
+    Returns the number of sources whose q was refined (logged upstream).
+    """
+    k = prior_strength if prior_strength is not None else 4.0
+    agree: dict[str, int] = {}
+    disagree: dict[str, int] = {}
+    for adopted_key, by_value in labeled_cells:
+        for key, ms in by_value.items():
+            tally = agree if key == adopted_key else disagree
+            for m in ms:
+                tally[m.source_id] = tally.get(m.source_id, 0) + 1
+    for sid in set(agree) | set(disagree):
+        src = source_lookup.get(sid)
+        if src is None:
+            continue
+        q0 = CLASS_PRIOR.get(src.source_class or "other", 0.50)
+        a, d = agree.get(sid, 0), disagree.get(sid, 0)
+        qtable.q_refined[sid] = (a + k * q0) / (a + d + k)
+    return len(qtable.q_refined)
 
 
 def per_value_subgraph(deriv_G: nx.DiGraph, mentions: list) -> nx.DiGraph:

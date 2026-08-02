@@ -374,10 +374,86 @@ def run_query(query: str, *, run_id: str, eps: float = config.EPS_G,
     return state, session
 
 
+def revalidate_certificates(state, ce: ClaimsEngine, frag_by: dict,
+                            by_record: dict, *, session=None, run_id=""):
+    """The SECOND checksum pass, at the resolved key (impl guide §14.1).
+
+    Discovery's checksums ran over pre-ER surface strata. ER can merge two
+    of a stratum's records into one -- then a COUNT that matched before is
+    short now, and a SUM assembled from those records moves. So after
+    re-keying, every stratum's checksum is re-evaluated against a coverage
+    view rebuilt from the POST-ER record grouping, and three things can
+    happen:
+
+      REVOKE   -- the stratum held a discovery-time checksum certificate
+                  that no longer closes (or now conflicts). The certificate
+                  was wrong; clear it and LOG it ("checksum_revoked" -- the
+                  guide flags this as a number worth reporting: it is the
+                  COUNT checksum's conditions enforcing themselves).
+      VETO     -- rule R3 conflict (count matches only via a fragile ER
+                  pair, or found > claimed): verification item, never
+                  certify ("count_sensitivity_veto", ch. 9 name kept).
+      CERTIFY  -- claims filed under two surfaces only meet after
+                  re-keying, so a stratum can EARN its certificate here
+                  ("checksum_certified_post_er", rule R1: belief stored).
+
+    Factored out of resolve_and_aggregate so the three branches are
+    unit-testable offline with hand-built states (ch. 14 tests).
+    """
+    def _log(name, val, **extra):
+        if session is not None:
+            log_measurement(session, run_id, 0, name, val, extra=extra)
+
+    for g in state.strata:
+        S = state.strata[g]
+        # post-ER assembled SUM view for this stratum: per-record asserted
+        # amounts, records now grouped by the RESOLVED key (eid == stratum)
+        amounts = {f"{eid}|{kind}": [float(m.value_num) for m in ms
+                                     if m.attribute == "amount" and m.value_num]
+                   for (eid, kind), ms in by_record.items() if eid == g}
+        s_total, e_g = _stratum_sum_view(
+            {k: v for k, v in amounts.items() if v})
+        m0 = state.chao_m0({g})
+        st = ce.checksum(g, CoverageView(
+            n_records=state.N({g}),
+            fragile_pairs=tuple(frag_by.get(g, ())),
+            sum=s_total, E_g=e_g,
+            chao_m0=m0 if math.isfinite(m0) else 0.0))
+
+        if S.certified == "checksum" and (st.conflict or not st.certified):
+            # ---- REVOCATION (§14.1): the pre-ER certificate was wrong ----
+            why = ("conflict" if st.conflict
+                   else "count_gap" if st.gap and "count_gap" in st.gap
+                   else "checksum_open")
+            _log("checksum_revoked", 1.0, stratum=g,
+                 kind=S.cert_kind, why=why)
+            S.certified = None
+            S.cert_kind = S.cert_belief = S.cert_delta_plus = None
+
+        if st.conflict:
+            _log("count_sensitivity_veto", 1.0, stratum=g,
+                 queued=len(ce.verification_queue))
+        elif st.certified and S.certified is None:
+            # §11 at the RESOLVED key: Thm 4(b) with |D_g| == n_g and no
+            # fragile pair -> recall 1. Discovery may have missed this
+            # (claims under two surfaces only meet after re-keying), so
+            # record it now -- belief stored, per rule R1.
+            S.certified, S.cert_kind, S.cert_belief = \
+                "checksum", st.kind, st.belief
+            S.cert_delta_plus = st.delta_plus
+            _log("checksum_certified_post_er", st.belief,
+                 stratum=g, kind=st.kind)
+
+
 def resolve_and_aggregate(session, *, run_id: str, query_attributes: set[str],
                           aggregate_attr: str = "amount",
                           eps: float = 0.10, eps_er: float = 0.05,
-                          cluster_fn=None, matcher=None, state=None):
+                          cluster_fn=None, matcher=None, state=None,
+                          mode: str = "open_web", domain: str | None = None,
+                          eps_F: float | None = None,
+                          delta_M: float = config.DELTA_M,
+                          max_steps: int = config.MAX_STEPS,
+                          verify_budget: int = config.VERIFY_BUDGET):
     """Stages 2-5 of the pipeline (design Sec. 7.1) over an already-populated
     run DB. Split out from end_to_end so it can run offline on a fixture DB
     (no search, no LLM) and re-run on a finished live DB without re-fetching.
@@ -392,8 +468,13 @@ def resolve_and_aggregate(session, *, run_id: str, query_attributes: set[str],
     state: the run's FrontierState, if the caller still has it (end_to_end
     does). When supplied, ch. 9's two integration duties run: strata are
     RE-KEYED by entity_id (frontier.rekey_strata, `strata_rekey` logged)
-    and each re-keyed stratum's COUNT checksum is re-evaluated with ER's
-    fragile pairs (count-sensitivity check).
+    and each re-keyed stratum's checksum is re-evaluated post-ER -- which
+    can now REVOKE a discovery-time certificate (§14.1).
+
+    §14 additions: mode/domain/eps_F/delta_M/max_steps feed the two-term
+    honest interval (report.aggregate_two_term); verify_budget sizes the
+    human-check menu (verify.verification_menu). Both land in the result
+    under "report" and "verify_menu" alongside the legacy keys.
     """
     # 0. reload what discovery persisted -- the DB is the source of truth,
     # and every object still carries its provenance handle (impl Sec. 4.2)
@@ -402,6 +483,7 @@ def resolve_and_aggregate(session, *, run_id: str, query_attributes: set[str],
 
     # 1. entity resolution -> the inferred join key (design Sec. 5 / ch. 9)
     er_fragile, er_result = [], None
+    ce = None    # ClaimsEngine handle; stays None on the no-state fixture path
     if cluster_fn is not None:
         mention_to_entity = cluster_fn(mentions, sources)
     else:
@@ -445,24 +527,12 @@ def resolve_and_aggregate(session, *, run_id: str, query_attributes: set[str],
             ce.ingest(c)
         ce.rekey(s2e)
         frag_by = er_result.fragile_by_stratum() if er_result else {}
-        for g in state.strata:
-            st = ce.checksum(g, CoverageView(
-                n_records=state.N({g}),
-                fragile_pairs=tuple(frag_by.get(g, ()))))
-            if st.conflict:
-                log_measurement(session, run_id, 0, "count_sensitivity_veto",
-                                1.0, extra={"stratum": g,
-                                            "queued": len(ce.verification_queue)})
-            elif st.certified and state.strata[g].certified is None:
-                # §11 at the RESOLVED key: Thm 4(b) with |D_g| == n_g and no
-                # fragile pair -> recall 1. Discovery may have missed this
-                # (claims under two surfaces only meet after re-keying), so
-                # record it now -- belief stored, per rule R1.
-                S = state.strata[g]
-                S.certified, S.cert_kind, S.cert_belief = \
-                    "checksum", st.kind, st.belief
-                log_measurement(session, run_id, 0, "checksum_certified_post_er",
-                                st.belief, extra={"stratum": g, "kind": st.kind})
+        # §14.1: the SECOND CHECKSUM PASS. Counts (and merged-record sums)
+        # are only meaningful post-ER, so every stratum's checksum is
+        # re-evaluated at the RESOLVED key -- and a certificate discovery
+        # granted on pre-ER counts can be REVOKED here.
+        revalidate_certificates(state, ce, frag_by, by_record,
+                                session=session, run_id=run_id)
 
     # 3. fragmentation: build M(rho), pick scan/join/redundant per record
     # (design Sec. 6, Algorithm 3); logs frag_case measurements (impl 10.8)
@@ -472,6 +542,7 @@ def resolve_and_aggregate(session, *, run_id: str, query_attributes: set[str],
     # 4. corroborate one value per attribute (design Sec. 3), guarding
     # fragmenting attributes against cross-entity contamination (Sec. 6.9)
     resolved = []
+    cells = []   # (stratum, record, attr, by_value): raw material for 4b's refine
     # One fixed-prior reliability table for the whole pass (guide 8.3)
     # class priors + the qbar=0.30 adversarial cap, no learning.
     qtable = QTable()
@@ -505,7 +576,30 @@ def resolve_and_aggregate(session, *, run_id: str, query_attributes: set[str],
                                     1.0, extra={"record_id": f"{eid}/{kind}",
                                     "attribute": attr})
             record["attributes"][attr] = cv
+            # kept for the optional §14 refine pass: which canonical values
+            # competed in this cell, and who asserted each
+            cells.append((eid, record, attr, dict(by_value)))
         resolved.append(record)
+
+    # 4b. OPTIONAL (config.USE_CERTIFIED_REFINE, paper §4.4 / App. F):
+    # adopted values in CERTIFIED strata act as labels; refine each
+    # source's q in closed form (Beta posterior over its agreement rate),
+    # then re-corroborate every cell under the refined table. Required by
+    # no theorem -- the fixed-prior path above is the guaranteed one.
+    if config.USE_CERTIFIED_REFINE and state is not None:
+        from .corroboration import refine_from_certified
+        certified_g = {g for g, S in state.strata.items() if S.certified}
+        labeled = [(record["attributes"][attr].value, by_value)
+                   for (eid, record, attr, by_value) in cells
+                   if eid in certified_g]
+        if labeled:
+            n_ref = refine_from_certified(qtable, labeled, sources,
+                                          prior_strength=config.REFINE_PRIOR_STRENGTH)
+            log_measurement(session, run_id, 0, "q_refined_sources",
+                            float(n_ref), extra={"labels": len(labeled)})
+            for (eid, record, attr, by_value) in cells:
+                record["attributes"][attr] = corroborate(by_value, sources,
+                                                         qtable)
 
     # 5. aggregate f_Q over distinct resolved records with the three-part
     # interval (design Corollary 2); reuse Experiment 3's implementation
@@ -521,9 +615,37 @@ def resolve_and_aggregate(session, *, run_id: str, query_attributes: set[str],
             continue                      # non-numeric value; skip, don't crash
     ci = aggregate_with_ci(rows, eps=eps, eps_er=eps_er)
     log_measurement(session, run_id, 0, "answer", ci["answer"], extra=ci)
+
+    # 6. §14: the REPORTED interval -- the two-term honest interval, per
+    # group (paper Thm 6 / Cor. 1). The legacy three-part ci above stays as
+    # a logged diagnostic (and Experiment 3 still uses its implementation),
+    # but what the user sees is the per-group table built from THIS.
+    from .report import aggregate_two_term
+    report = aggregate_two_term(resolved, state, mode=mode,
+                                aggregate_attr=aggregate_attr,
+                                eps_g=eps, delta_M=delta_M,
+                                max_steps=max_steps,
+                                eps_F=eps_F, domain=domain)
+    log_measurement(session, run_id, 0, "answer_two_term",
+                    report["__global__"]["total"],
+                    extra={"halfwidth": report["__global__"]["halfwidth"],
+                           "eps_C": report["__global__"]["eps_C"],
+                           "eps_F": report["__global__"]["eps_F"],
+                           "eps_F_source": report["__global__"]["eps_F_source"],
+                           "abandoned": sorted(report["__abandoned__"])})
+
+    # 7. §14.3: spend the human budget where it removes the most width
+    from .verify import verification_menu
+    menu = verification_menu(resolved, ce, state, report=report,
+                             fragile_pairs=er_fragile,
+                             # er_result.alpha may be None on matcher cold start (the
+                             # uncertified-alpha seam); verify.py handles it
+                             alpha=(er_result.alpha if er_result else None),
+                             budget=verify_budget)
     session.commit()
     return {"answer": ci["answer"], "ci": ci,
-            "records": resolved, "reports": reports}
+            "records": resolved, "reports": reports,
+            "report": report, "verify_menu": menu}
 
 
 def end_to_end(query: str, *, run_id: str, query_attributes: set[str],
@@ -531,7 +653,10 @@ def end_to_end(query: str, *, run_id: str, query_attributes: set[str],
                schema_driver=None, query_filter=None,
                eps: float = 0.10, delta: float = 0.10, eta: float = 0.5,
                max_steps: int = 200, eps_er: float = 0.05,
-               cluster_fn=None, matcher=None):
+               cluster_fn=None, matcher=None,
+               domain: str | None = None, eps_F: float | None = None,
+               verify_budget: int = config.VERIFY_BUDGET,
+               budget_usd: float = config.BUDGET_USD):
     """The full pipeline (impl Sec. 11.1): discovery, then resolve + aggregate.
 
     mode="open_web" runs the frontier loop (probabilistic completeness,
@@ -548,6 +673,7 @@ def end_to_end(query: str, *, run_id: str, query_attributes: set[str],
     else:
         state, session = run_query(query, run_id=run_id, eps=eps,
                                    delta=delta, eta=eta, max_steps=max_steps,
+                                   budget_usd=budget_usd,
                                    query_attributes=query_attributes)
         eps_effective = eps
 
@@ -558,6 +684,13 @@ def end_to_end(query: str, *, run_id: str, query_attributes: set[str],
                                    cluster_fn=cluster_fn, matcher=matcher,
                                    # ch. 9: state present -> strata re-key +
                                    # count-sensitivity run post-ER
-                                   state=state)
+                                   state=state,
+                                   # §14: the report layer's inputs -- mode
+                                   # picks the registry regime; delta and
+                                   # max_steps let psi be recomputed at
+                                   # report time; domain finds the §13 cert
+                                   mode=mode, domain=domain, eps_F=eps_F,
+                                   delta_M=delta, max_steps=max_steps,
+                                   verify_budget=verify_budget)
     result["state"] = state
     return result

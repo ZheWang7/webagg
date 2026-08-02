@@ -18,7 +18,7 @@ SIGMOD-version requirements implemented here:
 import httpx, trafilatura, dateparser
 from datetime import datetime
 from urllib.parse import urlparse
-from tenacity import retry, stop_after_attempt, wait_exponential
+from tenacity import RetryError, retry, stop_after_attempt, wait_exponential
 from .type_defs import Source
 from . import config
 
@@ -49,10 +49,15 @@ def _parse_publish_time(meta) -> datetime | None:
     return dt.replace(tzinfo=None) if dt else None
 
 
-@retry(stop=stop_after_attempt(3), wait=wait_exponential(min=1, max=10))
+@retry(stop=stop_after_attempt(3), wait=wait_exponential(min=1, max=10),
+       reraise=True)
 def _get(url: str) -> httpx.Response:
     # retry wraps ONLY the network call: a 404 or paywall is a fact about
     # the page, not a transient error, and must not be retried.
+    # reraise=True: when all attempts fail, surface the ORIGINAL httpx
+    # exception, not tenacity's RetryError wrapper -- fetch_url's
+    # except-net below is typed on httpx errors, and a run-killing
+    # RetryError leak is exactly what the first live ch.-14 run hit.
     return httpx.get(url, headers={"User-Agent": UA},
                      follow_redirects=True, timeout=20.0)
 
@@ -66,8 +71,12 @@ def fetch_url(url: str, formulation_id: str) -> Source | None:
 
     try:
         r = _get(url)
-    except httpx.HTTPError:
-        _CACHE[url] = None                  # unreachable: cache the miss
+    except (httpx.HTTPError, RetryError):
+        # unreachable / timed out after retries: ONE dead URL is a cached
+        # miss, never a run-killer (the Exp-1 lesson, now in the pipeline
+        # itself, not just the demo shims). RetryError kept in the net as
+        # belt-and-braces should the reraise policy ever change.
+        _CACHE[url] = None
         return None
 
     # 2. non-content filter (guide ch. 5): never counts as a fetch.
