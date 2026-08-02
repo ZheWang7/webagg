@@ -110,6 +110,39 @@ def test_fetch_negative_cache(monkeypatch):
     assert fetch.fetch_url("https://x.com/gone", "f1") is None
     assert fetch.fetch_url("https://x.com/gone", "f2") is None
     assert len(n_gets) == 1
+
+
+def test_fetch_survives_retry_exhaustion(monkeypatch):
+    """REGRESSION (first live ch.-14 run): a URL that TIMES OUT on every
+    attempt must become a cached miss, never a run-killer.
+
+    The old bug: tenacity's exhausted-retries exception is RetryError, NOT
+    a subclass of httpx.HTTPError, so it sailed past fetch_url's except
+    and crashed the whole discovery loop over ONE slow website. Fixed by
+    reraise=True on the decorator (surface the ORIGINAL httpx error) plus
+    RetryError in the except-net as belt-and-braces.
+
+    Unlike the tests above, this one deliberately patches httpx.get UNDER
+    _get, so the real retry decorator runs -- monkeypatching _get itself
+    would bypass the exact interaction that broke.
+    """
+    from tenacity import wait_none
+    fetch.clear_fetch_cache()
+    attempts = []
+
+    def timeout(url, **kw):
+        attempts.append(url)
+        raise httpx.ReadTimeout("The read operation timed out")
+
+    monkeypatch.setattr(fetch.httpx, "get", timeout)
+    # zero the exponential backoff so 3 real attempts run instantly
+    monkeypatch.setattr(fetch._get.retry, "wait", wait_none())
+
+    assert fetch.fetch_url("https://slow.example/x", "f1") is None
+    assert len(attempts) == 3                       # all retries really ran
+    assert fetch._CACHE["https://slow.example/x"] is None   # miss cached
+    assert fetch.fetch_url("https://slow.example/x", "f2") is None
+    assert len(attempts) == 3                       # ...and not re-tried
     fetch.clear_fetch_cache()
 
 

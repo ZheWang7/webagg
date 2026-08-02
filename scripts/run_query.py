@@ -1,4 +1,5 @@
-"""
+"""The CLI (impl guide §14.4): a per-group TABLE, not one number.
+
 Runs the full end-to-end pipeline on one query and prints, per stratum:
 its total, its own +/- halfwidth, and the regime label that says WHY the
 interval is what it is (registry / checksum COUNT / checksum SUM /
@@ -62,6 +63,9 @@ def main() -> None:
     ap.add_argument("--eta", type=float, default=config.ETA)
     ap.add_argument("--max-steps", type=int, default=config.MAX_STEPS)
     ap.add_argument("--verify-budget", type=int, default=config.VERIFY_BUDGET)
+    ap.add_argument("--budget-usd", type=float, default=config.BUDGET_USD,
+                    help="per-run spend cap; a long run needs headroom or "
+                         "it stops honestly with reason 'budget'")
     ap.add_argument("--surface-er", action="store_true",
                     help="skip the real matcher; cluster by entity surface")
     args = ap.parse_args()
@@ -80,6 +84,7 @@ def main() -> None:
         aggregate_attr=args.aggregate_attr, mode=args.mode,
         eps=args.eps, delta=args.delta, eta=args.eta,
         max_steps=args.max_steps, domain=args.domain,
+        budget_usd=args.budget_usd,
         verify_budget=args.verify_budget,
         cluster_fn=_surface_cluster if args.surface_er else None)
 
