@@ -14,11 +14,18 @@ SIGMOD-version requirements implemented here:
      fragmentation.classify(), identity_anchored for regulatory sources.
      (authority_chain_id / doc_type stay None here: registry drivers fill
      them in a later chapter.)
+  5. (Sec. 15) the withheld-registry denylist is enforced HERE as the last
+     line of defense: denied URLs are refused before the network, and the
+     post-redirect final URL is checked too. The search-result layer in
+     the pipeline catches denied results earlier; this guard exists so no
+     other caller of fetch_url -- present or future -- can bypass the
+     denial.
 """
 import httpx, trafilatura, dateparser
 from datetime import datetime
 from urllib.parse import urlparse
 from tenacity import RetryError, retry, stop_after_attempt, wait_exponential
+from .denylist import get_denylist
 from .type_defs import Source
 from . import config
 
@@ -63,6 +70,17 @@ def _get(url: str) -> httpx.Response:
 
 
 def fetch_url(url: str, formulation_id: str) -> Source | None:
+    # 0. the withheld-registry denylist (Sec. 15): checked BEFORE the cache
+    #    and BEFORE the network. The experiment's claim is "the agent never
+    #    read the registry" -- so not one byte, and not even a cached one
+    #    (belt-and-braces: the cache is per-run, but the invariant should
+    #    not depend on that).
+    dl = get_denylist()
+    if dl.blocks(url):
+        dl.record(url, "fetch")
+        _CACHE[url] = None
+        return None
+
     # 1. cache hit (positive or negative): one URL = at most one Source per
     #    run. NOTE: the cached Source keeps the formulation_id of whichever
     #    formulation fetched it FIRST -- first-discoverer attribution.
@@ -76,6 +94,16 @@ def fetch_url(url: str, formulation_id: str) -> Source | None:
         # miss, never a run-killer (the Exp-1 lesson, now in the pipeline
         # itself, not just the demo shims). RetryError kept in the net as
         # belt-and-braces should the reraise policy ever change.
+        _CACHE[url] = None
+        return None
+
+    # 0b. post-redirect check (Sec. 15): an allowed link that redirects
+    #     INTO a denied domain is still the registry -- the FINAL URL
+    #     decides, not the one we were handed. (The body was received but
+    #     is discarded unread: it never becomes a Source, a rejection row,
+    #     or extractor input.)
+    if dl.blocks(str(r.url)):
+        dl.record(f"{url} -> {r.url}", "fetch_redirect")
         _CACHE[url] = None
         return None
 

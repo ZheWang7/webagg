@@ -66,6 +66,11 @@ def main() -> None:
     ap.add_argument("--budget-usd", type=float, default=config.BUDGET_USD,
                     help="per-run spend cap; a long run needs headroom or "
                          "it stops honestly with reason 'budget'")
+    ap.add_argument("--deny", nargs="*", default=[],
+                    help="withheld-registry denylist (guide Sec. 15): domain "
+                         "suffixes or aliases, e.g. `--deny sec` withholds "
+                         "all of sec.gov from THIS agent run. The oracle "
+                         "(scripts/build_truth.py) is never subject to it.")
     ap.add_argument("--surface-er", action="store_true",
                     help="skip the real matcher; cluster by entity surface")
     args = ap.parse_args()
@@ -86,10 +91,17 @@ def main() -> None:
         max_steps=args.max_steps, domain=args.domain,
         budget_usd=args.budget_usd,
         verify_budget=args.verify_budget,
+        deny=tuple(args.deny),
         cluster_fn=_surface_cluster if args.surface_er else None)
 
     print(f"\nrun_id: {run_id}  (db: data/runs/{run_id}.sqlite)\n")
     print(format_report(result["report"], result["verify_menu"]))
+    # Sec. 15 receipt: an experiment run states what was withheld and how
+    # often the agent hit the wall -- the supervisor-facing one-liner.
+    d = result.get("denylist") or {}
+    if d.get("suffixes"):
+        print(f"\ndenied    : {', '.join(d['suffixes'])}  "
+              f"({d['n_denied']} denials this run; run DB verified clean)")
 
 
 if __name__ == "__main__":

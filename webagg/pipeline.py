@@ -7,6 +7,7 @@ from .frontier import (FrontierState, Formulation, StratumState,
                        add_if_novel, update_yield_estimates,
                        prune_formulations, normalize_surface)
 from .search import SerperBackend
+from .denylist import assert_no_denied_sources, get_denylist, set_denylist
 from .fetch import fetch_url
 from .extract import is_relevant, extract_certified
 from .llm import call_llm, set_llm_logger, set_llm_step
@@ -147,14 +148,29 @@ def all_strata_pass(state: FrontierState, eps_g: float, delta_M: float,
 def run_query(query: str, *, run_id: str, eps: float = config.EPS_G,
               delta: float = config.DELTA_M, eta: float = config.ETA,
               max_steps: int = 200, budget_usd: float = config.BUDGET_USD,
-              query_attributes: set[str] | None = None):
+              query_attributes: set[str] | None = None,
+              deny: tuple = ()):
     """The frontier loop (guide ch. 7 / paper §3): maintain a frontier of
     intended searches, track discovery per capture occasion, stop PER
     STRATUM by the two-conjunct rule. eps/delta/eta keep their ch. 5/6
-    kwarg names but now mean eps_g / delta_M / the hot-frontier threshold."""
+    kwarg names but now mean eps_g / delta_M / the hot-frontier threshold.
+
+    deny (Sec. 15): domain suffixes / aliases withheld from THIS agent run
+    ("--deny sec" for the withheld-registry oracle). Empty = allow all."""
     session = get_session(f"data/runs/{run_id}.sqlite")
     set_llm_logger(session, run_id)   # ch. 5: every LLM call -> measurements
     clear_fetch_cache()               # ch. 5: URL cache is per-run
+
+    # Sec. 15: install the run's denylist NEXT TO the other per-run module
+    # state. Set unconditionally (empty = allow-all) so a previous run's
+    # denylist can never leak into this run within the same process.
+    denylist = set_denylist(deny)
+    if denylist:
+        # the run DB must SELF-DESCRIBE its denial scope: the grading
+        # harness reads this row, not the CLI history.
+        log_measurement(session, run_id, 0, "denylist_active",
+                        float(len(denylist.suffixes)),
+                        extra={"suffixes": list(denylist.suffixes)})
 
     # ch. 6: the conformal gate. Unfitted (no calibration file yet) it runs
     # in bootstrap accept-all mode and stamps 'gate_uncalibrated'.
@@ -217,6 +233,18 @@ def run_query(query: str, *, run_id: str, eps: float = config.EPS_G,
             if r["url"] in seen_urls:
                 continue              # already processed this run (any verdict)
             seen_urls.add(r["url"])
+            # -- Sec. 15: the withheld registry does not exist for this
+            #    agent. Denied results are dropped BEFORE fetch (no bytes,
+            #    no snippet use, no rejection row -- a denial is not a
+            #    relevance verdict and must not enter the audit pool).
+            #    One measurement per unique denied URL (seen_urls dedupes),
+            #    so experiments can count how often search hit the wall.
+            if denylist.blocks(r["url"]):
+                denylist.record(r["url"], "search_result")
+                log_measurement(session, run_id, step, "registry_denied",
+                                1.0, extra={"url": r["url"],
+                                            "layer": "search_result"})
+                continue
             src = fetch_url(r["url"], formulation_id=r["formulation_id"])
             if src is None:
                 continue
@@ -369,8 +397,23 @@ def run_query(query: str, *, run_id: str, eps: float = config.EPS_G,
     else:
         log_stop(session, run_id, step, reason="max_steps")
 
+    # ---- Sec. 15 closeout ---------------------------------------------
+    # Fetch-layer denials (redirect catches, or any caller that bypassed
+    # the search-result layer) sit in the denylist's hit log but not yet
+    # in measurements; write them now so the DB holds EVERY denial. The
+    # step column carries the final step -- the url in extra is what the
+    # experiment plots actually key on.
+    for h in denylist.hits:
+        if h["layer"] != "search_result":       # those were logged live
+            log_measurement(session, run_id, step, "registry_denied",
+                            1.0, extra=h)
     persist_stratum_states(session, run_id, state, step)   # snapshot certificates
     session.commit()
+    # The invariant the grading harness will re-check: no fetched page on
+    # a denied domain, in sources OR rejected_sources. A contaminated run
+    # is worthless as an experiment, so it dies HERE, loudly -- not after
+    # someone has drawn a plot from it. No-op when deny is empty.
+    assert_no_denied_sources(session, denylist)
     return state, session
 
 
@@ -656,13 +699,18 @@ def end_to_end(query: str, *, run_id: str, query_attributes: set[str],
                cluster_fn=None, matcher=None,
                domain: str | None = None, eps_F: float | None = None,
                verify_budget: int = config.VERIFY_BUDGET,
-               budget_usd: float = config.BUDGET_USD):
+               budget_usd: float = config.BUDGET_USD,
+               deny: tuple = ()):
     """The full pipeline (impl Sec. 11.1): discovery, then resolve + aggregate.
 
     mode="open_web" runs the frontier loop (probabilistic completeness,
     Theorem 1); mode="schema" sweeps a key universe (deterministic
     completeness, Theorem 3), in which case the completeness slack eps is 0
     over the addressable closure -- the interval's recall term vanishes.
+
+    deny (Sec. 15): the withheld-registry denylist, open-web mode only --
+    a schema run's whole point is reading the registry, and the oracle's
+    build_truth.py never routes through here at all.
     """
     if mode == "schema":
         from .schema_addressable import run_schema_addressable
@@ -674,7 +722,8 @@ def end_to_end(query: str, *, run_id: str, query_attributes: set[str],
         state, session = run_query(query, run_id=run_id, eps=eps,
                                    delta=delta, eta=eta, max_steps=max_steps,
                                    budget_usd=budget_usd,
-                                   query_attributes=query_attributes)
+                                   query_attributes=query_attributes,
+                                   deny=deny)
         eps_effective = eps
 
     result = resolve_and_aggregate(session, run_id=run_id,
@@ -693,4 +742,8 @@ def end_to_end(query: str, *, run_id: str, query_attributes: set[str],
                                    delta_M=delta, max_steps=max_steps,
                                    verify_budget=verify_budget)
     result["state"] = state
+    # Sec. 15: the result carries its own denial scope (suffixes + hit
+    # count) so a grading harness or notebook never has to infer it from
+    # CLI history. Empty suffixes = ordinary run, nothing was withheld.
+    result["denylist"] = get_denylist().describe()
     return result
