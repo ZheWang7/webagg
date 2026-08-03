@@ -10,11 +10,21 @@ Distinguish carefully (these confusions are the common failure modes):
   is attribute "post_money", never "amount".
 - currency: ALWAYS set "currency" (ISO code) for money values; never assume USD.
 - an EXTENSION of an existing round vs. a NEW round.
+- record_kind INDIVIDUATES the record: for repeatable records (a company has
+  many funding rounds), qualify the kind with the instance so two different
+  rounds never share a record_kind. Convention (EXACTLY this spelling):
+  "funding_round/" + stage in lowercase snake_case from: seed, pre_seed,
+  series_a, series_b, series_c, series_d, series_e, series_f, bridge, debt,
+  grant, unknown -- e.g. "funding_round/series_b". Use "unknown" ONLY when
+  the passage states no stage. Valuations keep record_kind of the round they
+  price when stated (attribute "post_money"), else "funding_round/unknown".
+  One-per-entity record kinds (e.g. clinical_trial phase results) need no
+  qualifier.
 
 Schema:
 {"mentions": [
   {"entity_surface": "...",   // the surface form as it appears
-   "record_kind": "...",      // e.g. funding_round, clinical_trial
+   "record_kind": "...",      // kind + instance qualifier, see rule below
    "attribute": "...",        // e.g. amount, post_money, date, lead_investor
    "value": "...",            // canonicalize numbers to base units
    "currency": "USD",         // ISO code; REQUIRED for money values, else null

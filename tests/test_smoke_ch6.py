@@ -224,3 +224,58 @@ def test_phi_fn_upper_zero_findings_not_zero_bound(tmp_path, monkeypatch):
     monkeypatch.setattr(audit, "adjudicate_relevance", lambda text, q: False)
     rho = audit.phi_fn_upper(session, "q", n_audit=60, seed=1)
     assert 0.0 < rho == pytest.approx(float(beta_dist.ppf(0.95, 1, 60)))  # ~0.049
+
+
+def test_extract_survives_malformed_llm_fields(monkeypatch):
+    """REGRESSION (second live ch.-14 run): the model emitted
+    self_conf == ': 0.82' (key separator leaked into the value) and the raw
+    float() killed an 80-step run at the extraction boundary. Boundary rule
+    now: numeric LLM-JSON fields are COERCED (first numeric token), and an
+    item broken beyond coercion is a warned SKIP costing one mention/claim,
+    never the run -- the fetch-timeout lesson applied to the LLM seam."""
+    from webagg import extract
+    payload = {"mentions": [
+        {"entity_surface": "Acme, Inc.", "record_kind": "funding_round",
+         "attribute": "amount", "value": "$40M", "currency": "USD",
+         "date_role": None, "t_asof": None,
+         "self_conf": ": 0.82",                 # the exact live junk
+         "passage": "Acme raised $40M."},
+        {"entity_surface": "Bolt Ltd.", "record_kind": "funding_round",
+         "attribute": "amount",                 # no "value" key at all
+         "currency": "USD", "date_role": None, "t_asof": None,
+         "self_conf": 0.9, "passage": "Bolt raised money."}],
+        "claims": [
+        {"stratum_surface": "Acme, Inc.", "functional": "SUM",
+         "attribute": "amount", "value_num": ": 63000000",   # junk-wrapped
+         "currency": "USD", "t_asof": None, "scope": "",
+         "tolerance": "0.5e6", "passage": "total $63M"},
+        {"stratum_surface": "Acme, Inc.", "functional": "COUNT",
+         "attribute": "amount", "value_num": "n/a",          # hopeless
+         "currency": None, "t_asof": None, "scope": "",
+         "tolerance": 0.0, "passage": "several rounds"}]}
+    monkeypatch.setattr(extract, "call_llm",
+                        lambda **kw: {"payload": payload})
+    src = Source(source_id="s9", url="https://x.com/p", domain="x.com",
+                 fetch_time=T0, publish_time=T0, title="t",
+                 main_text="...", formulation_id="f1")
+
+    with pytest.warns(UserWarning, match="skipped one malformed"):
+        mentions, claims = extract.extract_mentions(src, "acme funding",
+                                                    extractor_id="A")
+    # the junk-conf mention SURVIVES with the coerced, clamped confidence
+    assert len(mentions) == 1 and mentions[0].self_conf == pytest.approx(0.82)
+    # the keyless mention was skipped; the run (i.e. this call) lived
+    # claims: junk-wrapped number coerced, string tolerance coerced;
+    # the numberless COUNT claim skipped
+    assert len(claims) == 1 and claims[0].value_num == 63e6
+    assert claims[0].tolerance == pytest.approx(0.5e6)
+
+
+def test_round_validator_applies_to_stage_qualified_kinds():
+    """§14 record-identity fix: record kinds are instance-qualified
+    ("funding_round/series_b") so each round is its own record. The round
+    validator must keep applying to them (prefix match, not exact)."""
+    m = mk_mention(record_kind="funding_round/series_b", value="$40M",
+                   currency="USD")
+    out = validate_mention(m, ExtractionContext())
+    assert out.value_num == 40e6          # money canonicalized as before

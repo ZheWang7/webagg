@@ -12,6 +12,11 @@ Before emitting each item, check the classic traps and skip or reclassify:
   or wording; if truly undeterminable, still emit but set self_conf low.
 - "extension", "top-up", "second close" => this is not a new round.
 - Unit traps: "$40MM" is 40 million; "0.04B" is 40 million.
+- record_kind must individuate repeatable records, same convention as your
+  counterpart (EXACTLY this spelling): "funding_round/" + stage in lowercase
+  snake_case from: seed, pre_seed, series_a, series_b, series_c, series_d,
+  series_e, series_f, bridge, debt, grant, unknown -- e.g.
+  "funding_round/series_b"; "unknown" only when the passage states no stage.
 
 Schema (identical to your counterpart's; field meanings must match exactly):
 {"mentions": [

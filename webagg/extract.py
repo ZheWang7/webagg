@@ -26,6 +26,23 @@ from .canonicalize import canonicalize_value
 from . import config
 from datetime import datetime
 import dateparser
+import re
+import warnings
+
+_NUM_RX = re.compile(r"-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?")
+
+
+def _coerce_float(x, default: float | None) -> float | None:
+    """BOUNDARY COERCION for numeric LLM-JSON fields (same principle as the
+    value->str coercion below): models sometimes emit a number wrapped in
+    junk -- the first live 80-step run died on self_conf == ': 0.82' (the
+    model leaked the key separator into the value). Accept real numbers
+    as-is; for strings, take the first numeric token; on anything else,
+    fall back to the default rather than crash the run over one field."""
+    if isinstance(x, (int, float)) and not isinstance(x, bool):
+        return float(x)
+    hit = _NUM_RX.search(str(x)) if x is not None else None
+    return float(hit.group()) if hit else default
 
 RELEVANCE_SYS = open("prompts/relevance.txt").read()
 EXTRACT_SYS_A = open("prompts/extract.txt").read()
@@ -68,6 +85,7 @@ def extract_mentions(source: Source, query: str,
                        model=config.MODEL_STRONG,
                        purpose=f"extraction_{extractor_id}")["payload"]
     mentions = []
+    skipped = 0
     for m in payload.get("mentions", []):
         # BOUNDARY COERCION: the prompt says "canonicalize numbers to base
         # units", so the model often emits value as a JSON NUMBER
@@ -76,29 +94,44 @@ def extract_mentions(source: Source, query: str,
         # than loosening the model's type. Coercing before make_id keeps
         # the identifier convention (guide §4.3) byte-identical for both
         # extractors regardless of which JSON type the model chose.
-        val = str(m["value"])
-        # ID convention (guide §4.3): ALWAYS via Mention.make_id -- now
-        # passage-aware, so two same-valued rounds on one list page stay
-        # two mentions (see make_id's deviation note).
-        mentions.append(Mention(
-            mention_id=Mention.make_id(source.source_id, m["entity_surface"],
-                                       m["record_kind"], m["attribute"],
-                                       val, extractor_id,
-                                       passage=m["passage"]),
-            source_id=source.source_id,
-            entity_surface=m["entity_surface"],
-            record_kind=m["record_kind"],
-            attribute=m["attribute"],
-            value=val,
-            passage=m["passage"],
-            extracted_at=datetime.utcnow(),
-            # typed, bi-temporal fields (guide §4.1) now come from the prompt:
-            t_asof=_parse_t_asof(m.get("t_asof")) or source.publish_time,
-            currency=m.get("currency"),
-            date_role=m.get("date_role"),
-            self_conf=float(m.get("self_conf", 0.5)),
-            extractor_id=extractor_id,
-        ))
+        # A structurally broken item (missing keys, hopeless types) is
+        # SKIPPED and counted, never a run-killer: one model stumble on
+        # one page must cost that mention only (the fetch-timeout lesson,
+        # applied to the LLM seam).
+        try:
+            val = str(m["value"])
+            # self_conf feeds the conformal gate's nonconformity score, so
+            # clamp the coerced value into [0, 1]
+            conf = min(max(_coerce_float(m.get("self_conf"), 0.5) or 0.5,
+                           0.0), 1.0)
+            # ID convention (guide §4.3): ALWAYS via Mention.make_id -- now
+            # passage-aware, so two same-valued rounds on one list page stay
+            # two mentions (see make_id's deviation note).
+            mentions.append(Mention(
+                mention_id=Mention.make_id(source.source_id,
+                                           m["entity_surface"],
+                                           m["record_kind"], m["attribute"],
+                                           val, extractor_id,
+                                           passage=m["passage"]),
+                source_id=source.source_id,
+                entity_surface=m["entity_surface"],
+                record_kind=m["record_kind"],
+                attribute=m["attribute"],
+                value=val,
+                passage=m["passage"],
+                extracted_at=datetime.utcnow(),
+                # typed, bi-temporal fields (guide §4.1) from the prompt:
+                t_asof=_parse_t_asof(m.get("t_asof")) or source.publish_time,
+                currency=m.get("currency"),
+                date_role=m.get("date_role"),
+                self_conf=conf,
+                extractor_id=extractor_id,
+            ))
+        except (KeyError, TypeError, ValueError) as e:
+            skipped += 1
+            warnings.warn(f"extractor {extractor_id}: skipped one malformed "
+                          f"mention from {source.source_id} ({e!r})",
+                          stacklevel=2)
     # a model sometimes repeats the SAME assertion verbatim (identical
     # entity/kind/attribute/value/passage). Those share an id BY DESIGN --
     # they are duplicates, not two records -- so collapse them here rather
@@ -106,20 +139,31 @@ def extract_mentions(source: Source, query: str,
     mentions = list({m.mention_id: m for m in mentions}.values())
     claims = []
     for c in payload.get("claims", []):
-        claims.append(Claim(
-            claim_id=Claim.make_id(source.source_id, c["functional"],
-                                   c["stratum_surface"]),
-            source_id=source.source_id,
-            stratum_surface=c["stratum_surface"],
-            functional=c["functional"],
-            attribute=c["attribute"],
-            value_num=float(c["value_num"]),
-            currency=c.get("currency"),
-            t_asof=_parse_t_asof(c.get("t_asof")) or source.publish_time,
-            scope=c.get("scope", ""),
-            tolerance=float(c.get("tolerance", 0.0)),
-            passage=c.get("passage", ""),
-        ))
+        try:
+            # A claim without a recoverable number is meaningless (it exists
+            # to feed checksum arithmetic) -> default None -> skip + count.
+            v = _coerce_float(c["value_num"], None)
+            if v is None:
+                raise ValueError(f"no numeric value_num: {c.get('value_num')!r}")
+            claims.append(Claim(
+                claim_id=Claim.make_id(source.source_id, c["functional"],
+                                       c["stratum_surface"]),
+                source_id=source.source_id,
+                stratum_surface=c["stratum_surface"],
+                functional=c["functional"],
+                attribute=c["attribute"],
+                value_num=v,
+                currency=c.get("currency"),
+                t_asof=_parse_t_asof(c.get("t_asof")) or source.publish_time,
+                scope=c.get("scope", ""),
+                tolerance=_coerce_float(c.get("tolerance"), 0.0),
+                passage=c.get("passage", ""),
+            ))
+        except (KeyError, TypeError, ValueError) as e:
+            skipped += 1
+            warnings.warn(f"extractor {extractor_id}: skipped one malformed "
+                          f"claim from {source.source_id} ({e!r})",
+                          stacklevel=2)
     return mentions, claims
 
 

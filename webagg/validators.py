@@ -192,7 +192,12 @@ def validate_mention(m: Mention, ctx: ExtractionContext | None = None) -> Mentio
     if m.attribute in _MONEY_ATTRS:
         m.value_num, money_flags = canonicalize_money(m.value, m.currency, m.t_asof)
         flags += money_flags
-        if m.record_kind == "funding_round" and m.attribute == "amount":
+        # startswith, not ==: record kinds are now INSTANCE-qualified
+        # ("funding_round/series_b") so distinct rounds are distinct
+        # records (§14 finding: rk = surface|kind collapsed every round
+        # of a company into one record, capping n at 1 and making COUNT
+        # checksums unwinnable). The round validator applies to them all.
+        if m.record_kind.startswith("funding_round") and m.attribute == "amount":
             flags += validate_round(m, ctx)
     elif m.attribute in _DATE_ATTRS:
         flags += validate_date(m)
