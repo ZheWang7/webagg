@@ -265,10 +265,14 @@ class EDGARDriver:
             if not filing["primary"]:
                 continue
             acc_nodash = filing["accession"].replace("-", "")
+            primary = re.sub(r"^xslFormDX\d+/", "", filing["primary"])
+            if not primary.lower().endswith(".xml"):
+                primary = filing["primary"]   # not the Form-D case: leave as-is
+            is_xml = primary.lower().endswith(".xml")
             doc_url = self.ARCHIVE_URL.format(
                 cik=int(cik),                 # archive path uses the un-padded CIK
                 acc=acc_nodash,
-                doc=filing["primary"],
+                doc=primary,                  # the (possibly de-xsl'd) doc name
             )
             try:
                 r = self._client.get(doc_url)
@@ -288,7 +292,8 @@ class EDGARDriver:
                 fetch_time=fetch_time,
                 publish_time=_parse_date(filing["filing_date"]),
                 title=f"{filing['form']} {filing['accession']}",
-                main_text=_html_to_text(r.text)[:20000],
+                main_text=(r.text[:200000] if is_xml
+                           else _html_to_text(r.text)[:20000]),
                 # formulation_id records WHICH key surfaced this doc -- the
                 # schema-mode analogue of "which search formulation produced it".
                 formulation_id=f"edgar:CIK{cik}",
