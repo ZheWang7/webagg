@@ -1,0 +1,107 @@
+{
+  "calibration_file": "D:\\Projects\\webagg\\data\\calibration\\extraction_cal.json",
+  "harvests": [
+    {
+      "at": "2026-08-04T22:03:09.704099",
+      "cohort": "formd_v1",
+      "run_id": "cal_uber_01",
+      "entity_id": "cik0001543151",
+      "aliases": [
+        "Uber Technologies, Inc",
+        "Uber"
+      ],
+      "stats": {
+        "amount_mentions": 5,
+        "out_of_scope": 0,
+        "harvested": 5,
+        "auto_exact": 0,
+        "auto_tol": 2,
+        "queued_for_review": 3
+      },
+      "n_added": 2,
+      "undenied_accepted": false
+    },
+    {
+      "at": "2026-08-04T22:03:11.286282",
+      "cohort": "formd_v1",
+      "run_id": "cal_uber_02",
+      "entity_id": "cik0001543151",
+      "aliases": [
+        "Uber Technologies, Inc",
+        "Uber"
+      ],
+      "stats": {
+        "amount_mentions": 26,
+        "out_of_scope": 20,
+        "harvested": 6,
+        "auto_exact": 0,
+        "auto_tol": 3,
+        "queued_for_review": 3
+      },
+      "n_added": 3,
+      "undenied_accepted": false
+    },
+    {
+      "at": "2026-08-04T22:03:12.633554",
+      "cohort": "formd_v1",
+      "run_id": "cal_instacart_01",
+      "entity_id": "cik0001579091",
+      "aliases": [
+        "Maplebear Inc.",
+        "Instacart"
+      ],
+      "stats": {
+        "amount_mentions": 6,
+        "out_of_scope": 0,
+        "harvested": 6,
+        "auto_exact": 0,
+        "auto_tol": 5,
+        "queued_for_review": 1
+      },
+      "n_added": 5,
+      "undenied_accepted": false
+    },
+    {
+      "at": "2026-08-04T22:03:15.941545",
+      "cohort": "formd_v1",
+      "run_id": "cal_instacart_02",
+      "entity_id": "cik0001579091",
+      "aliases": [
+        "Maplebear Inc.",
+        "Instacart"
+      ],
+      "stats": {
+        "amount_mentions": 18,
+        "out_of_scope": 0,
+        "harvested": 18,
+        "auto_exact": 1,
+        "auto_tol": 8,
+        "queued_for_review": 9
+      },
+      "n_added": 9,
+      "undenied_accepted": false
+    },
+    {
+      "at": "2026-08-10T20:10:26.937514",
+      "cohort": "formd_v1",
+      "run_id": "cal_uber_03",
+      "entity_id": "cik0001543151",
+      "aliases": [
+        "Uber Technologies, Inc",
+        "Uber"
+      ],
+      "stats": {
+        "amount_mentions": 9,
+        "out_of_scope": 0,
+        "harvested": 9,
+        "auto_exact": 0,
+        "auto_tol": 2,
+        "queued_for_review": 7
+      },
+      "n_added": 2,
+      "undenied_accepted": false
+    }
+  ],
+  "n_total": 37,
+  "n_below_recommended": true
+}

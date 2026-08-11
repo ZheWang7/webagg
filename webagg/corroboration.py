@@ -145,6 +145,15 @@ def build_attribute_graph(mentions_by_value: dict[str, list],
         G.add_node(s.source_id)
     for i, j in _candidate_pairs(srcs):
         a, b = srcs[i], srcs[j]
+        # PROPOSED FIX (Exp 4, found on live EDGAR data): documents in the
+        # SAME authority chain are versions related by supersession, not
+        # open-web copies -- an amendment is structurally a near-copy of the
+        # doc it amends, so without this guard the copy detector marks the
+        # D/A a derivation DESCENDANT of the D, and live_values() propagates
+        # the superseded doc's death onto its own successor (killing every
+        # value and triggering corroborate()'s resurrect-all fallback).
+        if a.authority_chain_id and a.authority_chain_id == b.authority_chain_id:
+            continue
         # test both directions; the temporal veto inside derivation_edge
         # decides which way (if either) the copy went
         if derivation_edge(a, b):
@@ -241,7 +250,17 @@ def live_values(mentions_by_value: dict[str, list],
     dead_srcs = set(dead)
     for d in dead:
         if d in deriv_G:
-            dead_srcs |= nx.descendants(deriv_G, d)
+            # PROPOSED FIX (Exp 4, found on live EDGAR data): propagated
+            # death marks stale ECHOES -- open-web copies of a superseded
+            # doc. A document that is itself a member of an authority chain
+            # is never an echo: its version status is governed solely by
+            # supersession edges. Without this guard, shared form boilerplate
+            # gives an amendment copy-edges from its predecessor's echoes
+            # (D -> echo -> D/A), the successor inherits the death sentence
+            # it issued, every value dies, and the resurrect-all fallback
+            # quietly adopts the stale figure.
+            dead_srcs |= {x for x in nx.descendants(deriv_G, d)
+                          if not source_lookup[x].authority_chain_id}
     live, excluded = set(), {}
     for v, ms in mentions_by_value.items():
         alive = [m for m in ms if m.source_id not in dead_srcs]

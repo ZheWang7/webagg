@@ -9,12 +9,19 @@ the DEPLOYMENT DOMAIN" -- so the division of labor here is:
     text source : a REAL open-web agent run (the deployment distribution --
                   news pages, blogs, press releases about a calibration
                   entity), run with --deny sec like every experiment run;
-    labels      : the Sec. 15 oracle truth table. Every totalAmountSold any
-                  filing of the entity ever carried (read from the oracle's
-                  _truth.sqlite mentions, so PRE-amendment values count) is
-                  a legitimate reading; a mention is CORRECT iff its
-                  canonical value equals one of them, else it is paired
-                  with the numerically nearest for nonconf()'s distance.
+    labels      : two-tier. The Sec. 15 truth table auto-decides what it
+                  can -- canonical equality with any totalAmountSold a
+                  filing ever carried (PRE-amendment values count), or
+                  within CLAIM_TOL_REL of one (the checksum layer's own
+                  agreement threshold, so a faithful read of a rounded
+                  press figure labels correct). Mentions FARTHER than the
+                  tolerance go to a human review queue: the open web
+                  faithfully reports IPO proceeds, cumulative totals and
+                  full-round figures that Form D does not contain, and the
+                  registry cannot tell those apart from hallucinations.
+                  This is Sec. 6.3's "label ~100 mentions once" shrunk to
+                  the tail the registry can't settle (roughly half, on the
+                  first live harvest).
 
 Why pre-amendment values count as correct: the gate certifies READING
 fidelity (did the extractor read the page right), not world-truth -- a
@@ -127,27 +134,47 @@ def _num(mention_value: str, value_num) -> float | None:
 
 
 def label_mention(value: str, value_num,
-                  legit: list[tuple[str, float]]) -> tuple[str, bool, float]:
-    """One mention -> (paired true value, is_correct, rel_distance).
+                  legit: list[tuple[str, float]]) -> tuple[str, str, float]:
+    """One mention -> (paired true value, label_source, rel_distance).
 
-    Correct iff canonical equality with SOME legitimate value (the same
-    test nonconf() will apply, so harvest labels and gate scores can never
-    disagree about what 'equal' means). Wrong -> paired with the
-    numerically nearest legitimate value so nonconf()'s distance term is
-    meaningful. Unparseable -> paired with the first legitimate value; the
-    score is 2.0 through nonconf()'s non-numeric branch regardless of the
-    pairing, and KEEPING these garbled extractions in the set is the point
-    (dropping them would bias calibration toward easy examples).
+    Three-way outcome. The first LIVE harvest (35 real press mentions:
+    1 exact, 18 within tolerance, 16 far) showed that exact equality is
+    the wrong rule for open-web text, so:
+
+      registry_exact -- canonical equality with a filed value;
+      registry_tol   -- within CLAIM_TOL_REL of a filed value. This is the
+                        checksum layer's OWN definition of agreement, so
+                        the gate's labels can't be stricter than the
+                        pipeline they protect: a faithful read of "$1.2B"
+                        for a filed 1,188,241,352 is a correct reading.
+                        true := pred, so nonconf() scores it correct;
+      review         -- farther than the tolerance. The registry CANNOT
+                        decide these: the open web faithfully reports IPO
+                        proceeds, cumulative raised-to-date totals, full
+                        round sizes where the filing covers one tranche,
+                        and convertibles -- none of which Form D contains
+                        -- and a hallucination looks exactly the same from
+                        here. Routed to the human review queue with the
+                        nearest filed value riding along as context.
+
+    Unparseable values go to review too (a garbled extraction is precisely
+    the thing a human should glance at, and dropping it would bias the set
+    toward easy examples).
     """
     cv = canonicalize_value(value or "")
     for tv, _ in legit:
         if cv == canonicalize_value(tv):
-            return tv, True, 0.0
+            return tv, "registry_exact", 0.0
     pn = _num(value, value_num)
     if pn is None:
-        return legit[0][0], False, float("inf")
+        return legit[0][0], "review", float("inf")
     tv, tn = min(legit, key=lambda x: abs(pn - x[1]))
-    return tv, False, abs(pn - tn) / max(abs(tn), 1e-9)
+    rel = abs(pn - tn) / max(abs(tn), 1e-9)
+    if rel <= config.CLAIM_TOL_REL:
+        # correct BY THE SYSTEM'S OWN TOLERANCE: assert the prediction as
+        # the true reading so the gate's equality test agrees with ours
+        return value, "registry_tol", rel
+    return tv, "review", rel
 
 
 # --------------------------------------------------------------------------- #
@@ -224,13 +251,21 @@ def gather_mentions(run_session, aliases: list[str]) -> tuple[list, dict]:
 # --------------------------------------------------------------------------- #
 
 def harvest(run_session, truth_session, *, run_id: str, entity_id: str,
-            entity_name: str, aliases: list[str]) -> tuple[list[dict], dict]:
-    """The full labeling pass for one (run, entity). Returns (rows, stats).
+            entity_name: str, aliases: list[str]) -> tuple[list[dict],
+                                                           list[dict], dict]:
+    """The full labeling pass for one (run, entity).
 
-    Row shape is a SUPERSET of what load_calibration_set reads -- the extra
-    keys (mention_id, run_id, entity_id, rel_dist) are provenance the
-    loader ignores, so the file stays loadable by the existing ch. 6 code
-    with zero changes.
+    Returns (auto_rows, review_rows, stats):
+      auto_rows   -- registry-decided (exact or within tolerance), ready
+                     for the calibration file. Row shape is a SUPERSET of
+                     what load_calibration_set reads; the extra keys are
+                     provenance the loader ignores.
+      review_rows -- registry-UNDECIDABLE, destined for the human queue.
+                     They carry the passage, the source URL and the
+                     nearest filed value so each judgment is a ten-second
+                     read; 'true' is deliberately absent until a human
+                     decides it (guide Sec. 6.3's "label ~100 mentions
+                     once", shrunk to the tail the registry can't settle).
     """
     legit = legit_amounts(truth_session, entity_name)
     if not legit:
@@ -239,25 +274,31 @@ def harvest(run_session, truth_session, *, run_id: str, entity_id: str,
             "truth DB -- check the name (it must equal the filed "
             "entityName) or rebuild the cohort.")
     mentions, stats = gather_mentions(run_session, aliases)
-    rows = []
-    n_correct = n_within_tol = 0
+    # source_id -> url, so a reviewer can open the page behind a passage
+    from .storage import SourceRow
+    urls = {s.source_id: s.url for s in run_session.query(SourceRow).all()}
+    auto, review = [], []
     for m in mentions:
-        true, ok, rel = label_mention(m.value, m.value_num, legit)
-        n_correct += ok
-        # rounding-style disagreement (within the checksum tolerance CLAIM_TOL_REL): a
-        # faithful read of a rounded press figure -- counted as WRONG for
-        # the threshold (conservative), surfaced in the receipt
-        if not ok and rel <= config.CLAIM_TOL_REL:
-            n_within_tol += 1
-        rows.append({"pred": m.value, "true": true,
-                     "self_conf": float(m.self_conf),
-                     "mention_id": m.mention_id, "run_id": run_id,
-                     "entity_id": entity_id,
-                     "rel_dist": None if rel == float("inf") else rel})
-    stats.update({"harvested": len(rows), "correct": n_correct,
-                  "wrong": len(rows) - n_correct,
-                  "wrong_within_tol": n_within_tol})
-    return rows, stats
+        true, label_source, rel = label_mention(m.value, m.value_num, legit)
+        row = {"pred": m.value, "self_conf": float(m.self_conf),
+               "mention_id": m.mention_id, "run_id": run_id,
+               "entity_id": entity_id, "label_source": label_source,
+               "rel_dist": None if rel == float("inf") else rel}
+        if label_source == "review":
+            row.update({"registry_nearest": true,
+                        "passage": m.passage or "",
+                        "url": urls.get(m.source_id, "")})
+            review.append(row)
+        else:
+            row["true"] = true
+            auto.append(row)
+    stats.update({"harvested": len(auto) + len(review),
+                  "auto_exact": sum(r["label_source"] == "registry_exact"
+                                    for r in auto),
+                  "auto_tol": sum(r["label_source"] == "registry_tol"
+                                  for r in auto),
+                  "queued_for_review": len(review)})
+    return auto, review, stats
 
 
 def append_calibration(path: str | Path, new_rows: list[dict]) -> tuple[int, int]:
@@ -272,6 +313,57 @@ def append_calibration(path: str | Path, new_rows: list[dict]) -> tuple[int, int
     p.parent.mkdir(parents=True, exist_ok=True)
     p.write_text(json.dumps(merged, indent=2))
     return len(added), len(merged)
+
+
+def append_queue(queue_path: str | Path, cal_path: str | Path,
+                 rows: list[dict]) -> tuple[int, int]:
+    """Append registry-undecidable rows to the review queue, idempotent by
+    mention_id against BOTH the queue and the calibration file (a mention
+    already decided by a human must never reappear for re-review)."""
+    qp, cp = Path(queue_path), Path(cal_path)
+    queue = json.loads(qp.read_text()) if qp.exists() else []
+    decided = set()
+    if cp.exists():
+        decided = {r.get("mention_id") for r in json.loads(cp.read_text())}
+    seen = decided | {r.get("mention_id") for r in queue}
+    added = [r for r in rows if r["mention_id"] not in seen]
+    queue += added
+    qp.parent.mkdir(parents=True, exist_ok=True)
+    qp.write_text(json.dumps(queue, indent=2))
+    return len(added), len(queue)
+
+
+def record_decision(cal_path: str | Path, queue_path: str | Path,
+                    mention_id: str, faithful: bool) -> dict:
+    """Apply one human judgment and move the row queue -> calibration file.
+
+    faithful=True  -> the passage really says this: true := pred, the gate
+                      learns it as a CORRECT extraction (label_source
+                      human_faithful);
+    faithful=False -> the extractor garbled the page: true := the nearest
+                      filed value, so nonconf()'s distance term reflects
+                      how far off it was (label_source human_error).
+
+    Saves both files immediately (crash-safe: quitting mid-review loses
+    nothing already answered). Returns the calibration row written.
+    """
+    qp = Path(queue_path)
+    queue = json.loads(qp.read_text()) if qp.exists() else []
+    idx = next((i for i, r in enumerate(queue)
+                if r["mention_id"] == mention_id), None)
+    if idx is None:
+        raise KeyError(f"mention {mention_id} not in the review queue")
+    row = queue.pop(idx)
+    cal_row = {"pred": row["pred"],
+               "true": row["pred"] if faithful else row["registry_nearest"],
+               "self_conf": row["self_conf"],
+               "mention_id": row["mention_id"], "run_id": row["run_id"],
+               "entity_id": row["entity_id"], "rel_dist": row["rel_dist"],
+               "label_source": "human_faithful" if faithful
+                               else "human_error"}
+    append_calibration(cal_path, [cal_row])
+    qp.write_text(json.dumps(queue, indent=2))
+    return cal_row
 
 
 def threshold_preview(path: str | Path, delta_E: float = None) -> dict:

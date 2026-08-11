@@ -1,0 +1,442 @@
+[
+  {
+    "pred": "1200000000",
+    "self_conf": 0.83,
+    "mention_id": "daa51e318f827a5c:amount:7becbddd:A",
+    "run_id": "cal_uber_01",
+    "entity_id": "cik0001543151",
+    "label_source": "registry_tol",
+    "rel_dist": 0.009895841430032979,
+    "true": "1200000000"
+  },
+  {
+    "pred": "1200000000",
+    "self_conf": 0.8,
+    "mention_id": "daa51e318f827a5c:amount:9d1726f5:A",
+    "run_id": "cal_uber_01",
+    "entity_id": "cik0001543151",
+    "label_source": "registry_tol",
+    "rel_dist": 0.009895841430032979,
+    "true": "1200000000"
+  },
+  {
+    "pred": "1200000000",
+    "self_conf": 0.73,
+    "mention_id": "e292339a95399e52:amount:23479661:A",
+    "run_id": "cal_uber_02",
+    "entity_id": "cik0001543151",
+    "label_source": "registry_tol",
+    "rel_dist": 0.009895841430032979,
+    "true": "1200000000"
+  },
+  {
+    "pred": "37000000",
+    "self_conf": 0.9,
+    "mention_id": "376ab0bc0fa25896:amount:3eb79710:A",
+    "run_id": "cal_uber_02",
+    "entity_id": "cik0001543151",
+    "label_source": "registry_tol",
+    "rel_dist": 0.006722128797428817,
+    "true": "37000000"
+  },
+  {
+    "pred": "1200000000",
+    "self_conf": 0.86,
+    "mention_id": "61955c8a43c0c6e0:amount:3221234a:A",
+    "run_id": "cal_uber_02",
+    "entity_id": "cik0001543151",
+    "label_source": "registry_tol",
+    "rel_dist": 0.009895841430032979,
+    "true": "1200000000"
+  },
+  {
+    "pred": "200000000",
+    "self_conf": 0.88,
+    "mention_id": "af5125cf4c1a889a:amount:65a71897:A",
+    "run_id": "cal_instacart_01",
+    "entity_id": "cik0001579091",
+    "label_source": "registry_tol",
+    "rel_dist": 1.00000010000001e-07,
+    "true": "200000000"
+  },
+  {
+    "pred": "225000000",
+    "self_conf": 0.8,
+    "mention_id": "af5125cf4c1a889a:amount:1deb50ff:A",
+    "run_id": "cal_instacart_01",
+    "entity_id": "cik0001579091",
+    "label_source": "registry_tol",
+    "rel_dist": 3.288889970568257e-07,
+    "true": "225000000"
+  },
+  {
+    "pred": "200000000",
+    "self_conf": 0.9,
+    "mention_id": "bc3d9452e0dc4d59:amount:f3daf9dd:A",
+    "run_id": "cal_instacart_01",
+    "entity_id": "cik0001579091",
+    "label_source": "registry_tol",
+    "rel_dist": 1.00000010000001e-07,
+    "true": "200000000"
+  },
+  {
+    "pred": "225000000",
+    "self_conf": 0.8,
+    "mention_id": "bc3d9452e0dc4d59:amount:d658105d:A",
+    "run_id": "cal_instacart_01",
+    "entity_id": "cik0001579091",
+    "label_source": "registry_tol",
+    "rel_dist": 3.288889970568257e-07,
+    "true": "225000000"
+  },
+  {
+    "pred": "220000000",
+    "self_conf": 0.9,
+    "mention_id": "31f75e6ebfbfe9c2:amount:2ffc0df7:A",
+    "run_id": "cal_instacart_01",
+    "entity_id": "cik0001579091",
+    "label_source": "registry_tol",
+    "rel_dist": 0.0007463834047920034,
+    "true": "220000000"
+  },
+  {
+    "pred": "200000000",
+    "self_conf": 0.9,
+    "mention_id": "17b884334fee2870:amount:abb7cbd0:A",
+    "run_id": "cal_instacart_02",
+    "entity_id": "cik0001579091",
+    "label_source": "registry_tol",
+    "rel_dist": 1.00000010000001e-07,
+    "true": "200000000"
+  },
+  {
+    "pred": "225000000",
+    "self_conf": 0.86,
+    "mention_id": "17b884334fee2870:amount:80e6ecd6:A",
+    "run_id": "cal_instacart_02",
+    "entity_id": "cik0001579091",
+    "label_source": "registry_tol",
+    "rel_dist": 3.288889970568257e-07,
+    "true": "225000000"
+  },
+  {
+    "pred": "8730000",
+    "self_conf": 0.9,
+    "mention_id": "077ba87173101e61:amount:f900ca93:A",
+    "run_id": "cal_instacart_02",
+    "entity_id": "cik0001579091",
+    "label_source": "registry_tol",
+    "rel_dist": 0.00028685926890393995,
+    "true": "8730000"
+  },
+  {
+    "pred": "220000000",
+    "self_conf": 0.9,
+    "mention_id": "077ba87173101e61:amount:c556d0ed:A",
+    "run_id": "cal_instacart_02",
+    "entity_id": "cik0001579091",
+    "label_source": "registry_tol",
+    "rel_dist": 0.0007463834047920034,
+    "true": "220000000"
+  },
+  {
+    "pred": "413000000",
+    "self_conf": 0.9,
+    "mention_id": "077ba87173101e61:amount:f481d376:A",
+    "run_id": "cal_instacart_02",
+    "entity_id": "cik0001579091",
+    "label_source": "registry_tol",
+    "rel_dist": 4.545556081670999e-05,
+    "true": "413000000"
+  },
+  {
+    "pred": "350000000",
+    "self_conf": 0.9,
+    "mention_id": "ee6a31cdd716f975:amount:1dfc2e8b:A",
+    "run_id": "cal_instacart_02",
+    "entity_id": "cik0001579091",
+    "label_source": "registry_tol",
+    "rel_dist": 0.0025790314359543307,
+    "true": "350000000"
+  },
+  {
+    "pred": "413000000",
+    "self_conf": 0.9,
+    "mention_id": "ee6a31cdd716f975:amount:33dec61a:A",
+    "run_id": "cal_instacart_02",
+    "entity_id": "cik0001579091",
+    "label_source": "registry_tol",
+    "rel_dist": 4.545556081670999e-05,
+    "true": "413000000"
+  },
+  {
+    "pred": "265000000",
+    "self_conf": 0.9,
+    "mention_id": "6f83c4c21f5a530d:amount:3ab00607:A",
+    "run_id": "cal_instacart_02",
+    "entity_id": "cik0001579091",
+    "label_source": "registry_exact",
+    "rel_dist": 0.0,
+    "true": "265000000"
+  },
+  {
+    "pred": "200000000",
+    "self_conf": 0.85,
+    "mention_id": "6f83c4c21f5a530d:amount:d07b3236:A",
+    "run_id": "cal_instacart_02",
+    "entity_id": "cik0001579091",
+    "label_source": "registry_tol",
+    "rel_dist": 1.00000010000001e-07,
+    "true": "200000000"
+  },
+  {
+    "pred": "1250000000",
+    "true": "1250000000",
+    "self_conf": 0.9,
+    "mention_id": "3786ee5a1a2d35c0:amount:8467c681:A",
+    "run_id": "cal_uber_01",
+    "entity_id": "cik0001543151",
+    "rel_dist": 0.05197483482295102,
+    "label_source": "human_faithful"
+  },
+  {
+    "pred": "1570000",
+    "true": "1570000",
+    "self_conf": 0.9,
+    "mention_id": "3786ee5a1a2d35c0:amount:3e2a8e64:A",
+    "run_id": "cal_uber_01",
+    "entity_id": "cik0001543151",
+    "rel_dist": 0.5802717664821339,
+    "label_source": "human_faithful"
+  },
+  {
+    "pred": "8100000000",
+    "true": "8100000000",
+    "self_conf": 0.55,
+    "mention_id": "fa703c06cd7450fb:amount:1674ae2b:A",
+    "run_id": "cal_uber_01",
+    "entity_id": "cik0001543151",
+    "rel_dist": 1.8894249167671366,
+    "label_source": "human_faithful"
+  },
+  {
+    "pred": "3500000000",
+    "true": "3500000000",
+    "self_conf": 0.9,
+    "mention_id": "376ab0bc0fa25896:amount:8b9f58ca:A",
+    "run_id": "cal_uber_02",
+    "entity_id": "cik0001543151",
+    "rel_dist": 0.2485169393438245,
+    "label_source": "human_faithful"
+  },
+  {
+    "pred": "361200000",
+    "true": "361200000",
+    "self_conf": 0.93,
+    "mention_id": "5582e2e45d8defa3:amount:32949e68:A",
+    "run_id": "cal_uber_02",
+    "entity_id": "cik0001543151",
+    "rel_dist": 0.40113811516480175,
+    "label_source": "human_faithful"
+  },
+  {
+    "pred": "1600000000",
+    "true": "1600000000",
+    "self_conf": 0.82,
+    "mention_id": "fe272146d7c4d4b5:amount:8b888914:A",
+    "run_id": "cal_uber_02",
+    "entity_id": "cik0001543151",
+    "rel_dist": 0.053541175691151556,
+    "label_source": "human_faithful"
+  },
+  {
+    "pred": "100000000",
+    "true": "100000000",
+    "self_conf": 0.8,
+    "mention_id": "af5125cf4c1a889a:amount:4648e61f:A",
+    "run_id": "cal_instacart_01",
+    "entity_id": "cik0001579091",
+    "rel_dist": 1.3565134845710696,
+    "label_source": "human_faithful"
+  },
+  {
+    "pred": "100000000",
+    "true": "100000000",
+    "self_conf": 0.86,
+    "mention_id": "17b884334fee2870:amount:e7e299f1:A",
+    "run_id": "cal_instacart_02",
+    "entity_id": "cik0001579091",
+    "rel_dist": 1.3565134845710696,
+    "label_source": "human_faithful"
+  },
+  {
+    "pred": "400000000",
+    "true": "400000000",
+    "self_conf": 0.6,
+    "mention_id": "27ccfe0a89ae1baf:amount:6cbfa2f7:A",
+    "run_id": "cal_instacart_02",
+    "entity_id": "cik0001579091",
+    "rel_dist": 0.03152102233493144,
+    "label_source": "human_faithful"
+  },
+  {
+    "pred": "44000000",
+    "true": "44000000",
+    "self_conf": 0.9,
+    "mention_id": "077ba87173101e61:amount:55b38b76:A",
+    "run_id": "cal_instacart_02",
+    "entity_id": "cik0001579091",
+    "rel_dist": 0.03686593321127065,
+    "label_source": "human_faithful"
+  },
+  {
+    "pred": "44000000",
+    "true": "44000000",
+    "self_conf": 0.93,
+    "mention_id": "a0ea6a82f76f660c:amount:88996557:A",
+    "run_id": "cal_instacart_02",
+    "entity_id": "cik0001579091",
+    "rel_dist": 0.03686593321127065,
+    "label_source": "human_faithful"
+  },
+  {
+    "pred": "871000000",
+    "true": "871000000",
+    "self_conf": 0.82,
+    "mention_id": "697c963e1b5444b6:amount:87bd500a:A",
+    "run_id": "cal_instacart_02",
+    "entity_id": "cik0001579091",
+    "rel_dist": 1.1088629738656868,
+    "label_source": "human_faithful"
+  },
+  {
+    "pred": "8500000",
+    "true": "8500000",
+    "self_conf": 0.9,
+    "mention_id": "e4aa3faa07a92ab4:amount:23fd6d6c:A",
+    "run_id": "cal_instacart_02",
+    "entity_id": "cik0001579091",
+    "rel_dist": 0.026625235256092037,
+    "label_source": "human_faithful"
+  },
+  {
+    "pred": "871000000",
+    "true": "871000000",
+    "self_conf": 0.83,
+    "mention_id": "78bae78381fe2f9e:amount:87bd500a:A",
+    "run_id": "cal_instacart_02",
+    "entity_id": "cik0001579091",
+    "rel_dist": 1.1088629738656868,
+    "label_source": "human_faithful"
+  },
+  {
+    "pred": "44000000",
+    "true": "44000000",
+    "self_conf": 0.92,
+    "mention_id": "12b1cda3b4f1559d:amount:4feaeeb3:A",
+    "run_id": "cal_instacart_02",
+    "entity_id": "cik0001579091",
+    "rel_dist": 0.03686593321127065,
+    "label_source": "human_faithful"
+  },
+  {
+    "pred": "120000",
+    "true": "120000",
+    "self_conf": 0.9,
+    "mention_id": "4cd0b7049bd82c9c:amount:3dabe6a0:A",
+    "run_id": "cal_instacart_02",
+    "entity_id": "cik0001579091",
+    "rel_dist": 0.3768661560431001,
+    "label_source": "human_faithful"
+  },
+  {
+    "pred": "1200000000",
+    "self_conf": 0.9,
+    "mention_id": "de8ab7afd1eecd50:amount:656d24d1:A",
+    "run_id": "cal_uber_03",
+    "entity_id": "cik0001543151",
+    "label_source": "registry_tol",
+    "rel_dist": 0.009895841430032979,
+    "true": "1200000000"
+  },
+  {
+    "pred": "30000000",
+    "self_conf": 0.88,
+    "mention_id": "44b6b96568aa13bc:amount:f31112d4:A",
+    "run_id": "cal_uber_03",
+    "entity_id": "cik0001543151",
+    "label_source": "registry_tol",
+    "rel_dist": 0.0024593669803250643,
+    "true": "30000000"
+  },
+  {
+    "pred": "2100000000",
+    "true": "2100000000",
+    "self_conf": 0.55,
+    "mention_id": "084732612271b809:amount:ae29d8bf:A",
+    "run_id": "cal_uber_03",
+    "entity_id": "cik0001543151",
+    "rel_dist": 0.2422272069053636,
+    "label_source": "human_faithful"
+  },
+  {
+    "pred": "500000000",
+    "true": "500000000",
+    "self_conf": 0.92,
+    "mention_id": "d9205bfd22e0e99c:amount:a696dab1:A",
+    "run_id": "cal_uber_03",
+    "entity_id": "cik0001543151",
+    "rel_dist": 0.9395599600841663,
+    "label_source": "human_faithful"
+  },
+  {
+    "pred": "3500000000",
+    "true": "3500000000",
+    "self_conf": 0.93,
+    "mention_id": "44b6b96568aa13bc:amount:145da0b8:A",
+    "run_id": "cal_uber_03",
+    "entity_id": "cik0001543151",
+    "rel_dist": 0.2485169393438245,
+    "label_source": "human_faithful"
+  },
+  {
+    "pred": "1300000000",
+    "true": "1300000000",
+    "self_conf": 0.9,
+    "mention_id": "44b6b96568aa13bc:amount:4db107f5:A",
+    "run_id": "cal_uber_03",
+    "entity_id": "cik0001543151",
+    "rel_dist": 0.09405382821586906,
+    "label_source": "human_faithful"
+  },
+  {
+    "pred": "500000000",
+    "true": "500000000",
+    "self_conf": 0.9,
+    "mention_id": "44b6b96568aa13bc:amount:8cbb98dd:A",
+    "run_id": "cal_uber_03",
+    "entity_id": "cik0001543151",
+    "rel_dist": 0.9395599600841663,
+    "label_source": "human_faithful"
+  },
+  {
+    "pred": "500000000",
+    "true": "500000000",
+    "self_conf": 0.9,
+    "mention_id": "44b6b96568aa13bc:amount:a696dab1:A",
+    "run_id": "cal_uber_03",
+    "entity_id": "cik0001543151",
+    "rel_dist": 0.9395599600841663,
+    "label_source": "human_faithful"
+  },
+  {
+    "pred": "1570000",
+    "true": "1570000",
+    "self_conf": 0.9,
+    "mention_id": "b38d700a8db5fdf2:amount:c3b17c7c:A",
+    "run_id": "cal_uber_03",
+    "entity_id": "cik0001543151",
+    "rel_dist": 0.5802717664821339,
+    "label_source": "human_faithful"
+  }
+]

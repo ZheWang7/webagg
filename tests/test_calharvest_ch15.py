@@ -5,8 +5,8 @@ One test per duty (repo convention):
                                            entity, keeps strangers out
   test_legit_amounts_from_oracle_db     -> only oracle amount mentions of
                                            THAT entity; deduped
-  test_label_mention_correct_and_nearest-> canonical equality = correct;
-                                           wrong pairs with the nearest;
+  test_label_mention_three_way          -> exact / within-tolerance auto-
+                                           labels; farther -> review queue;
                                            unparseable kept, not dropped
   test_check_split_leakage_loud         -> validation-half entity refused
   test_check_run_conditions             -> undenied refused (warn only with
@@ -16,9 +16,12 @@ One test per duty (repo convention):
   test_gather_refuses_gated_run         -> circularity guard: a mention
                                            accepted by a FITTED gate kills
                                            the harvest
-  test_harvest_end_to_end_offline       -> fixture run + truth DB -> rows,
-                                           stats, idempotent append, file
-                                           loadable by the ch. 6 loader
+  test_harvest_end_to_end_offline       -> fixture run + truth DB -> auto
+                                           + queue buckets, idempotent
+                                           appends, ch. 6 loader unchanged
+  test_review_decisions_and_no_requeue  -> y/n judgments move queue rows
+                                           into the file; decided mentions
+                                           never reappear for review
   test_threshold_preview_semantics      -> all-correct set = calibrated
                                            accept-all; >delta_E wrong at
                                            low conf = a real threshold
@@ -33,9 +36,10 @@ from pathlib import Path
 import pytest
 
 from webagg import config
-from webagg.calharvest import (append_calibration, check_run_conditions,
-                               check_split, gather_mentions, harvest,
-                               label_mention, legit_amounts,
+from webagg.calharvest import (append_calibration, append_queue,
+                               check_run_conditions, check_split,
+                               gather_mentions, harvest, label_mention,
+                               legit_amounts, record_decision,
                                surface_in_scope, threshold_preview)
 from webagg.calibration import load_calibration_set
 from webagg.storage import (MeasurementRow, MentionRow, SourceRow,
@@ -84,6 +88,8 @@ def run_db(tmp_path):
     s.add(_mention("m1", "$45M", 45_000_000.0, 0.95))
     # faithful read of the ORIGINAL figure (stale page) -> still correct
     s.add(_mention("m2", "40000000", 40_000_000.0, 0.90))
+    # rounded press figure within CLAIM_TOL_REL of the filed 45M -> auto-tol
+    s.add(_mention("m7", "45300000", 45_300_000.0, 0.88))
     # a wrong extraction, nearest to 45M
     s.add(_mention("m3", "46000000", 46_000_000.0, 0.40))
     # garbled: not a number at all -- must be KEPT (scores 2.0)
@@ -122,18 +128,23 @@ def test_legit_amounts_from_oracle_db(truth_db):
 # --------------------------------------------------------------------------- #
 # 3. labeling
 # --------------------------------------------------------------------------- #
-def test_label_mention_correct_and_nearest():
+def test_label_mention_three_way():
     legit = [("40000000", 40_000_000.0), ("45000000", 45_000_000.0)]
-    # canonical equality: "$45M" == "45000000" after canonicalize_value
-    true, ok, rel = label_mention("$45M", 45_000_000.0, legit)
-    assert ok and true == "45000000" and rel == 0.0
-    # wrong -> paired with the NEAREST legitimate value
-    true, ok, rel = label_mention("46000000", 46_000_000.0, legit)
-    assert not ok and true == "45000000"
-    assert rel == pytest.approx(1_000_000 / 45_000_000)
-    # unparseable -> kept, paired arbitrarily, infinite distance recorded
-    true, ok, rel = label_mention("forty-five-ish", None, legit)
-    assert not ok and rel == float("inf")
+    # canonical equality: "$45M" == "45000000" -> registry decides, exact
+    true, src, rel = label_mention("$45M", 45_000_000.0, legit)
+    assert (true, src, rel) == ("45000000", "registry_exact", 0.0)
+    # within CLAIM_TOL_REL (0.67%): auto-correct, true := pred so the
+    # gate's own equality test scores it correct
+    true, src, rel = label_mention("45300000", 45_300_000.0, legit)
+    assert src == "registry_tol" and true == "45300000"
+    assert rel == pytest.approx(300_000 / 45_000_000)
+    # beyond tolerance (2.2%): the registry cannot decide -> review, with
+    # the nearest filed value as context
+    true, src, rel = label_mention("46000000", 46_000_000.0, legit)
+    assert src == "review" and true == "45000000"
+    # unparseable: also review (a human should glance at garbled output)
+    true, src, rel = label_mention("forty-five-ish", None, legit)
+    assert src == "review" and rel == float("inf")
 
 
 # --------------------------------------------------------------------------- #
@@ -175,7 +186,7 @@ def test_check_run_conditions(tmp_path, run_db):
 # --------------------------------------------------------------------------- #
 def test_gather_refuses_gated_run(run_db):
     kept, stats = gather_mentions(run_db, _ALIASES)           # bootstrap: fine
-    assert len(kept) == 4 and stats["out_of_scope"] == 1
+    assert len(kept) == 5 and stats["out_of_scope"] == 1
 
     run_db.add(_mention("m6", "45000000", 45_000_000.0, 0.99, flags=()))
     run_db.commit()
@@ -187,29 +198,59 @@ def test_gather_refuses_gated_run(run_db):
 # 7. end-to-end harvest, file contract, idempotency
 # --------------------------------------------------------------------------- #
 def test_harvest_end_to_end_offline(tmp_path, run_db, truth_db):
-    rows, stats = harvest(run_db, truth_db, run_id="r1",
-                          entity_id="cik1", entity_name=_NAME,
-                          aliases=_ALIASES)
-    assert stats == {"amount_mentions": 5, "out_of_scope": 1,
-                     "harvested": 4, "correct": 2, "wrong": 2,
-                     "wrong_within_tol": 0}
-    # the stale-but-faithful 40M read labels CORRECT (reading fidelity)
-    by_id = {r["mention_id"]: r for r in rows}
-    assert by_id["m2"]["true"] == "40000000"
-    assert by_id["m3"]["true"] == "45000000"                  # nearest pairing
+    auto, review, stats = harvest(run_db, truth_db, run_id="r1",
+                                  entity_id="cik1", entity_name=_NAME,
+                                  aliases=_ALIASES)
+    assert stats == {"amount_mentions": 6, "out_of_scope": 1,
+                     "harvested": 5, "auto_exact": 2, "auto_tol": 1,
+                     "queued_for_review": 2}
+    by_id = {r["mention_id"]: r for r in auto + review}
+    # the stale-but-faithful 40M read auto-labels CORRECT (reading fidelity)
+    assert by_id["m2"]["label_source"] == "registry_exact"
+    # the rounded 45.3M press figure auto-labels correct with true := pred
+    assert by_id["m7"]["true"] == "45300000"
+    # review rows carry NO 'true' yet, but do carry the reviewer's context
+    assert "true" not in by_id["m3"] and by_id["m3"]["registry_nearest"] == "45000000"
+    assert "passage" in by_id["m4"] and "url" in by_id["m4"]
 
-    out = tmp_path / "extraction_cal.json"
-    n_added, n_total = append_calibration(out, rows)
-    assert (n_added, n_total) == (4, 4)
-    # idempotent: the same run adds nothing twice
-    n_added, n_total = append_calibration(out, rows)
-    assert (n_added, n_total) == (0, 4)
+    cal = tmp_path / "extraction_cal.json"
+    q = tmp_path / "review_queue.json"
+    assert append_calibration(cal, auto) == (3, 3)
+    assert append_queue(q, cal, review) == (2, 2)
+    # idempotent: the same harvest adds nothing to either file
+    assert append_calibration(cal, auto) == (0, 3)
+    assert append_queue(q, cal, review) == (0, 2)
 
-    # the ch. 6 loader reads the file UNCHANGED and the gate fits on it
-    cal = load_calibration_set(out)
-    assert len(cal) == 4 and all(len(t) == 3 for t in cal)
-    pv = threshold_preview(out)
-    assert pv["n"] == 4 and pv["threshold"] > 0
+    # the ch. 6 loader reads the DECIDED file unchanged; the gate fits
+    loaded = load_calibration_set(cal)
+    assert len(loaded) == 3 and all(len(t) == 3 for t in loaded)
+    assert threshold_preview(cal)["n"] == 3
+
+
+def test_review_decisions_and_no_requeue(tmp_path, run_db, truth_db):
+    auto, review, _ = harvest(run_db, truth_db, run_id="r1",
+                              entity_id="cik1", entity_name=_NAME,
+                              aliases=_ALIASES)
+    cal = tmp_path / "extraction_cal.json"
+    q = tmp_path / "review_queue.json"
+    append_calibration(cal, auto)
+    append_queue(q, cal, review)
+
+    # 'faithful' -> correct extraction: true := pred, human_faithful
+    row = record_decision(cal, q, "m3", faithful=True)
+    assert row["true"] == row["pred"] == "46000000"
+    assert row["label_source"] == "human_faithful"
+    # 'garbled' -> extraction error: true := nearest filed value
+    row = record_decision(cal, q, "m4", faithful=False)
+    assert row["true"] == "40000000" and row["label_source"] == "human_error"
+
+    assert json.loads(q.read_text()) == []                # queue drained
+    assert threshold_preview(cal)["n"] == 5               # all five decided
+    # a DECIDED mention must never reappear for re-review: re-harvesting
+    # the same run adds nothing to the queue
+    assert append_queue(q, cal, review) == (0, 0)
+    with pytest.raises(KeyError):
+        record_decision(cal, q, "m3", faithful=True)      # already decided
 
 
 # --------------------------------------------------------------------------- #

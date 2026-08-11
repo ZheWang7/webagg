@@ -35,8 +35,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from webagg import config                                   # noqa: E402
 from webagg.calharvest import (MIN_RECOMMENDED_N,           # noqa: E402
-                               append_calibration, check_run_conditions,
-                               check_split, harvest, threshold_preview)
+                               append_calibration, append_queue,
+                               check_run_conditions, check_split, harvest,
+                               threshold_preview)
 from webagg.storage import get_session                      # noqa: E402
 
 
@@ -76,15 +77,17 @@ def main() -> None:
             warnings.simplefilter("always")
             check_run_conditions(run_session,             # guard 3
                                  allow_undenied=args.allow_undenied)
-        rows, stats = harvest(run_session, truth_session,  # guard 1 inside
-                              run_id=args.run, entity_id=args.entity,
-                              entity_name=entity_name, aliases=aliases)
+        auto_rows, review_rows, stats = harvest(          # guard 1 inside
+            run_session, truth_session, run_id=args.run,
+            entity_id=args.entity, entity_name=entity_name, aliases=aliases)
     finally:
         run_session.close()
         truth_session.close()
 
     out_path = Path(args.out or config.CALIBRATION_SET)
-    n_added, n_total = append_calibration(out_path, rows)
+    queue_path = out_path.with_name("review_queue.json")
+    n_added, n_total = append_calibration(out_path, auto_rows)
+    q_added, q_total = append_queue(queue_path, out_path, review_rows)
 
     # -- sidecar manifest: every harvest leaves its provenance ---------------
     man_path = out_path.with_suffix(".manifest.json")
@@ -104,10 +107,11 @@ def main() -> None:
     pv = threshold_preview(out_path)
     print(f"harvested  : {stats['harvested']} amount mentions "
           f"({stats['out_of_scope']} out-of-scope surfaces skipped)")
-    print(f"labels     : {stats['correct']} correct / {stats['wrong']} wrong "
-          f"(of which {stats['wrong_within_tol']} within "
-          f"{config.CLAIM_TOL_REL:.0%} = rounding-style)")
-    print(f"file       : {out_path}  (+{n_added} new, {n_total} total)")
+    print(f"registry   : {stats['auto_exact']} exact + {stats['auto_tol']} "
+          f"within {config.CLAIM_TOL_REL:.0%} auto-labeled correct")
+    print(f"review     : {stats['queued_for_review']} registry-undecidable "
+          f"-> queue (+{q_added} new, {q_total} pending)")
+    print(f"file       : {out_path}  (+{n_added} new, {n_total} decided)")
     # HONEST accept-all disambiguation: t_hat >= 1 can mean two OPPOSITE
     # things -- the set is so clean that accepting everything satisfies
     # delta_E (fine), or the wrong-label mass EXCEEDS delta_E and the
@@ -127,12 +131,17 @@ def main() -> None:
                    f"(1 - self_conf) cannot exceed 1 -- self_conf does not "
                    f"separate right from wrong here. More/cleaner examples "
                    f"needed before delta_E is meaningful.")
-    print(f"gate preview: n={pv['n']}  t_hat={pv['threshold']:.4f}  ->  "
-          + verdict)
+    print(f"gate preview: n={pv['n']} decided  t_hat={pv['threshold']:.4f}"
+          f"  ->  " + verdict)
+    print("             (preview covers DECIDED rows only; it moves as the "
+          "review queue drains)")
+    if q_total:
+        print(f"\nnext       : python scripts/review_calibration.py   "
+              f"({q_total} judgments, ~10s each)")
     if n_total < MIN_RECOMMENDED_N:
-        print(f"\n!! only {n_total} examples -- the guide asks for "
-              f"~{MIN_RECOMMENDED_N}+. Harvest more calibration entities / "
-              f"runs before treating delta_E as meaningful.")
+        print(f"\n!! only {n_total} decided examples -- the guide asks for "
+              f"~{MIN_RECOMMENDED_N}+ (decided + reviewed). Harvest more "
+              f"calibration entities / runs and drain the queue.")
 
 
 if __name__ == "__main__":
