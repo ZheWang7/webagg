@@ -438,5 +438,675 @@
     "entity_id": "cik0001543151",
     "rel_dist": 0.5802717664821339,
     "label_source": "human_faithful"
+  },
+  {
+    "pred": "258000000",
+    "self_conf": 0.9,
+    "mention_id": "4c8748e46a45ee77:amount:533eed97:A",
+    "run_id": "cal_uber_04",
+    "entity_id": "cik0001543151",
+    "label_source": "registry_tol",
+    "rel_dist": 0.0008129394034298371,
+    "true": "258000000"
+  },
+  {
+    "pred": "258000000",
+    "self_conf": 0.9,
+    "mention_id": "4150a572c3d21584:amount:d19dca90:A",
+    "run_id": "cal_uber_04",
+    "entity_id": "cik0001543151",
+    "label_source": "registry_tol",
+    "rel_dist": 0.0008129394034298371,
+    "true": "258000000"
+  },
+  {
+    "pred": "258000000",
+    "self_conf": 0.9,
+    "mention_id": "df3bf0b4cc706018:amount:e134fc5d:A",
+    "run_id": "cal_uber_04",
+    "entity_id": "cik0001543151",
+    "label_source": "registry_tol",
+    "rel_dist": 0.0008129394034298371,
+    "true": "258000000"
+  },
+  {
+    "pred": "258000000",
+    "self_conf": 0.9,
+    "mention_id": "b94548553f1c2721:amount:6c43be00:A",
+    "run_id": "cal_uber_04",
+    "entity_id": "cik0001543151",
+    "label_source": "registry_tol",
+    "rel_dist": 0.0008129394034298371,
+    "true": "258000000"
+  },
+  {
+    "pred": "361000000",
+    "true": "361000000",
+    "self_conf": 0.9,
+    "mention_id": "6cfa60fd38864e34:amount:8fa6b3e9:A",
+    "run_id": "cal_uber_04",
+    "entity_id": "cik0001543151",
+    "rel_dist": 0.4003622911807681,
+    "label_source": "human_faithful"
+  },
+  {
+    "pred": "361200000",
+    "true": "361200000",
+    "self_conf": 0.6,
+    "mention_id": "b5b8361e4088d1a9:amount:67eb8954:A",
+    "run_id": "cal_uber_04",
+    "entity_id": "cik0001543151",
+    "rel_dist": 0.40113811516480175,
+    "label_source": "human_faithful"
+  },
+  {
+    "pred": "350000000",
+    "true": "350000000",
+    "self_conf": 0.7,
+    "mention_id": "9c31a93fa9ed43cc:amount:db3e128f:A",
+    "run_id": "cal_uber_04",
+    "entity_id": "cik0001543151",
+    "rel_dist": 0.35769197205891645,
+    "label_source": "human_faithful"
+  },
+  {
+    "pred": "361200000",
+    "true": "361200000",
+    "self_conf": 0.6,
+    "mention_id": "3e4fe56ce142a070:amount:2e95b87e:A",
+    "run_id": "cal_uber_04",
+    "entity_id": "cik0001543151",
+    "rel_dist": 0.40113811516480175,
+    "label_source": "human_faithful"
+  },
+  {
+    "pred": "1200000000",
+    "self_conf": 0.9,
+    "mention_id": "bae6c0a9bc08de33:amount:d1f3043b:A",
+    "run_id": "cal_uber_05",
+    "entity_id": "cik0001543151",
+    "label_source": "registry_tol",
+    "rel_dist": 0.009895841430032979,
+    "true": "1200000000"
+  },
+  {
+    "pred": "30000000",
+    "self_conf": 0.9,
+    "mention_id": "bae6c0a9bc08de33:amount:597650ca:A",
+    "run_id": "cal_uber_05",
+    "entity_id": "cik0001543151",
+    "label_source": "registry_tol",
+    "rel_dist": 0.0024593669803250643,
+    "true": "30000000"
+  },
+  {
+    "pred": "1690000000",
+    "self_conf": 0.9,
+    "mention_id": "bae6c0a9bc08de33:amount:2ee33dff:A",
+    "run_id": "cal_uber_05",
+    "entity_id": "cik0001543151",
+    "label_source": "registry_tol",
+    "rel_dist": 0.0003028668237788315,
+    "true": "1690000000"
+  },
+  {
+    "pred": "2800000000",
+    "self_conf": 0.9,
+    "mention_id": "bae6c0a9bc08de33:amount:6aca8232:A",
+    "run_id": "cal_uber_05",
+    "entity_id": "cik0001543151",
+    "label_source": "registry_tol",
+    "rel_dist": 0.0011864485249404111,
+    "true": "2800000000"
+  },
+  {
+    "pred": "1200000000",
+    "self_conf": 0.9,
+    "mention_id": "bae6c0a9bc08de33:amount:436380f3:A",
+    "run_id": "cal_uber_05",
+    "entity_id": "cik0001543151",
+    "label_source": "registry_tol",
+    "rel_dist": 0.009895841430032979,
+    "true": "1200000000"
+  },
+  {
+    "pred": "37300000",
+    "self_conf": 0.9,
+    "mention_id": "bae6c0a9bc08de33:amount:1037099b:A",
+    "run_id": "cal_uber_05",
+    "entity_id": "cik0001543151",
+    "label_source": "registry_tol",
+    "rel_dist": 0.0013314755636731116,
+    "true": "37300000"
+  },
+  {
+    "pred": "1150000000",
+    "true": "1150000000",
+    "self_conf": 0.9,
+    "mention_id": "bae6c0a9bc08de33:amount:ed5e8d81:A",
+    "run_id": "cal_uber_05",
+    "entity_id": "cik0001543151",
+    "rel_dist": 0.03218315196288506,
+    "label_source": "human_faithful"
+  },
+  {
+    "pred": "500000000",
+    "true": "500000000",
+    "self_conf": 0.9,
+    "mention_id": "bae6c0a9bc08de33:amount:b2b2e7d9:A",
+    "run_id": "cal_uber_05",
+    "entity_id": "cik0001543151",
+    "rel_dist": 0.9395599600841663,
+    "label_source": "human_faithful"
+  },
+  {
+    "pred": "500000000",
+    "true": "500000000",
+    "self_conf": 0.9,
+    "mention_id": "bae6c0a9bc08de33:amount:c5e1db07:A",
+    "run_id": "cal_uber_05",
+    "entity_id": "cik0001543151",
+    "rel_dist": 0.9395599600841663,
+    "label_source": "human_faithful"
+  },
+  {
+    "pred": "1500000000",
+    "true": "1500000000",
+    "self_conf": 0.9,
+    "mention_id": "bae6c0a9bc08de33:amount:e6f65bcb:A",
+    "run_id": "cal_uber_05",
+    "entity_id": "cik0001543151",
+    "rel_dist": 0.11269485221045458,
+    "label_source": "human_faithful"
+  },
+  {
+    "pred": "1300000000",
+    "true": "1300000000",
+    "self_conf": 0.9,
+    "mention_id": "bae6c0a9bc08de33:amount:6bfc7f04:A",
+    "run_id": "cal_uber_05",
+    "entity_id": "cik0001543151",
+    "rel_dist": 0.09405382821586906,
+    "label_source": "human_faithful"
+  },
+  {
+    "pred": "3500000000",
+    "true": "3500000000",
+    "self_conf": 0.9,
+    "mention_id": "bae6c0a9bc08de33:amount:ce4746d9:A",
+    "run_id": "cal_uber_05",
+    "entity_id": "cik0001543151",
+    "rel_dist": 0.2485169393438245,
+    "label_source": "human_faithful"
+  },
+  {
+    "pred": "200000000",
+    "true": "200000000",
+    "self_conf": 0.9,
+    "mention_id": "bae6c0a9bc08de33:amount:fabb2665:A",
+    "run_id": "cal_uber_05",
+    "entity_id": "cik0001543151",
+    "rel_dist": 0.22417601596633346,
+    "label_source": "human_faithful"
+  },
+  {
+    "pred": "75000000",
+    "true": "75000000",
+    "self_conf": 0.9,
+    "mention_id": "bae6c0a9bc08de33:amount:cd2f2b67:A",
+    "run_id": "cal_uber_05",
+    "entity_id": "cik0001543151",
+    "rel_dist": 1.0134010902754822,
+    "label_source": "human_faithful"
+  },
+  {
+    "pred": "1000000000",
+    "true": "1000000000",
+    "self_conf": 0.9,
+    "mention_id": "bae6c0a9bc08de33:amount:e908a442:A",
+    "run_id": "cal_uber_05",
+    "entity_id": "cik0001543151",
+    "rel_dist": 0.09072573161980718,
+    "label_source": "human_faithful"
+  },
+  {
+    "pred": "1600000000",
+    "true": "1600000000",
+    "self_conf": 0.9,
+    "mention_id": "bae6c0a9bc08de33:amount:8fa1807d:A",
+    "run_id": "cal_uber_05",
+    "entity_id": "cik0001543151",
+    "rel_dist": 0.053541175691151556,
+    "label_source": "human_faithful"
+  },
+  {
+    "pred": "361000000",
+    "true": "361000000",
+    "self_conf": 0.9,
+    "mention_id": "bae6c0a9bc08de33:amount:8fa6b3e9:A",
+    "run_id": "cal_uber_05",
+    "entity_id": "cik0001543151",
+    "rel_dist": 0.4003622911807681,
+    "label_source": "human_faithful"
+  },
+  {
+    "pred": "11000000",
+    "true": "11000000",
+    "self_conf": 0.9,
+    "mention_id": "bae6c0a9bc08de33:amount:f79df9c8:A",
+    "run_id": "cal_uber_05",
+    "entity_id": "cik0001543151",
+    "rel_dist": 10.071967790639155,
+    "label_source": "human_faithful"
+  },
+  {
+    "pred": "1250000",
+    "true": "1250000",
+    "self_conf": 0.9,
+    "mention_id": "bae6c0a9bc08de33:amount:8e68a13c:A",
+    "run_id": "cal_uber_05",
+    "entity_id": "cik0001543151",
+    "rel_dist": 0.25817815802717664,
+    "label_source": "human_faithful"
+  },
+  {
+    "pred": "200000",
+    "true": "200000",
+    "self_conf": 0.8,
+    "mention_id": "bae6c0a9bc08de33:amount:7eb6d883:A",
+    "run_id": "cal_uber_05",
+    "entity_id": "cik0001543151",
+    "rel_dist": 0.7986914947156517,
+    "label_source": "human_faithful"
+  },
+  {
+    "pred": "265000000",
+    "self_conf": 0.92,
+    "mention_id": "133d227e942950fb:amount:0daacbd9:A",
+    "run_id": "cal_instacart_04",
+    "entity_id": "cik0001579091",
+    "label_source": "registry_exact",
+    "rel_dist": 0.0,
+    "true": "265000000"
+  },
+  {
+    "pred": "265000000",
+    "self_conf": 0.9,
+    "mention_id": "cb59805bd801aed1:amount:87a81555:A",
+    "run_id": "cal_instacart_04",
+    "entity_id": "cik0001579091",
+    "label_source": "registry_exact",
+    "rel_dist": 0.0,
+    "true": "265000000"
+  },
+  {
+    "pred": "265000000",
+    "self_conf": 0.9,
+    "mention_id": "ea25c3111ad215f3:amount:22c2fd99:A",
+    "run_id": "cal_instacart_04",
+    "entity_id": "cik0001579091",
+    "label_source": "registry_exact",
+    "rel_dist": 0.0,
+    "true": "265000000"
+  },
+  {
+    "pred": "200000000",
+    "self_conf": 0.88,
+    "mention_id": "ea25c3111ad215f3:amount:8db82802:A",
+    "run_id": "cal_instacart_04",
+    "entity_id": "cik0001579091",
+    "label_source": "registry_tol",
+    "rel_dist": 1.00000010000001e-07,
+    "true": "200000000"
+  },
+  {
+    "pred": "265000000",
+    "self_conf": 0.9,
+    "mention_id": "9849428c4568e62f:amount:5d82c6a8:A",
+    "run_id": "cal_instacart_04",
+    "entity_id": "cik0001579091",
+    "label_source": "registry_exact",
+    "rel_dist": 0.0,
+    "true": "265000000"
+  },
+  {
+    "pred": "265000000",
+    "self_conf": 0.9,
+    "mention_id": "819260f68143b375:amount:0de98dfb:A",
+    "run_id": "cal_instacart_04",
+    "entity_id": "cik0001579091",
+    "label_source": "registry_exact",
+    "rel_dist": 0.0,
+    "true": "265000000"
+  },
+  {
+    "pred": "265000000",
+    "self_conf": 0.9,
+    "mention_id": "76d429f4effe90b6:amount:dbdd296f:A",
+    "run_id": "cal_instacart_04",
+    "entity_id": "cik0001579091",
+    "label_source": "registry_exact",
+    "rel_dist": 0.0,
+    "true": "265000000"
+  },
+  {
+    "pred": "8500000",
+    "true": "8500000",
+    "self_conf": 0.85,
+    "mention_id": "1154f957e66eae97:amount:57e37ab6:A",
+    "run_id": "cal_instacart_04",
+    "entity_id": "cik0001579091",
+    "rel_dist": 0.026625235256092037,
+    "label_source": "human_faithful"
+  },
+  {
+    "pred": "1000000",
+    "self_conf": 0.86,
+    "mention_id": "7b70458c14ac4b15:amount:580ea185:A",
+    "run_id": "cal_uber_06",
+    "entity_id": "cik0001543151",
+    "label_source": "registry_tol",
+    "rel_dist": 0.006542526421741319,
+    "true": "1000000"
+  },
+  {
+    "pred": "232000000",
+    "self_conf": 0.9,
+    "mention_id": "4131813ee5e3d016:amount:99ca0df3:A",
+    "run_id": "cal_instacart_05",
+    "entity_id": "cik0001579091",
+    "label_source": "registry_exact",
+    "rel_dist": 0.0,
+    "true": "232000000"
+  },
+  {
+    "pred": "265000000",
+    "self_conf": 0.9,
+    "mention_id": "4131813ee5e3d016:amount:aff3ce1d:A",
+    "run_id": "cal_instacart_05",
+    "entity_id": "cik0001579091",
+    "label_source": "registry_exact",
+    "rel_dist": 0.0,
+    "true": "265000000"
+  },
+  {
+    "pred": "200000000",
+    "self_conf": 0.9,
+    "mention_id": "4131813ee5e3d016:amount:ed560407:A",
+    "run_id": "cal_instacart_05",
+    "entity_id": "cik0001579091",
+    "label_source": "registry_tol",
+    "rel_dist": 1.00000010000001e-07,
+    "true": "200000000"
+  },
+  {
+    "pred": "225000000",
+    "self_conf": 0.9,
+    "mention_id": "4131813ee5e3d016:amount:8adc03b1:A",
+    "run_id": "cal_instacart_05",
+    "entity_id": "cik0001579091",
+    "label_source": "registry_tol",
+    "rel_dist": 3.288889970568257e-07,
+    "true": "225000000"
+  },
+  {
+    "pred": "200000000",
+    "self_conf": 0.9,
+    "mention_id": "4131813ee5e3d016:amount:7644abbb:A",
+    "run_id": "cal_instacart_05",
+    "entity_id": "cik0001579091",
+    "label_source": "registry_tol",
+    "rel_dist": 1.00000010000001e-07,
+    "true": "200000000"
+  },
+  {
+    "pred": "413000000",
+    "self_conf": 0.9,
+    "mention_id": "4131813ee5e3d016:amount:f481d376:A",
+    "run_id": "cal_instacart_05",
+    "entity_id": "cik0001579091",
+    "label_source": "registry_tol",
+    "rel_dist": 4.545556081670999e-05,
+    "true": "413000000"
+  },
+  {
+    "pred": "220000000",
+    "self_conf": 0.9,
+    "mention_id": "4131813ee5e3d016:amount:c556d0ed:A",
+    "run_id": "cal_instacart_05",
+    "entity_id": "cik0001579091",
+    "label_source": "registry_tol",
+    "rel_dist": 0.0007463834047920034,
+    "true": "220000000"
+  },
+  {
+    "pred": "8730000",
+    "self_conf": 0.9,
+    "mention_id": "4131813ee5e3d016:amount:f900ca93:A",
+    "run_id": "cal_instacart_05",
+    "entity_id": "cik0001579091",
+    "label_source": "registry_tol",
+    "rel_dist": 0.00028685926890393995,
+    "true": "8730000"
+  },
+  {
+    "pred": "193000",
+    "self_conf": 0.9,
+    "mention_id": "4131813ee5e3d016:amount:028714db:A",
+    "run_id": "cal_instacart_05",
+    "entity_id": "cik0001579091",
+    "label_source": "registry_tol",
+    "rel_dist": 0.0022069323640140203,
+    "true": "193000"
+  },
+  {
+    "pred": "265000000",
+    "self_conf": 0.86,
+    "mention_id": "891b17687f15c788:amount:72d58503:A",
+    "run_id": "cal_instacart_05",
+    "entity_id": "cik0001579091",
+    "label_source": "registry_exact",
+    "rel_dist": 0.0,
+    "true": "265000000"
+  },
+  {
+    "pred": "200000000",
+    "self_conf": 0.9,
+    "mention_id": "4febb2ffb0e527dd:amount:abb7cbd0:A",
+    "run_id": "cal_instacart_05",
+    "entity_id": "cik0001579091",
+    "label_source": "registry_tol",
+    "rel_dist": 1.00000010000001e-07,
+    "true": "200000000"
+  },
+  {
+    "pred": "225000000",
+    "self_conf": 0.82,
+    "mention_id": "4febb2ffb0e527dd:amount:0297fb3b:A",
+    "run_id": "cal_instacart_05",
+    "entity_id": "cik0001579091",
+    "label_source": "registry_tol",
+    "rel_dist": 3.288889970568257e-07,
+    "true": "225000000"
+  },
+  {
+    "pred": "350000000",
+    "self_conf": 0.94,
+    "mention_id": "0215739314a8d869:amount:4ea788a7:A",
+    "run_id": "cal_instacart_05",
+    "entity_id": "cik0001579091",
+    "label_source": "registry_tol",
+    "rel_dist": 0.0025790314359543307,
+    "true": "350000000"
+  },
+  {
+    "pred": "200000000",
+    "self_conf": 0.9,
+    "mention_id": "c5035ffedb393538:amount:19d6a7c3:A",
+    "run_id": "cal_instacart_05",
+    "entity_id": "cik0001579091",
+    "label_source": "registry_tol",
+    "rel_dist": 1.00000010000001e-07,
+    "true": "200000000"
+  },
+  {
+    "pred": "350000000",
+    "self_conf": 0.9,
+    "mention_id": "3cde23804c7e64f4:amount:e9cf6ef8:A",
+    "run_id": "cal_instacart_05",
+    "entity_id": "cik0001579091",
+    "label_source": "registry_tol",
+    "rel_dist": 0.0025790314359543307,
+    "true": "350000000"
+  },
+  {
+    "pred": "200000000",
+    "self_conf": 0.9,
+    "mention_id": "54237011077a3505:amount:26b257ea:A",
+    "run_id": "cal_instacart_05",
+    "entity_id": "cik0001579091",
+    "label_source": "registry_tol",
+    "rel_dist": 1.00000010000001e-07,
+    "true": "200000000"
+  },
+  {
+    "pred": "225000000",
+    "self_conf": 0.88,
+    "mention_id": "54237011077a3505:amount:0431b3e5:A",
+    "run_id": "cal_instacart_05",
+    "entity_id": "cik0001579091",
+    "label_source": "registry_tol",
+    "rel_dist": 3.288889970568257e-07,
+    "true": "225000000"
+  },
+  {
+    "pred": "100000000",
+    "true": "100000000",
+    "self_conf": 0.9,
+    "mention_id": "4131813ee5e3d016:amount:3e897ded:A",
+    "run_id": "cal_instacart_05",
+    "entity_id": "cik0001579091",
+    "rel_dist": 1.3565134845710696,
+    "label_source": "human_faithful"
+  },
+  {
+    "pred": "271000000",
+    "true": "271000000",
+    "self_conf": 0.9,
+    "mention_id": "4131813ee5e3d016:amount:9afe4666:A",
+    "run_id": "cal_instacart_05",
+    "entity_id": "cik0001579091",
+    "rel_dist": 0.022641509433962263,
+    "label_source": "human_faithful"
+  },
+  {
+    "pred": "600000000",
+    "true": "600000000",
+    "self_conf": 0.9,
+    "mention_id": "4131813ee5e3d016:amount:28e11f55:A",
+    "run_id": "cal_instacart_05",
+    "entity_id": "cik0001579091",
+    "rel_dist": 0.45271846649760283,
+    "label_source": "human_faithful"
+  },
+  {
+    "pred": "150000000",
+    "true": "150000000",
+    "self_conf": 0.9,
+    "mention_id": "4131813ee5e3d016:amount:1ef6a1f2:A",
+    "run_id": "cal_instacart_05",
+    "entity_id": "cik0001579091",
+    "rel_dist": 0.23076885996037352,
+    "label_source": "human_faithful"
+  },
+  {
+    "pred": "44000000",
+    "true": "44000000",
+    "self_conf": 0.9,
+    "mention_id": "4131813ee5e3d016:amount:55b38b76:A",
+    "run_id": "cal_instacart_05",
+    "entity_id": "cik0001579091",
+    "rel_dist": 0.03686593321127065,
+    "label_source": "human_faithful"
+  },
+  {
+    "pred": "2300000",
+    "true": "2300000",
+    "self_conf": 0.9,
+    "mention_id": "4131813ee5e3d016:amount:80e6d2da:A",
+    "run_id": "cal_instacart_05",
+    "entity_id": "cik0001579091",
+    "rel_dist": 10.943398675840582,
+    "label_source": "human_faithful"
+  },
+  {
+    "pred": "120000",
+    "true": "120000",
+    "self_conf": 0.9,
+    "mention_id": "4131813ee5e3d016:amount:142892fc:A",
+    "run_id": "cal_instacart_05",
+    "entity_id": "cik0001579091",
+    "rel_dist": 0.3768661560431001,
+    "label_source": "human_faithful"
+  },
+  {
+    "pred": "100000000",
+    "true": "100000000",
+    "self_conf": 0.82,
+    "mention_id": "4febb2ffb0e527dd:amount:06fd125a:A",
+    "run_id": "cal_instacart_05",
+    "entity_id": "cik0001579091",
+    "rel_dist": 1.3565134845710696,
+    "label_source": "human_faithful"
+  },
+  {
+    "pred": "500000000",
+    "true": "500000000",
+    "self_conf": 0.91,
+    "mention_id": "3cde23804c7e64f4:amount:0549a3b1:A",
+    "run_id": "cal_instacart_05",
+    "entity_id": "cik0001579091",
+    "rel_dist": 0.2105987220813357,
+    "label_source": "human_faithful"
+  },
+  {
+    "pred": "325000000",
+    "true": "325000000",
+    "self_conf": 0.86,
+    "mention_id": "3cde23804c7e64f4:amount:94e47c29:A",
+    "run_id": "cal_instacart_05",
+    "entity_id": "cik0001579091",
+    "rel_dist": 0.06903375652375669,
+    "label_source": "human_faithful"
+  },
+  {
+    "pred": "871000000",
+    "true": "871000000",
+    "self_conf": 0.86,
+    "mention_id": "3cde23804c7e64f4:amount:f7846cc2:A",
+    "run_id": "cal_instacart_05",
+    "entity_id": "cik0001579091",
+    "rel_dist": 1.1088629738656868,
+    "label_source": "human_faithful"
+  },
+  {
+    "pred": "500000000",
+    "true": "500000000",
+    "self_conf": 0.86,
+    "mention_id": "4e3b4f29f01de6fe:amount:e7d93f96:A",
+    "run_id": "cal_instacart_05",
+    "entity_id": "cik0001579091",
+    "rel_dist": 0.2105987220813357,
+    "label_source": "human_faithful"
+  },
+  {
+    "pred": "500000000",
+    "true": "500000000",
+    "self_conf": 0.9,
+    "mention_id": "715534e1eea9f55c:amount:5ac72778:A",
+    "run_id": "cal_instacart_05",
+    "entity_id": "cik0001579091",
+    "rel_dist": 0.2105987220813357,
+    "label_source": "human_faithful"
   }
 ]

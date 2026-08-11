@@ -100,8 +100,128 @@
       },
       "n_added": 2,
       "undenied_accepted": false
+    },
+    {
+      "at": "2026-08-11T03:10:27.710463",
+      "cohort": "formd_v1",
+      "run_id": "cal_uber_04",
+      "entity_id": "cik0001543151",
+      "aliases": [
+        "Uber Technologies, Inc",
+        "Uber"
+      ],
+      "stats": {
+        "amount_mentions": 8,
+        "out_of_scope": 0,
+        "harvested": 8,
+        "auto_exact": 0,
+        "auto_tol": 4,
+        "queued_for_review": 4
+      },
+      "n_added": 4,
+      "undenied_accepted": false
+    },
+    {
+      "at": "2026-08-11T03:17:16.132184",
+      "cohort": "formd_v1",
+      "run_id": "cal_uber_05",
+      "entity_id": "cik0001543151",
+      "aliases": [
+        "Uber Technologies, Inc",
+        "Uber"
+      ],
+      "stats": {
+        "amount_mentions": 20,
+        "out_of_scope": 0,
+        "harvested": 20,
+        "auto_exact": 0,
+        "auto_tol": 6,
+        "queued_for_review": 14
+      },
+      "n_added": 6,
+      "undenied_accepted": false
+    },
+    {
+      "at": "2026-08-11T03:29:28.341982",
+      "cohort": "formd_v1",
+      "run_id": "cal_instacart_03",
+      "entity_id": "cik0001579091",
+      "aliases": [
+        "Maplebear Inc.",
+        "Instacart"
+      ],
+      "stats": {
+        "amount_mentions": 0,
+        "out_of_scope": 0,
+        "harvested": 0,
+        "auto_exact": 0,
+        "auto_tol": 0,
+        "queued_for_review": 0
+      },
+      "n_added": 0,
+      "undenied_accepted": false
+    },
+    {
+      "at": "2026-08-11T03:57:10.071458",
+      "cohort": "formd_v1",
+      "run_id": "cal_instacart_04",
+      "entity_id": "cik0001579091",
+      "aliases": [
+        "Maplebear Inc.",
+        "Instacart"
+      ],
+      "stats": {
+        "amount_mentions": 8,
+        "out_of_scope": 0,
+        "harvested": 8,
+        "auto_exact": 6,
+        "auto_tol": 1,
+        "queued_for_review": 1
+      },
+      "n_added": 7,
+      "undenied_accepted": false
+    },
+    {
+      "at": "2026-08-11T04:18:37.699669",
+      "cohort": "formd_v1",
+      "run_id": "cal_uber_06",
+      "entity_id": "cik0001543151",
+      "aliases": [
+        "Uber Technologies, Inc",
+        "Uber"
+      ],
+      "stats": {
+        "amount_mentions": 1,
+        "out_of_scope": 0,
+        "harvested": 1,
+        "auto_exact": 0,
+        "auto_tol": 1,
+        "queued_for_review": 0
+      },
+      "n_added": 1,
+      "undenied_accepted": false
+    },
+    {
+      "at": "2026-08-11T05:18:48.552585",
+      "cohort": "formd_v1",
+      "run_id": "cal_instacart_05",
+      "entity_id": "cik0001579091",
+      "aliases": [
+        "Maplebear Inc.",
+        "Instacart"
+      ],
+      "stats": {
+        "amount_mentions": 30,
+        "out_of_scope": 0,
+        "harvested": 30,
+        "auto_exact": 3,
+        "auto_tol": 14,
+        "queued_for_review": 13
+      },
+      "n_added": 17,
+      "undenied_accepted": false
     }
   ],
-  "n_total": 37,
+  "n_total": 98,
   "n_below_recommended": true
 }
