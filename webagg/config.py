@@ -32,6 +32,13 @@ MODEL_STRONG = os.environ.get("WEBAGG_MODEL_STRONG", "gpt-5")
 DELTA_E = 0.05      # conformal miscoverage level (paper Prop. 2)
 DELTA_A = 0.05      # confidence level of the phi-audit Clopper-Pearson bound
 CALIBRATION_SET = DATA_DIR / "calibration" / "extraction_cal.json"
+# --- ER labeled pairs (seam A2; guide ch. 9 matching bullet) ----------------
+MATCH_PAIRS = GROUND_TRUTH_DIR / "match_pairs.csv"
+# Fitting floor (documented deviation -- the guide targets ~200 pairs but
+# names no minimum): below this, load_fitted_matcher returns the cold-start
+# matcher rather than Platt-scaling a handful of pairs into a fake alpha.
+ER_MIN_LABELED = 40        # labeled pairs overall
+ER_MIN_PER_CLASS = 10      # and at least this many in EACH class
 
 # --- stopping-rule / frontier constants (impl guide ch. 7, paper §3.3) --------
 EPS_G = 0.10       # per-stratum unseen-mass threshold eps_g (conjunct i)
@@ -78,24 +85,14 @@ EPS_F_TARGET = 0.10   # the fidelity level we ATTEMPT to certify; the stored
 FIDELITY_CERT_DIR = DATA_DIR / "fidelity_certs"   # one JSON per domain
 FIDELITY_CERT_DIR.mkdir(parents=True, exist_ok=True)
 
-# --- end-to-end report layer (impl guide §14, paper Thm 6 / Cor. 1) ----------
-# The interval printed to the user is TWO terms: eps_C^g (per-group
-# completeness slack, regime-dependent) + eps_F (one domain-wide fidelity
-# level from §13). If no fidelity certificate exists for the domain, §14's
-# decision (risk_control.load_fidelity_cert docstring poses it) is: fall
-# back to this conservative constant AND SAY SO in the regime label,
-# rather than refuse to print an interval. Calibrating (§13) replaces it.
+# --- end-to-end report layer (impl guide Ch14, paper Thm 6 / Cor. 1) ----------
 EPS_F_FALLBACK = 0.15
 
-# Optional post-certification reliability refinement (paper §4.4 / App. F):
-# values in checksum/registry-certified strata act as labels; each source's
-# q becomes a closed-form Beta-posterior over its agreement rate. OFF by
-# default -- the fixed-prior QTable is the guaranteed path; this is a
-# drop-in refinement required by no theorem.
+# Optional post-certification reliability refinement (paper Ch4.4 / App. F):
 USE_CERTIFIED_REFINE = False
 REFINE_PRIOR_STRENGTH = 4.0    # pseudo-count mass anchoring the class prior
 
-# --- verification allocator (impl guide §14.3, "spending a human wisely") ----
+# --- verification allocator (impl guide Ch 14.3, "spending a human wisely") ----
 VERIFY_BUDGET = 5          # top-B human checks to print (B <= 10: greedy fine)
 VERIFY_BELIEF_FLOOR = 0.70 # adopted values below this belief become candidates
 DELTA_T_VERIFY = 0.10      # weight on supersession checks (share of value at risk

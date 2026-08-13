@@ -532,8 +532,11 @@ def resolve_and_aggregate(session, *, run_id: str, query_attributes: set[str],
     else:
         # lazy import: pulls in sentence-transformers/torch only when the
         # real matcher is actually wanted
-        from .entity_resolution import resolve_entities, Matcher
-        er_result = resolve_entities(mentions, matcher or Matcher(), sources)
+        from .entity_resolution import resolve_entities
+        from .er_pairs import load_fitted_matcher
+        er_result = resolve_entities(mentions,
+                                     matcher or load_fitted_matcher(),
+                                     sources)
         mention_to_entity = er_result.mention_to_entity
         er_fragile = er_result.fragile_pairs
         # ch. 9 bookkeeping: how many decisions were one flip from changing
