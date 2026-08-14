@@ -1,0 +1,32 @@
+{
+  "cik0001543151": {
+    "db": "D:\\Projects\\webagg\\data\\runs\\cert_formd_v1_cik0001543151.sqlite",
+    "delta": 0.1,
+    "delta_E_ref": 0.05,
+    "deny": [
+      "sec.gov",
+      "www.sec.gov",
+      "data.sec.gov"
+    ],
+    "entity_name": "Uber Technologies, Inc",
+    "eps": 0.1,
+    "max_steps": 60,
+    "query": "total funding raised by Uber Technologies, Inc",
+    "run_id": "cert_formd_v1_cik0001543151"
+  },
+  "cik0001579091": {
+    "db": "D:\\Projects\\webagg\\data\\runs\\cert_formd_v1_cik0001579091.sqlite",
+    "delta": 0.1,
+    "delta_E_ref": 0.05,
+    "deny": [
+      "sec.gov",
+      "www.sec.gov",
+      "data.sec.gov"
+    ],
+    "entity_name": "Instacart",
+    "eps": 0.1,
+    "max_steps": 60,
+    "query": "total funding raised by Instacart",
+    "run_id": "cert_formd_v1_cik0001579091"
+  }
+}
