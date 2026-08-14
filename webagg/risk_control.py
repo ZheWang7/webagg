@@ -166,14 +166,20 @@ def default_truth_key(record) -> Optional[str]:
         return str(rk.value)
     dt = attrs.get("date")
     if dt is not None and getattr(dt, "value", None):
+        # BASE kind only: the pipeline instance-qualifies record kinds
+        # ("funding_round/series_e") to keep rounds apart during ER, but the
+        # registry cannot know press stage labels -- truth keys are written
+        # unqualified ("funding_round|date"). Alignment strips the qualifier;
+        # two same-date rounds colliding under the base kind is exactly the
+        # duplicate_truth_key case the truth builder already flags.
         base_kind = _kind(record).split("/")[0]
         return f"{base_kind}|{dt.value}"
-    return None
     return None
 
 
 def match_to_truth(resolved_g, truth_g: TruthEntity,
-                   key_fn: Callable = default_truth_key
+                   key_fn: Callable = default_truth_key,
+                   amount_tol: Optional[float] = None
                    ) -> list[tuple[object, Optional[TruthRecord]]]:
     """Align each resolved record with its true counterpart, or None.
 
@@ -184,6 +190,18 @@ def match_to_truth(resolved_g, truth_g: TruthEntity,
     pulls in a foreign round fails to find a key and is spurious too).
     Truth records that nothing matched are MISSING records: completeness,
     not fidelity, so they simply do not appear in the output (guide 13.2).
+
+    amount_tol (PRE-REGISTERED grading fallback, A3 attempt #2): press
+    pools structurally lack resolvable round DATES ("in June 2014" fails
+    full-ISO extraction), so date keys alone strand well-assembled records
+    as spurious. When amount_tol is set, records left unmatched by keys get
+    a SECOND one-to-one pass against still-unused truth records by relative
+    amount distance <= amount_tol -- the cohort's registry_tol convention
+    (2%), i.e. alignment by near-equality of the very quantity the registry
+    filed. Deterministic (closest first, ties by truth key), and
+    conservative in the right direction: a record whose amount is wrong
+    beyond tolerance still takes the full spurious penalty. Date keys keep
+    PRECEDENCE; default None = off (core behavior unchanged).
     """
     by_key = {t.key: t for t in truth_g.records}
     unused = set(by_key)                     # each truth record usable once
@@ -194,12 +212,33 @@ def match_to_truth(resolved_g, truth_g: TruthEntity,
             unused.discard(k)
             aligned.append((r, by_key[k]))
         else:
-            aligned.append((r, None))        # spurious: no true counterpart
+            aligned.append((r, None))        # provisional: no key match
+
+    if amount_tol is not None:
+        # second pass: (record, relative distance, truth key) candidates
+        # over the still-unmatched x still-unused grid, greedily closest
+        cands = []
+        for i, (r, t) in enumerate(aligned):
+            if t is not None:
+                continue
+            amt = usd(_attrs(r).get("amount"))
+            if amt <= 0:
+                continue                     # nothing to align on
+            for k in unused:
+                ta = by_key[k].amount
+                rel = abs(amt - ta) / max(abs(ta), 1e-9)
+                if rel <= amount_tol:
+                    cands.append((rel, k, i))
+        for rel, k, i in sorted(cands):      # deterministic: closest first
+            if k in unused and aligned[i][1] is None:
+                unused.discard(k)
+                aligned[i] = (aligned[i][0], by_key[k])
     return aligned
 
 
 def fidelity_loss(resolved_g, truth_g: TruthEntity,
-                  key_fn: Callable = default_truth_key) -> float:
+                  key_fn: Callable = default_truth_key,
+                  amount_tol: Optional[float] = None) -> float:
     """L_g in [0,1]: relative error of the aggregate over CONTRIBUTED
     records only. Missing records are completeness, not fidelity, so they
     are excluded (guide Sec. 13.2; paper Theorem 5).
@@ -210,7 +249,7 @@ def fidelity_loss(resolved_g, truth_g: TruthEntity,
     point: we measure the realized composition, including the cancellations
     a per-stage union bound throws away.
     """
-    aligned = match_to_truth(resolved_g, truth_g, key_fn)
+    aligned = match_to_truth(resolved_g, truth_g, key_fn, amount_tol)
     # value the pipeline assembled for records that DO have a true counterpart
     assembled = sum(usd(_attrs(r).get("amount"))
                     for (r, t) in aligned if t is not None)
@@ -243,6 +282,7 @@ def hoeffding_p(losses, eps_F: float) -> float:
 
 def learn_then_test(cohort, configs, eps_F: float, delta_F: float, *,
                     run_pipeline: Callable, truth: Callable,
+                    loss_fn: Callable = None,
                     trace: Optional[list] = None):
     """Fixed-sequence test over a PRE-COMMITTED, cheapest-first config list.
 
@@ -268,8 +308,9 @@ def learn_then_test(cohort, configs, eps_F: float, delta_F: float, *,
     config fails.
     """
     certified = None
+    loss_fn = loss_fn or fidelity_loss
     for lam in configs:
-        losses = [fidelity_loss(run_pipeline(g, lam), truth(g)) for g in cohort]
+        losses = [loss_fn(run_pipeline(g, lam), truth(g)) for g in cohort]
         p = hoeffding_p(losses, eps_F)
         if trace is not None:
             trace.append({"lam": lam, "mean_loss": float(np.mean(losses)),
@@ -364,6 +405,8 @@ class FidelityCertificate:
     delta_F: float                  # confidence it was certified at
     method: str                     # "ltt" (calibrated) | "fallback" (App. H)
     lam: dict = field(default_factory=dict)   # the selected configuration
+    grading: dict = field(default_factory=dict)   # pre-registered grading
+                                                  # rules (e.g. amount_tol)
     mean_loss: float = float("nan")           # realized mean L on calibration
     n_cal: int = 0                            # calibration cohort size
     # model stamps: a cert calibrated under one extractor does NOT transfer

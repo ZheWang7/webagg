@@ -231,3 +231,71 @@ def test_make_callables_truth_closure(tmp_path):
     # and run_pipeline propagates the delta guard through the closure
     with pytest.raises(ValueError, match="TIGHTEN"):
         run_pipeline("cik0000000077", dict(_LAM, delta_E=0.10))
+
+
+# --------------------------------------------------------------------------- #
+# 11-14. Attempt-#2 pre-registered grading rules
+# --------------------------------------------------------------------------- #
+def test_amount_tol_fallback_matches_within_tolerance():
+    truth = TruthEntity("g", (TruthRecord("funding_round|2020-06-15",
+                                          225_000_000.0, "2020-06-15"),))
+    undated = {"entity_id": "e", "record_kind": "funding_round/unknown",
+               "attributes": {"amount": _cv("224000000", 224_000_000.0)}}
+    from webagg.risk_control import match_to_truth
+    # without the tolerance: spurious (no date key)
+    assert match_to_truth([undated], truth)[0][1] is None
+    # with the cohort tolerance: aligned (0.44% off < 2%)
+    aligned = match_to_truth([undated], truth, amount_tol=0.02)
+    assert aligned[0][1] is truth.records[0]
+    # and the loss reflects the small residual, not a full spurious hit
+    assert fidelity_loss([undated], truth, amount_tol=0.02) < 0.01
+
+
+def test_amount_tol_beyond_tolerance_stays_spurious():
+    truth = TruthEntity("g", (TruthRecord("funding_round|2020-06-15",
+                                          225_000_000.0, "2020-06-15"),))
+    wrong = {"entity_id": "e", "record_kind": "funding_round/unknown",
+             "attributes": {"amount": _cv("200000000", 200_000_000.0)}}
+    from webagg.risk_control import match_to_truth
+    assert match_to_truth([wrong], truth, amount_tol=0.02)[0][1] is None
+    assert fidelity_loss([wrong], truth, amount_tol=0.02) >= 0.88
+
+
+def test_amount_tol_one_to_one_closest_first_and_date_precedence():
+    truth = TruthEntity("g", (
+        TruthRecord("funding_round|2020-06-15", 1_000_000.0, "2020-06-15"),
+        TruthRecord("funding_round|2021-03-02", 1_010_000.0, "2021-03-02")))
+    dated = _dict_record(kind="funding_round/series_a", date="2021-03-02",
+                         amount="1010000", amount_num=1_010_000.0)
+    near = {"entity_id": "e", "record_kind": "funding_round/unknown",
+            "attributes": {"amount": _cv("1000500", 1_000_500.0)}}
+    also = {"entity_id": "e", "record_kind": "funding_round/unknown",
+            "attributes": {"amount": _cv("1004000", 1_004_000.0)}}
+    from webagg.risk_control import match_to_truth
+    aligned = match_to_truth([dated, near, also], truth, amount_tol=0.02)
+    # the DATED record claimed 2021-03-02 by key, before any fallback ran
+    assert aligned[0][1].key == "funding_round|2021-03-02"
+    # closest undated record takes the remaining truth record...
+    assert aligned[1][1].key == "funding_round|2020-06-15"
+    # ...and one-to-one exhausts truth: the second undated stays spurious
+    assert aligned[2][1] is None
+
+
+def test_learn_then_test_loss_fn_injection():
+    from webagg.risk_control import learn_then_test
+    calls = []
+
+    def fake_loss(recs, t):
+        calls.append(recs)
+        return 0.0
+    out = learn_then_test(["g1"], [{"lam": 1}], 0.5, 0.9,
+                          run_pipeline=lambda g, lam: ["records"],
+                          truth=lambda g: "truth", loss_fn=fake_loss)
+    assert out is not None and calls == [["records"]]
+
+
+def test_query_name_override():
+    manifest = {"entities": {"cik1": {"entity_name": "Maplebear Inc."}}}
+    assert certify.query_name(manifest, "cik1", None) == "Maplebear Inc."
+    assert certify.query_name(manifest, "cik1",
+                              {"cik1": "Instacart"}) == "Instacart"

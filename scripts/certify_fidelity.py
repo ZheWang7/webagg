@@ -1,4 +1,4 @@
-"""Certify eps_F by Learn-Then-Test on the withheld-registry cohort.
+"""Certify eps_F by Learn-Then-Test on the withheld-registry cohort (A3).
 
 The run that replaces `eps_F=0.150 [fallback]` in every report with a
 CALIBRATED number (guide Sec. 13; paper Theorem 5). Two phases:
@@ -29,6 +29,7 @@ the certificate; the validation half stays untouched for experiment 8.
 from __future__ import annotations
 
 import argparse
+import functools
 import json
 import sys
 from pathlib import Path
@@ -39,7 +40,8 @@ from webagg import config                                  # noqa: E402
 from webagg.certify import (load_runs_index, make_callables,  # noqa: E402
                             reference_runs)
 from webagg.risk_control import (FidelityCertificate,      # noqa: E402
-                                 learn_then_test, save_fidelity_cert)
+                                 fidelity_loss, learn_then_test,
+                                 save_fidelity_cert)
 
 
 def main() -> None:
@@ -59,6 +61,17 @@ def main() -> None:
                     help="per-entity budget for reference runs")
     ap.add_argument("--refresh", action="store_true",
                     help="force fresh reference runs (default: reuse pools)")
+    ap.add_argument("--refresh-entities", nargs="*", default=(),
+                    help="refresh ONLY these entity ids (others reuse pools)")
+    ap.add_argument("--name", action="append", default=[],
+                    metavar="EID=COMMON_NAME",
+                    help="open-web query name override, e.g. "
+                         "--name cik0001579091=Instacart (the manifest holds "
+                         "registry legal names, which the press may not use)")
+    ap.add_argument("--amount-tol", type=float, default=0.02,
+                    help="PRE-REGISTERED grading fallback: undated records "
+                         "may align to truth by relative amount distance "
+                         "<= this (the cohort's registry_tol); 0 disables")
     args = ap.parse_args()
     domain = args.domain or args.cohort
 
@@ -75,10 +88,12 @@ def main() -> None:
           f"NOT touched (experiment 8's holdout).")
 
     # ---- phase 1: the frozen pools ---------------------------------------
+    names = dict(kv.split("=", 1) for kv in args.name)
     index = reference_runs(manifest, domain=domain,
                            max_steps=args.max_steps,
                            budget_usd=args.budget_usd,
-                           refresh=args.refresh)
+                           refresh=args.refresh, names=names,
+                           refresh_entities=tuple(args.refresh_entities))
     missing = [e for e in cal_ids if e not in index]
     if missing:
         sys.exit(f"reference runs missing for {missing}; aborting.")
@@ -86,10 +101,12 @@ def main() -> None:
     # ---- phase 2: fixed-sequence LTT over the pre-committed grid ---------
     run_pipeline, truth = make_callables(index, cohort_dir)
     trace: list = []
+    tol = args.amount_tol if args.amount_tol > 0 else None
+    loss_fn = functools.partial(fidelity_loss, amount_tol=tol)
     certified = learn_then_test(cal_ids, config.LTT_GRID,
                                 args.eps_f, args.delta_f,
                                 run_pipeline=run_pipeline, truth=truth,
-                                trace=trace)
+                                loss_fn=loss_fn, trace=trace)
 
     print(f"\n{'lambda':<58}{'mean L':>8}{'p':>10}  verdict")
     for t in trace:
@@ -109,7 +126,10 @@ def main() -> None:
     cert = FidelityCertificate(domain=domain, eps_F=args.eps_f,
                                delta_F=args.delta_f, method="ltt",
                                lam=lam_star, mean_loss=mean_loss,
-                               n_cal=len(cal_ids))
+                               n_cal=len(cal_ids),
+                               grading={"amount_tol": tol,
+                                        "key": "base_kind|date, "
+                                               "amount-tol fallback"})
     path = save_fidelity_cert(cert)
     print(f"\nCERTIFIED: eps_F={args.eps_f} at 1-delta_F="
           f"{1 - args.delta_f:.2f}  (lambda*={lam_star}, realized mean "

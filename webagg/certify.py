@@ -72,6 +72,20 @@ def entity_query(entity_name: str) -> str:
     return f"total funding raised by {entity_name}"
 
 
+def query_name(manifest: dict, eid: str, names: dict | None) -> str:
+    """The name the OPEN-WEB query uses for entity eid.
+
+    Attempt-#2 lesson (pre-registered): the manifest carries the REGISTRY
+    legal name ("Maplebear Inc."), which the open web barely uses -- a
+    reference run under it probes a name, not a pipeline. `names` maps
+    eid -> the common name the press uses ("Instacart"); entities without
+    an override keep the registry name. The chosen name is stored in the
+    runs index, so the certificate's provenance shows exactly what was
+    asked.
+    """
+    return (names or {}).get(eid) or manifest["entities"][eid]["entity_name"]
+
+
 def _runs_index_path(domain: str) -> Path:
     return config.FIDELITY_CERT_DIR / f"{domain}.runs.json"
 
@@ -92,7 +106,9 @@ def reference_runs(manifest: dict, *, domain: str,
                    eps: float = 0.10, delta: float = 0.10,
                    max_steps: int = 60,
                    budget_usd: float = config.BUDGET_USD,
-                   refresh: bool = False) -> dict:
+                   refresh: bool = False,
+                   names: dict | None = None,
+                   refresh_entities: tuple = ()) -> dict:
     """Run discovery ONCE per CALIBRATION entity; return the runs index.
 
     Idempotent: an entity whose run DB already exists is skipped unless
@@ -108,14 +124,19 @@ def reference_runs(manifest: dict, *, domain: str,
             "registry is grading itself against its own answer key.")
     index = load_runs_index(domain)
     for eid in manifest["split"]["calibration"]:
-        name = manifest["entities"][eid]["entity_name"]
+        name = query_name(manifest, eid, names)
         run_id = f"cert_{domain}_{eid}"
         db = str(config.RUNS_DIR / f"{run_id}.sqlite")
-        if not refresh and eid in index and Path(index[eid]["db"]).exists():
+        force = refresh or eid in refresh_entities
+        if not force and eid in index and Path(index[eid]["db"]).exists():
             print(f"[certify] {eid} ({name}): reference run exists -- skip")
             continue
+        if force:
+            Path(db).unlink(missing_ok=True)   # stale-output lesson: a
+            # forced refresh deletes the old pool, else run_query appends
+            # into a mixed-vintage DB
         print(f"[certify] {eid} ({name}): live reference run "
-              f"(deny={list(deny)}) ...")
+              f"(deny={list(deny)}, query={entity_query(name)!r}) ...")
         state, session = run_query(entity_query(name), run_id=run_id,
                                    eps=eps, delta=delta,
                                    max_steps=max_steps,
