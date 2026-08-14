@@ -1,0 +1,150 @@
+{
+  "entity_id": "cik0001321655",
+  "entity_name": "Palantir Technologies Inc.",
+  "n_filings": 23,
+  "n_rounds": 14,
+  "rounds": [
+    {
+      "accession": "0001321655-09-000003",
+      "amount": 8291250.0,
+      "date": "2009-03-25",
+      "entity_name": "Palantir Technologies Inc",
+      "flags": [],
+      "key": "funding_round|2009-03-25",
+      "n_filings": 1,
+      "root_accession": "0001321655-09-000003"
+    },
+    {
+      "accession": "0001321655-10-000001",
+      "amount": 90058503.0,
+      "date": "2009-11-17",
+      "entity_name": "Palantir Technologies Inc",
+      "flags": [],
+      "key": "funding_round|2009-11-17",
+      "n_filings": 2,
+      "root_accession": "0001321655-09-000004"
+    },
+    {
+      "accession": "0001321655-09-000005",
+      "amount": 0.0,
+      "date": "2009-12-08",
+      "entity_name": "Palantir Technologies Inc",
+      "flags": [],
+      "key": "funding_round|2009-12-08",
+      "n_filings": 1,
+      "root_accession": "0001321655-09-000005"
+    },
+    {
+      "accession": "0001321655-11-000002",
+      "amount": 50000000.0,
+      "date": "2011-04-20",
+      "entity_name": "Palantir Technologies Inc",
+      "flags": [],
+      "key": "funding_round|2011-04-20",
+      "n_filings": 1,
+      "root_accession": "0001321655-11-000002"
+    },
+    {
+      "accession": "0001321655-11-000003",
+      "amount": 68000000.0,
+      "date": "2011-08-23",
+      "entity_name": "Palantir Technologies Inc",
+      "flags": [],
+      "key": "funding_round|2011-08-23",
+      "n_filings": 1,
+      "root_accession": "0001321655-11-000003"
+    },
+    {
+      "accession": "0001321655-12-000002",
+      "amount": 56120202.0,
+      "date": "2012-05-01",
+      "entity_name": "Palantir Technologies Inc.",
+      "flags": [],
+      "key": "funding_round|2012-05-01",
+      "n_filings": 1,
+      "root_accession": "0001321655-12-000002"
+    },
+    {
+      "accession": "0001321655-14-000001",
+      "amount": 111306601.0,
+      "date": "2013-06-28",
+      "entity_name": "Palantir Technologies Inc.",
+      "flags": [],
+      "key": "funding_round|2013-06-28",
+      "n_filings": 2,
+      "root_accession": "0001321655-13-000001"
+    },
+    {
+      "accession": "0001321655-13-000002",
+      "amount": 196500204.0,
+      "date": "2013-09-12",
+      "entity_name": "Palantir Technologies Inc.",
+      "flags": [],
+      "key": "funding_round|2013-09-12",
+      "n_filings": 1,
+      "root_accession": "0001321655-13-000002"
+    },
+    {
+      "accession": "0001321655-14-000003",
+      "amount": 444184042.0,
+      "date": "2013-11-20",
+      "entity_name": "Palantir Technologies Inc.",
+      "flags": [],
+      "key": "funding_round|2013-11-20",
+      "n_filings": 5,
+      "root_accession": "0001321655-13-000003"
+    },
+    {
+      "accession": "0001321655-14-000005",
+      "amount": 50000001.0,
+      "date": "2014-11-26",
+      "entity_name": "Palantir Technologies Inc.",
+      "flags": [],
+      "key": "funding_round|2014-11-26",
+      "n_filings": 1,
+      "root_accession": "0001321655-14-000005"
+    },
+    {
+      "accession": "0001321655-15-000004",
+      "amount": 879829998.0,
+      "date": "2015-07-08",
+      "entity_name": "Palantir Technologies Inc.",
+      "flags": [],
+      "key": "funding_round|2015-07-08",
+      "n_filings": 4,
+      "root_accession": "0001321655-15-000001"
+    },
+    {
+      "accession": "0001321655-16-000005",
+      "amount": 19999995.0,
+      "date": "2016-11-08",
+      "entity_name": "Palantir Technologies Inc.",
+      "flags": [],
+      "key": "funding_round|2016-11-08",
+      "n_filings": 1,
+      "root_accession": "0001321655-16-000005"
+    },
+    {
+      "accession": "0001321655-20-000001",
+      "amount": 549727437.0,
+      "date": "2020-04-07",
+      "entity_name": "Palantir Technologies Inc.",
+      "flags": [],
+      "key": "funding_round|2020-04-07",
+      "n_filings": 1,
+      "root_accession": "0001321655-20-000001"
+    },
+    {
+      "accession": "0001321655-14-000004",
+      "amount": 0.0,
+      "date": null,
+      "entity_name": "Palantir Technologies Inc.",
+      "flags": [],
+      "key": "0001321655-14-000004",
+      "n_filings": 1,
+      "root_accession": "0001321655-14-000004"
+    }
+  ],
+  "true_count": 14,
+  "true_sum": 2524018233.0
+}

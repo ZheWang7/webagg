@@ -1,0 +1,160 @@
+{
+  "entity_id": "cik0001181412",
+  "entity_name": "SPACE EXPLORATION TECHNOLOGIES CORP",
+  "n_filings": 21,
+  "n_rounds": 15,
+  "rounds": [
+    {
+      "accession": "0001181412-09-000003",
+      "amount": 15025000.0,
+      "date": "2009-03-18",
+      "entity_name": "SPACE EXPLORATION TECHNOLOGIES CORP",
+      "flags": [],
+      "key": "funding_round|2009-03-18",
+      "n_filings": 1,
+      "root_accession": "0001181412-09-000003"
+    },
+    {
+      "accession": "0001181412-10-000001",
+      "amount": 50199998.0,
+      "date": "2010-10-28",
+      "entity_name": "SPACE EXPLORATION TECHNOLOGIES CORP",
+      "flags": [],
+      "key": "funding_round|2010-10-28",
+      "n_filings": 1,
+      "root_accession": "0001181412-10-000001"
+    },
+    {
+      "accession": "0001181412-15-000001",
+      "amount": 999999925.0,
+      "date": "2015-01-20",
+      "entity_name": "SPACE EXPLORATION TECHNOLOGIES CORP",
+      "flags": [],
+      "key": "funding_round|2015-01-20",
+      "n_filings": 1,
+      "root_accession": "0001181412-15-000001"
+    },
+    {
+      "accession": "0001181412-17-000002",
+      "amount": 449999820.0,
+      "date": "2017-07-26",
+      "entity_name": "SPACE EXPLORATION TECHNOLOGIES CORP",
+      "flags": [],
+      "key": "funding_round|2017-07-26",
+      "n_filings": 2,
+      "root_accession": "0001181412-17-000001"
+    },
+    {
+      "accession": "0001181412-18-000001",
+      "amount": 214000137.0,
+      "date": "2018-04-05",
+      "entity_name": "SPACE EXPLORATION TECHNOLOGIES CORP",
+      "flags": [],
+      "key": "funding_round|2018-04-05",
+      "n_filings": 1,
+      "root_accession": "0001181412-18-000001"
+    },
+    {
+      "accession": "0001181412-19-000004",
+      "amount": 486198978.0,
+      "date": "2018-12-21",
+      "entity_name": "SPACE EXPLORATION TECHNOLOGIES CORP",
+      "flags": [],
+      "key": "funding_round|2018-12-21",
+      "n_filings": 2,
+      "root_accession": "0001181412-19-000001"
+    },
+    {
+      "accession": "0001181412-19-000003",
+      "amount": 535744188.0,
+      "date": "2019-04-08",
+      "entity_name": "SPACE EXPLORATION TECHNOLOGIES CORP",
+      "flags": [],
+      "key": "funding_round|2019-04-08",
+      "n_filings": 2,
+      "root_accession": "0001181412-19-000002"
+    },
+    {
+      "accession": "0001181412-19-000005",
+      "amount": 214000000.0,
+      "date": "2019-06-24",
+      "entity_name": "SPACE EXPLORATION TECHNOLOGIES CORP",
+      "flags": [],
+      "key": "funding_round|2019-06-24",
+      "n_filings": 1,
+      "root_accession": "0001181412-19-000005"
+    },
+    {
+      "accession": "0001181412-20-000002",
+      "amount": 346224340.0,
+      "date": "2020-02-28",
+      "entity_name": "SPACE EXPLORATION TECHNOLOGIES CORP",
+      "flags": [],
+      "key": "funding_round|2020-02-28",
+      "n_filings": 2,
+      "root_accession": "0001181412-20-000001"
+    },
+    {
+      "accession": "0001181412-20-000003",
+      "amount": 1901446920.0,
+      "date": "2020-08-04",
+      "entity_name": "SPACE EXPLORATION TECHNOLOGIES CORP",
+      "flags": [],
+      "key": "funding_round|2020-08-04",
+      "n_filings": 1,
+      "root_accession": "0001181412-20-000003"
+    },
+    {
+      "accession": "0001181412-21-000002",
+      "amount": 1164061924.0,
+      "date": "2021-02-16",
+      "entity_name": "SPACE EXPLORATION TECHNOLOGIES CORP",
+      "flags": [],
+      "key": "funding_round|2021-02-16",
+      "n_filings": 2,
+      "root_accession": "0001181412-21-000001"
+    },
+    {
+      "accession": "0001181412-21-000003",
+      "amount": 344836569.0,
+      "date": "2021-11-01",
+      "entity_name": "SPACE EXPLORATION TECHNOLOGIES CORP",
+      "flags": [],
+      "key": "funding_round|2021-11-01",
+      "n_filings": 1,
+      "root_accession": "0001181412-21-000003"
+    },
+    {
+      "accession": "0001181412-21-000004",
+      "amount": 337355200.0,
+      "date": "2021-12-14",
+      "entity_name": "SPACE EXPLORATION TECHNOLOGIES CORP",
+      "flags": [],
+      "key": "funding_round|2021-12-14",
+      "n_filings": 1,
+      "root_accession": "0001181412-21-000004"
+    },
+    {
+      "accession": "0001181412-22-000002",
+      "amount": 1724965480.0,
+      "date": "2022-05-27",
+      "entity_name": "SPACE EXPLORATION TECHNOLOGIES CORP",
+      "flags": [],
+      "key": "funding_round|2022-05-27",
+      "n_filings": 2,
+      "root_accession": "0001181412-22-000001"
+    },
+    {
+      "accession": "0001181412-22-000003",
+      "amount": 249999890.0,
+      "date": "2022-07-20",
+      "entity_name": "SPACE EXPLORATION TECHNOLOGIES CORP",
+      "flags": [],
+      "key": "funding_round|2022-07-20",
+      "n_filings": 1,
+      "root_accession": "0001181412-22-000003"
+    }
+  ],
+  "true_count": 15,
+  "true_sum": 9034058369.0
+}

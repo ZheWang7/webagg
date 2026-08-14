@@ -1,0 +1,60 @@
+{
+  "entity_id": "cik0001784570",
+  "entity_name": "BETA Technologies, Inc.",
+  "n_filings": 7,
+  "n_rounds": 5,
+  "rounds": [
+    {
+      "accession": "0001784570-21-000003",
+      "amount": 425618177.0,
+      "date": "2021-03-16",
+      "entity_name": "Beta Technologies Inc.",
+      "flags": [],
+      "key": "funding_round|2021-03-16",
+      "n_filings": 2,
+      "root_accession": "0001784570-21-000001"
+    },
+    {
+      "accession": "0001784570-22-000001",
+      "amount": 375000000.0,
+      "date": "2022-04-04",
+      "entity_name": "Beta Technologies Inc.",
+      "flags": [],
+      "key": "funding_round|2022-04-04",
+      "n_filings": 1,
+      "root_accession": "0001784570-22-000001"
+    },
+    {
+      "accession": "0001676800-25-000001",
+      "amount": 469621170.0,
+      "date": "2024-10-24",
+      "entity_name": "Beta Technologies Inc.",
+      "flags": [],
+      "key": "funding_round|2024-10-24",
+      "n_filings": 2,
+      "root_accession": "0000950123-24-010540"
+    },
+    {
+      "accession": "0001784570-25-000006",
+      "amount": 300000000.0,
+      "date": "2025-09-03",
+      "entity_name": "BETA Technologies, Inc.",
+      "flags": [],
+      "key": "funding_round|2025-09-03",
+      "n_filings": 1,
+      "root_accession": "0001784570-25-000006"
+    },
+    {
+      "accession": "0001784570-26-000001",
+      "amount": 7051692.0,
+      "date": "2026-04-02",
+      "entity_name": "BETA Technologies, Inc.",
+      "flags": [],
+      "key": "funding_round|2026-04-02",
+      "n_filings": 1,
+      "root_accession": "0001784570-26-000001"
+    }
+  ],
+  "true_count": 5,
+  "true_sum": 1577291039.0
+}

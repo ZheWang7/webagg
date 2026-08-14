@@ -1,0 +1,110 @@
+{
+  "entity_id": "cik0001579091",
+  "entity_name": "Maplebear Inc.",
+  "n_filings": 12,
+  "n_rounds": 10,
+  "rounds": [
+    {
+      "accession": "0001579091-13-000001",
+      "amount": 192575.0,
+      "date": "2013-04-04",
+      "entity_name": "Maplebear Inc.",
+      "flags": [],
+      "key": "funding_round|2013-04-04",
+      "n_filings": 1,
+      "root_accession": "0001579091-13-000001"
+    },
+    {
+      "accession": "0001579091-13-000002",
+      "amount": 8732505.0,
+      "date": "2013-06-26",
+      "entity_name": "Maplebear Inc.",
+      "flags": [],
+      "key": "funding_round|2013-06-26",
+      "n_filings": 1,
+      "root_accession": "0001579091-13-000002"
+    },
+    {
+      "accession": "0001579091-14-000001",
+      "amount": 42435573.0,
+      "date": "2014-06-10",
+      "entity_name": "Maplebear Inc.",
+      "flags": [],
+      "key": "funding_round|2014-06-10",
+      "n_filings": 1,
+      "root_accession": "0001579091-14-000001"
+    },
+    {
+      "accession": "0001579091-15-000001",
+      "amount": 220164327.0,
+      "date": "2014-12-15",
+      "entity_name": "Maplebear Inc.",
+      "flags": [],
+      "key": "funding_round|2014-12-15",
+      "n_filings": 2,
+      "root_accession": "0001579091-14-000002"
+    },
+    {
+      "accession": "0001579091-17-000003",
+      "amount": 413018774.0,
+      "date": "2017-03-02",
+      "entity_name": "Maplebear Inc.",
+      "flags": [],
+      "key": "funding_round|2017-03-02",
+      "n_filings": 1,
+      "root_accession": "0001579091-17-000003"
+    },
+    {
+      "accession": "0001579091-18-000002",
+      "amount": 349099661.0,
+      "date": "2018-02-07",
+      "entity_name": "Maplebear Inc.",
+      "flags": [],
+      "key": "funding_round|2018-02-07",
+      "n_filings": 2,
+      "root_accession": "0001579091-18-000001"
+    },
+    {
+      "accession": "0001810806-20-000002",
+      "amount": 224999926.0,
+      "date": "2020-06-15",
+      "entity_name": "Maplebear Inc.",
+      "flags": [],
+      "key": "funding_round|2020-06-15",
+      "n_filings": 1,
+      "root_accession": "0001810806-20-000002"
+    },
+    {
+      "accession": "0001827715-20-000001",
+      "amount": 199999980.0,
+      "date": "2020-10-08",
+      "entity_name": "Maplebear Inc.",
+      "flags": [],
+      "key": "funding_round|2020-10-08",
+      "n_filings": 1,
+      "root_accession": "0001827715-20-000001"
+    },
+    {
+      "accession": "0001559292-21-000001",
+      "amount": 265000000.0,
+      "date": "2021-02-26",
+      "entity_name": "Maplebear Inc.",
+      "flags": [],
+      "key": "funding_round|2021-02-26",
+      "n_filings": 1,
+      "root_accession": "0001559292-21-000001"
+    },
+    {
+      "accession": "0001891344-21-000001",
+      "amount": 232000000.0,
+      "date": "2021-10-15",
+      "entity_name": "Maplebear Inc.",
+      "flags": [],
+      "key": "funding_round|2021-10-15",
+      "n_filings": 1,
+      "root_accession": "0001891344-21-000001"
+    }
+  ],
+  "true_count": 10,
+  "true_sum": 1955643321.0
+}

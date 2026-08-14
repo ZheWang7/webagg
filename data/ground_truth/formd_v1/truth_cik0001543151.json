@@ -1,0 +1,90 @@
+{
+  "entity_id": "cik0001543151",
+  "entity_name": "Uber Technologies, Inc",
+  "n_filings": 8,
+  "n_rounds": 8,
+  "rounds": [
+    {
+      "accession": "0001543151-12-000001",
+      "amount": 37250402.0,
+      "date": "2011-11-23",
+      "entity_name": "Uber Technologies, Inc",
+      "flags": [],
+      "key": "funding_round|2011-11-23",
+      "n_filings": 1,
+      "root_accession": "0001543151-12-000001"
+    },
+    {
+      "accession": "0001168404-13-000011",
+      "amount": 257790432.0,
+      "date": "2013-08-01",
+      "entity_name": "Uber Technologies, Inc",
+      "flags": [],
+      "key": "funding_round|2013-08-01",
+      "n_filings": 1,
+      "root_accession": "0001168404-13-000011"
+    },
+    {
+      "accession": "0001168404-14-000006",
+      "amount": 993500.0,
+      "date": "2014-02-14",
+      "entity_name": "Uber Technologies, Inc",
+      "flags": [],
+      "key": "funding_round|2014-02-14",
+      "n_filings": 1,
+      "root_accession": "0001168404-14-000006"
+    },
+    {
+      "accession": "0001543151-14-000001",
+      "amount": 1188241352.0,
+      "date": "2014-06-06",
+      "entity_name": "Uber Technologies, Inc",
+      "flags": [],
+      "key": "funding_round|2014-06-06",
+      "n_filings": 1,
+      "root_accession": "0001543151-14-000001"
+    },
+    {
+      "accession": "0001543151-15-000002",
+      "amount": 2803326002.0,
+      "date": "2014-12-04",
+      "entity_name": "Uber Technologies, Inc",
+      "flags": [],
+      "key": "funding_round|2014-12-04",
+      "n_filings": 1,
+      "root_accession": "0001543151-15-000002"
+    },
+    {
+      "accession": "0001543151-15-000001",
+      "amount": 1690512000.0,
+      "date": "2015-01-16",
+      "entity_name": "Uber Technologies, Inc",
+      "flags": [],
+      "key": "funding_round|2015-01-16",
+      "n_filings": 1,
+      "root_accession": "0001543151-15-000001"
+    },
+    {
+      "accession": "0001543151-20-000001",
+      "amount": 29926400.0,
+      "date": "2020-01-02",
+      "entity_name": "Uber Technologies, Inc",
+      "flags": [],
+      "key": "funding_round|2020-01-02",
+      "n_filings": 1,
+      "root_accession": "0001543151-20-000001"
+    },
+    {
+      "accession": "0000925421-21-000167",
+      "amount": 1099778180.0,
+      "date": "2021-08-10",
+      "entity_name": "Uber Technologies, Inc",
+      "flags": [],
+      "key": "funding_round|2021-08-10",
+      "n_filings": 1,
+      "root_accession": "0000925421-21-000167"
+    }
+  ],
+  "true_count": 8,
+  "true_sum": 7107818268.0
+}
