@@ -1,0 +1,276 @@
+# Candidate companies for the formd_v2 cohort screen (~210 names).
+# One name per line; '#' lines are comments. Over-collected on purpose:
+# the EDGAR screen (name->CIK match, Form D presence, FULL-history check)
+# is expected to reject half or more.
+#
+# Deliberately EXCLUDED: SpaceX, Palantir (untouched validation holdout);
+# Uber, Instacart (diagnostic/label entities, fail the full-history screen);
+# Anthropic (conflict-of-interest optics in the write-up); non-US companies
+# (Klarna, Canva, Mistral, Revolut, etc. -- Form D coverage unreliable).
+#
+# TIER A -- exited/public: private funding history is FROZEN (ideal oracle
+# entities; no staleness during the experiment window).
+Airbnb
+DoorDash
+Coinbase
+Snowflake
+Unity Technologies
+Confluent
+GitLab
+HashiCorp
+Amplitude
+Braze
+Toast
+Olo
+Squarespace
+Duolingo
+Roblox
+Coursera
+Affirm
+Marqeta
+Robinhood
+Oscar Health
+Hims & Hers
+Warby Parker
+Allbirds
+Poshmark
+Bumble
+Nextdoor
+Compass
+Opendoor
+Lemonade
+Hippo Insurance
+Doximity
+GoodRx
+Ginkgo Bioworks
+Recursion Pharmaceuticals
+Reddit
+Klaviyo
+Rubrik
+ServiceTitan
+Chime
+Circle
+CoreWeave
+Figma
+Astera Labs
+Ibotta
+Tempus AI
+OneStream
+Navan
+Cerebras Systems
+Hinge Health
+Omada Health
+Asana
+Sprout Social
+Procore
+Samsara
+UiPath
+Expensify
+EverQuote
+Udemy
+Grindr
+#
+# TIER B -- large active privates (heavy press, long histories; some will
+# fail the screen on non-Form-D raises -- that's what the screen is for).
+OpenAI
+Stripe
+Databricks
+Scale AI
+Anduril
+Figure AI
+xAI
+Perplexity
+Groq
+Ramp
+Brex
+Deel
+Rippling
+Gusto
+Plaid
+Chainalysis
+Alchemy
+Kraken
+Gemini Trust
+Anchorage Digital
+Fanatics
+Epic Games
+Discord
+Notion
+Airtable
+Grammarly
+Calendly
+ClickUp
+Vanta
+Abnormal Security
+Arctic Wolf
+Tanium
+Netskope
+Illumio
+Huntress
+Dragos
+Zscaler
+Flexport
+Faire
+Whatnot
+StockX
+Goat Group
+Zocdoc
+Ro
+Cedar
+Devoted Health
+Cityblock Health
+Komodo Health
+Benchling
+Redwood Materials
+Form Energy
+Commonwealth Fusion Systems
+Helion Energy
+Boom Supersonic
+Zipline
+Skydio
+Shield AI
+Saronic
+Hadrian
+Varda Space
+Astranis
+Stoke Space
+Relativity Space
+Firefly Aerospace
+Vast Space
+Axiom Space
+Sierra Space
+Impulse Space
+Applied Intuition
+Nuro
+Aurora Innovation
+Waabi
+Gatik
+Kodiak Robotics
+#
+# TIER C -- mid-size (typically 2-5 rounds; good stratum diversity).
+Retool
+Linear
+Vercel
+Render
+Railway
+Supabase
+PlanetScale
+Temporal Technologies
+dbt Labs
+Hex Technologies
+Sigma Computing
+Airbyte
+Fivetran
+Hightouch
+Mux
+LaunchDarkly
+Statsig
+Mixpanel
+Heap
+FullStory
+Pendo
+Gong
+Outreach
+Salesloft
+Apollo.io
+Clari
+Highspot
+Seismic
+Front
+Drift
+Qualified
+Forethought
+Cresta
+Observe.AI
+AssemblyAI
+Deepgram
+Runway
+Luma AI
+Suno
+Harvey
+Hebbia
+Glean
+Sierra
+Decagon
+Anysphere
+Cognition
+Replit
+Sourcegraph
+Warp
+Clay
+Gamma
+Mercury
+Modern Treasury
+Unit
+Lithic
+Moov
+Column
+Increase
+Check
+Pilot
+Puzzle
+Numeric
+Runway Financial
+Mosaic
+Vareto
+Causal
+Equals
+#
+# TIER D -- small / Cinder-shaped (1-3 rounds; deliberately skewed groups
+# for Exp 3; includes fresh 2025-26 names from current lists).
+HappyRobot
+Glow Security
+Granola
+Mercor
+Physical Intelligence
+World Labs
+Skild AI
+Chef Robotics
+Apptronik
+Agility Robotics
+Collaborative Robotics
+Standard Bots
+Ambi Robotics
+Dexterity
+Path Robotics
+Rapid Robotics
+Matternet
+Castelion
+K2 Space
+Limitless
+Rabbit
+Browser Company
+Raycast
+Cartesia
+Fal
+Baseten
+Modal Labs
+Together AI
+Fireworks AI
+OctoAI
+Anyscale
+Weights and Biases
+Arize AI
+Galileo
+Patronus AI
+Braintrust Data
+Langchain
+LlamaIndex
+Contextual AI
+Unstructured
+Reducto
+Tensorlake
+Roe AI
+Exa
+Firecrawl
+Browserbase
+Stagehand
+E2B
+Daytona
+Zed Industries
+Void
+Codeium
+Magic AI
+Poolside
+Reflection AI
+Liquid AI
