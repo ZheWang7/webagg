@@ -496,7 +496,8 @@ def resolve_and_aggregate(session, *, run_id: str, query_attributes: set[str],
                           eps_F: float | None = None,
                           delta_M: float = config.DELTA_M,
                           max_steps: int = config.MAX_STEPS,
-                          verify_budget: int = config.VERIFY_BUDGET):
+                          verify_budget: int = config.VERIFY_BUDGET,
+                          gate=None, qbar: float | None = None):
     """Stages 2-5 of the pipeline (design Sec. 7.1) over an already-populated
     run DB. Split out from end_to_end so it can run offline on a fixture DB
     (no search, no LLM) and re-run on a finished live DB without re-fetching.
@@ -522,6 +523,10 @@ def resolve_and_aggregate(session, *, run_id: str, query_attributes: set[str],
     # 0. reload what discovery persisted -- the DB is the source of truth,
     # and every object still carries its provenance handle (impl Sec. 4.2)
     mentions = load_mentions(session)
+    if gate is not None:
+        for m in mentions:
+            m.accepted = gate.accept(m)
+        mentions = [m for m in mentions if m.accepted]
     sources = {s.source_id: s for s in load_sources(session)}
 
     # 1. entity resolution -> the inferred join key (design Sec. 5 / ch. 9)
@@ -591,7 +596,7 @@ def resolve_and_aggregate(session, *, run_id: str, query_attributes: set[str],
     cells = []   # (stratum, record, attr, by_value): raw material for 4b's refine
     # One fixed-prior reliability table for the whole pass (guide 8.3)
     # class priors + the qbar=0.30 adversarial cap, no learning.
-    qtable = QTable()
+    qtable = QTable(qbar=qbar) if qbar is not None else QTable()
     for (eid, kind), rep, ms in reports:
         entity_surfaces = list({m.entity_surface for m in ms})
         record = {"entity_id": eid, "record_kind": kind,

@@ -168,7 +168,7 @@ def test_truth_key_matches_default_truth_key():
     # a minimal stand-in for the agent's ResolvedRecord: record_kind +
     # a date attribute whose .value is the ISO date the pipeline stores
     agent_record = SimpleNamespace(
-        record_kind="funding_round",
+        record_kind="funding_round/series_a",
         attributes={"date": SimpleNamespace(value="2024-01-10")})
     assert default_truth_key(agent_record) == truth.records[0].key
     assert truth.records[0].key == "funding_round|2024-01-10"

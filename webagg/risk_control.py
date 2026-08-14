@@ -127,6 +127,29 @@ def usd(cv) -> float:
 # 13.2  The per-entity loss L_g
 # ===========================================================================
 
+def _attrs(record) -> dict:
+    """The attributes mapping of a resolved record, WHATEVER its shape.
+
+    Found during A3: the live pipeline builds records as plain DICTS
+    ({"entity_id", "record_kind", "attributes", ...}) while this module --
+    written against attribute-style offline fakes -- read them with getattr.
+    getattr(dict, "attributes", {}) silently returns {} and every record
+    would have been scored spurious: the fixture-coverage gap again (the
+    fake pinned the wrong shape). Both shapes are now first-class here and
+    a regression test pins the DICT one -- the shape reality produces.
+    """
+    if isinstance(record, dict):
+        return record.get("attributes") or {}
+    return getattr(record, "attributes", {}) or {}
+
+
+def _kind(record) -> str:
+    """record_kind of a resolved record, dict- or attribute-shaped."""
+    if isinstance(record, dict):
+        return record.get("record_kind", "?")
+    return getattr(record, "record_kind", "?")
+
+
 def default_truth_key(record) -> Optional[str]:
     """Extract the truth-alignment key from a ResolvedRecord.
 
@@ -137,13 +160,15 @@ def default_truth_key(record) -> Optional[str]:
     None when neither is present: the record can then never match truth and
     is scored SPURIOUS at full value, which is the conservative direction.
     """
-    attrs = getattr(record, "attributes", {}) or {}
+    attrs = _attrs(record)
     rk = attrs.get("registry_key")
     if rk is not None and getattr(rk, "value", None):
         return str(rk.value)
     dt = attrs.get("date")
     if dt is not None and getattr(dt, "value", None):
-        return f"{getattr(record, 'record_kind', '?')}|{dt.value}"
+        base_kind = _kind(record).split("/")[0]
+        return f"{base_kind}|{dt.value}"
+    return None
     return None
 
 
@@ -187,13 +212,13 @@ def fidelity_loss(resolved_g, truth_g: TruthEntity,
     """
     aligned = match_to_truth(resolved_g, truth_g, key_fn)
     # value the pipeline assembled for records that DO have a true counterpart
-    assembled = sum(usd(r.attributes.get("amount"))
+    assembled = sum(usd(_attrs(r).get("amount"))
                     for (r, t) in aligned if t is not None)
     # what those same true counterparts actually sum to
     true_match = sum(t.amount for (r, t) in aligned if t is not None)
     # records with NO true counterpart (over-merge / hallucination):
     # their full value is error
-    spurious = sum(usd(r.attributes.get("amount"))
+    spurious = sum(usd(_attrs(r).get("amount"))
                    for (r, t) in aligned if t is None)
     err = abs(assembled - true_match) + spurious
     return min(1.0, err / max(truth_g.true_sum, 1e-9))
