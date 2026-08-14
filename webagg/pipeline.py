@@ -369,18 +369,24 @@ def run_query(query: str, *, run_id: str, eps: float = config.EPS_G,
                                 extra={"keep_class": keep.value,
                                        "n_records": len(frag_acc)})
 
-        # ---- 4. per-stratum measurements (the §15 calibration plot eats these)
         for g, pool in stratum_pools(state):
             S = state.strata[g]
+            hot = any(not f.issued and f.residual_yield >= eta
+                      and f.stratum in (g, None)
+                      for f in state.formulations.values())
             log_measurement(
                 session, run_id, step, "U_hat", state.U_hat(pool), stratum=g,
                 extra={"N": state.N(pool), "f1": state.f(1, pool),
                        "f2": state.f(2, pool),
-                       "psi": state.psi(pool, delta, w_g(state, g), max_steps,
-                                        V_realized=S.V or None),
+                       "psi": state.psi(delta, S.w or 1.0,
+                                         V_realized=S.V or None),
                        "m0": state.chao_m0(pool), "T": state.T, "new": new,
                        "claimed_count": S.claimed_count,
-                       "formulation": fm.query})
+                       "formulation": fm.query,
+                       "hot": bool(hot),
+                       "certified": S.certified,
+                       "spent": spent,
+                       "formulation_id": fm.formulation_id})
         session.commit()
 
         # ---- 5. stop test -------------------------------------------------
