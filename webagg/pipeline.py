@@ -606,7 +606,8 @@ def resolve_and_aggregate(session, *, run_id: str, query_attributes: set[str],
     for (eid, kind), rep, ms in reports:
         entity_surfaces = list({m.entity_surface for m in ms})
         record = {"entity_id": eid, "record_kind": kind,
-                  "frag_case": rep.case, "attributes": {}}
+                  "frag_case": rep.case, "attributes": {},
+                  "contributing_mentions": sorted(m.mention_id for m in ms)}
         by_attr = defaultdict(list)
         for m in ms:
             if m.attribute in query_attributes:

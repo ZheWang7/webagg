@@ -299,3 +299,26 @@ def test_query_name_override():
     assert certify.query_name(manifest, "cik1", None) == "Maplebear Inc."
     assert certify.query_name(manifest, "cik1",
                               {"cik1": "Instacart"}) == "Instacart"
+
+
+def test_records_carry_mention_provenance(tmp_path):
+    """Every resolved record must name the stored mentions it came from
+    (impl Sec. 4.2). Regression: Exp-2 grading silently saw empty
+    provenance and graded recall 0 at every step."""
+    db = _fixture_db(tmp_path)
+    s = get_session(db)
+    try:
+        out = resolve_and_aggregate(
+            s, run_id="t", query_attributes={"amount"},
+            cluster_fn=lambda ms, src: {m.mention_id: m.entity_surface
+                                        for m in ms})
+        stored = {m.mention_id for m in
+                  __import__("webagg.pipeline", fromlist=["load_mentions"])
+                  .load_mentions(s)}
+        assert out["records"], "fixture produced no records"
+        for r in out["records"]:
+            got = r["contributing_mentions"]
+            assert got, f"record {r['record_kind']} has empty provenance"
+            assert set(got) <= stored, "provenance names unknown mention ids"
+    finally:
+        s.close()
