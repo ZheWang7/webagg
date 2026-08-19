@@ -40,6 +40,14 @@ MATCH_PAIRS = GROUND_TRUTH_DIR / "match_pairs.csv"
 ER_MIN_LABELED = 40        # labeled pairs overall
 ER_MIN_PER_CLASS = 10      # and at least this many in EACH class
 
+# --- A3 attempt-#3 grading (pre-registered) ---------------------------------
+# Alignment tolerance for undated records vs registry amounts. Raised from
+# registry_tol's 2% after the attempt-#2 diagnostic: press rounds to round
+# numbers while filings carry exact figures, a systematic 2-7% gap ($8.5M
+# press vs $8,732,505 filed). Truth rounds closer than 2x this get the
+# 'close_amounts' flag at build time so tolerance collisions are VISIBLE.
+GRADING_AMOUNT_TOL = 0.05
+
 # --- stopping-rule / frontier constants (impl guide ch. 7, paper §3.3) --------
 EPS_G = 0.10       # per-stratum unseen-mass threshold eps_g (conjunct i)
 DELTA_M = 0.10     # confidence budget for the psi radii (union-bounded via w_g)

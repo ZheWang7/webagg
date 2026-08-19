@@ -68,8 +68,20 @@ CERT_ATTRS = frozenset({"amount", "date"})
 
 def entity_query(entity_name: str) -> str:
     """The one query template all certification runs share -- part of the
-    frozen configuration (a per-entity prompt tweak would be tuning)."""
-    return f"total funding raised by {entity_name}"
+    frozen configuration (a per-entity prompt tweak would be tuning).
+
+    Attempt-#3 pre-registration: scoped to the ORACLE'S UNIVERSE. The
+    registry holds exempt private offerings, so debt facilities, IPO
+    proceeds and secondary share sales -- real events the old unscoped
+    query honestly invited -- can never align and drowned the grade
+    (~$25B spurious on Uber). Scoping the QUERY aligns the two universes;
+    deliberately NO grading-side kind filter exists, so if the pipeline
+    still asserts debt records under an equity-scoped query, that is
+    genuine fidelity error and is priced.
+    """
+    return (f"total equity funding raised by {entity_name} in private "
+            f"funding rounds, excluding debt, IPO proceeds, and "
+            f"share sales")
 
 
 def query_name(manifest: dict, eid: str, names: dict | None) -> str:

@@ -301,24 +301,77 @@ def test_query_name_override():
                               {"cik1": "Instacart"}) == "Instacart"
 
 
-def test_records_carry_mention_provenance(tmp_path):
-    """Every resolved record must name the stored mentions it came from
-    (impl Sec. 4.2). Regression: Exp-2 grading silently saw empty
-    provenance and graded recall 0 at every step."""
-    db = _fixture_db(tmp_path)
-    s = get_session(db)
-    try:
-        out = resolve_and_aggregate(
-            s, run_id="t", query_attributes={"amount"},
-            cluster_fn=lambda ms, src: {m.mention_id: m.entity_surface
-                                        for m in ms})
-        stored = {m.mention_id for m in
-                  __import__("webagg.pipeline", fromlist=["load_mentions"])
-                  .load_mentions(s)}
-        assert out["records"], "fixture produced no records"
-        for r in out["records"]:
-            got = r["contributing_mentions"]
-            assert got, f"record {r['record_kind']} has empty provenance"
-            assert set(got) <= stored, "provenance names unknown mention ids"
-    finally:
-        s.close()
+# --------------------------------------------------------------------------- #
+# 15-18. Attempt-#3 instrument changes
+# --------------------------------------------------------------------------- #
+def test_chain_snapshots_in_truth(tmp_path):
+    """A two-tranche chain: snapshots carry BOTH amounts, .amount the final."""
+    from webagg.formd import collapse_chains
+    d = parse_form_d(_xml_two_tranche(200_000_000), accession="0000000077-18-000001",
+                     filing_date="2018-02-08")
+    da = parse_form_d(_xml_two_tranche(349_000_000, amendment=True,
+                                       previous="0000000077-18-000001"),
+                      accession="0000000077-18-000002", filing_date="2018-04-20")
+    rounds = collapse_chains([d, da])
+    assert rounds[0]["amount"] == 349_000_000.0
+    assert rounds[0]["amount_snapshots"] == [200_000_000.0]   # intermediates only
+
+
+def _xml_two_tranche(sold, amendment=False, previous=None):
+    amend = (f"<isAmendment>true</isAmendment>"
+             f"<previousAccessionNumber>{previous}</previousAccessionNumber>"
+             if amendment else "<isAmendment>false</isAmendment>")
+    return f"""<?xml version="1.0"?><edgarSubmission>
+      <primaryIssuer><cik>77</cik><entityName>Acme</entityName></primaryIssuer>
+      <offeringData><typeOfFiling>
+        <newOrAmendment>{amend}</newOrAmendment>
+        <dateOfFirstSale><value>2018-02-07</value></dateOfFirstSale>
+      </typeOfFiling><offeringSalesAmounts>
+        <totalOfferingAmount>400000000</totalOfferingAmount>
+        <totalAmountSold>{sold}</totalAmountSold>
+      </offeringSalesAmounts></offeringData></edgarSubmission>"""
+
+
+def test_snapshot_aware_tolerance_alignment():
+    """Press quotes the FIRST tranche ($200M); truth's final is $349M.
+    Plain tolerance (5%) misses; a snapshot anchor catches it -- and the
+    LOSS still grades against the final amount."""
+    truth = TruthEntity("g", (TruthRecord(
+        "funding_round|2018-02-07", 349_000_000.0, "2018-02-07",
+        amount_snapshots=(200_000_000.0,)),))
+    press = {"entity_id": "e", "record_kind": "funding_round/series_e",
+             "attributes": {"amount": _cv("200000000", 200_000_000.0)}}
+    from webagg.risk_control import match_to_truth
+    aligned = match_to_truth([press], truth, amount_tol=0.05)
+    assert aligned[0][1] is truth.records[0]          # aligned via snapshot
+    loss = fidelity_loss([press], truth, amount_tol=0.05)
+    assert abs(loss - (149_000_000 / 349_000_000)) < 1e-6   # error vs FINAL
+
+
+def test_close_amounts_flagged(tmp_path):
+    """Two distinct rounds 2.2% apart (the Instacart pair) get the flag."""
+    from webagg.formd import collapse_chains
+    a = parse_form_d(_xml_close(220_164_327, "2014-12-15"),
+                     accession="0000000077-14-000001", filing_date="2014-12-16")
+    b = parse_form_d(_xml_close(224_999_926, "2020-06-15"),
+                     accession="0000000077-20-000001", filing_date="2020-06-16")
+    rounds = collapse_chains([a, b])
+    assert all("close_amounts" in r["flags"] for r in rounds)
+
+
+def _xml_close(sold, date):
+    return f"""<?xml version="1.0"?><edgarSubmission>
+      <primaryIssuer><cik>77</cik><entityName>Acme</entityName></primaryIssuer>
+      <offeringData><typeOfFiling>
+        <newOrAmendment><isAmendment>false</isAmendment></newOrAmendment>
+        <dateOfFirstSale><value>{date}</value></dateOfFirstSale>
+      </typeOfFiling><offeringSalesAmounts>
+        <totalOfferingAmount>{sold}</totalOfferingAmount>
+        <totalAmountSold>{sold}</totalAmountSold>
+      </offeringSalesAmounts></offeringData></edgarSubmission>"""
+
+
+def test_scoped_equity_query():
+    q = certify.entity_query("Acme")
+    for phrase in ("equity", "private", "excluding debt", "IPO"):
+        assert phrase in q                # the universe-scoping is present

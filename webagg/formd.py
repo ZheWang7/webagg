@@ -56,6 +56,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
+from . import config
 from .risk_control import TruthEntity, TruthRecord
 from .type_defs import Mention, Source
 
@@ -331,6 +332,16 @@ def collapse_chains(filings: list[FormDFiling]) -> list[dict]:
             amount = 0.0                    # never guess; score the shortfall
             flags.append("amount_scored_zero")
 
+        # CHAIN SNAPSHOTS (attempt-#3 pre-registration): the INTERMEDIATE
+        # amounts the chain filed before the final (the final lives in
+        # "amount"). Press quotes announcement-time tranche sizes ("$200M",
+        # later amended to "$349M") -- alignment may match any snapshot;
+        # the ERROR always grades against the final amount. Alignment key
+        # and error metric are allowed to differ.
+        snapshots = sorted({float(f.amount_sold) for f in members
+                            if f.amount_sold is not None}
+                           - {float(amount)})
+
         # the alignment key (matches risk_control.default_truth_key exactly):
         # kind|ISO-date when a date exists, else the accession -- still
         # matchable through the explicit registry_key attribute path.
@@ -344,6 +355,7 @@ def collapse_chains(filings: list[FormDFiling]) -> list[dict]:
             "root_accession": root,
             "n_filings": len(members),
             "entity_name": last.entity_name,
+            "amount_snapshots": snapshots,
             "flags": flags,
         })
 
@@ -357,6 +369,18 @@ def collapse_chains(filings: list[FormDFiling]) -> list[dict]:
     for r in rounds:
         if r["key"] in dupes:
             r["flags"] = sorted(set(r["flags"]) | {"duplicate_truth_key"})
+
+    # CLOSE AMOUNTS (attempt-#3): two DISTINCT rounds within 2x the grading
+    # tolerance can absorb each other's undated records under tolerance
+    # matching (Instacart files $220.2M and $225.0M rounds, 2.2% apart).
+    # Flag both so the collision is visible to grading, never silent.
+    tol2 = 2 * config.GRADING_AMOUNT_TOL
+    for i, a in enumerate(rounds):
+        for b in rounds[i + 1:]:
+            hi = max(a["amount"], b["amount"], 1e-9)
+            if abs(a["amount"] - b["amount"]) / hi <= tol2:
+                a["flags"] = sorted(set(a["flags"]) | {"close_amounts"})
+                b["flags"] = sorted(set(b["flags"]) | {"close_amounts"})
     return rounds
 
 
@@ -373,7 +397,9 @@ def build_truth_entity(entity_id: str,
     truth = TruthEntity(
         entity_id=entity_id,
         records=tuple(TruthRecord(key=r["key"], amount=r["amount"],
-                                  date=r["date"]) for r in rounds),
+                                  date=r["date"],
+                                  amount_snapshots=tuple(r["amount_snapshots"]))
+                      for r in rounds),
     )
     meta = {
         "entity_id": entity_id,
@@ -408,7 +434,9 @@ def load_truth_entity(path: Path) -> tuple[TruthEntity, dict]:
     truth = TruthEntity(
         entity_id=meta["entity_id"],
         records=tuple(TruthRecord(key=r["key"], amount=float(r["amount"]),
-                                  date=r.get("date"))
+                                  date=r.get("date"),
+                                  amount_snapshots=tuple(
+                                      r.get("amount_snapshots", ())))
                       for r in meta["rounds"]),
     )
     return truth, meta

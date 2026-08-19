@@ -82,8 +82,13 @@ class TruthRecord:
     recoverable from the open web. match_to_truth() matches on this.
     """
     key: str
-    amount: float                 # true USD amount of this record
+    amount: float                 # true USD amount (FINAL, chain-collapsed)
     date: Optional[str] = None    # ISO date, informational only
+    amount_snapshots: tuple = ()  # INTERMEDIATE chain amounts (the final
+                                  # lives in `amount`); attempt-#3:
+                                  # alignment may match any snapshot,
+                                  # error grades vs .amount. Empty tuple
+                                  # = no intermediate snapshots.
 
 
 @dataclass(frozen=True)
@@ -225,8 +230,12 @@ def match_to_truth(resolved_g, truth_g: TruthEntity,
             if amt <= 0:
                 continue                     # nothing to align on
             for k in unused:
-                ta = by_key[k].amount
-                rel = abs(amt - ta) / max(abs(ta), 1e-9)
+                t = by_key[k]
+                # nearest of the final amount and every chain snapshot --
+                # press may quote any of them; the error in fidelity_loss
+                # still grades against the final .amount
+                anchors = (t.amount, *t.amount_snapshots)
+                rel = min(abs(amt - a) / max(abs(a), 1e-9) for a in anchors)
                 if rel <= amount_tol:
                     cands.append((rel, k, i))
         for rel, k, i in sorted(cands):      # deterministic: closest first
@@ -234,6 +243,28 @@ def match_to_truth(resolved_g, truth_g: TruthEntity,
                 unused.discard(k)
                 aligned[i] = (aligned[i][0], by_key[k])
     return aligned
+
+
+def ambiguous_truth_pairs(truth_g: TruthEntity,
+                          amount_tol: float) -> list[tuple[str, str]]:
+    """Truth-record pairs whose amounts sit within 2x the grading tolerance.
+
+    These are the collisions tolerance matching could confuse (Instacart
+    files $220.2M and $225.0M rounds, 2.2% apart): an undated record
+    between them could align to either. Closest-first keeps the damage
+    bounded; this helper makes the exposure VISIBLE -- the certification
+    CLI prints these pairs per entity so a grade over an ambiguous cohort
+    is never silently trusted. Mirrors build_truth's `close_amounts` flag
+    (same 2x threshold), computed here so already-built cohorts get the
+    check too."""
+    out: list[tuple[str, str]] = []
+    recs = truth_g.records
+    for i, a in enumerate(recs):
+        for b in recs[i + 1:]:
+            hi = max(abs(a.amount), abs(b.amount), 1e-9)
+            if abs(a.amount - b.amount) / hi <= 2 * amount_tol:
+                out.append((a.key, b.key))
+    return out
 
 
 def fidelity_loss(resolved_g, truth_g: TruthEntity,

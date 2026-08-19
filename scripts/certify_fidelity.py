@@ -68,7 +68,8 @@ def main() -> None:
                     help="open-web query name override, e.g. "
                          "--name cik0001579091=Instacart (the manifest holds "
                          "registry legal names, which the press may not use)")
-    ap.add_argument("--amount-tol", type=float, default=0.02,
+    ap.add_argument("--amount-tol", type=float,
+                    default=config.GRADING_AMOUNT_TOL,
                     help="PRE-REGISTERED grading fallback: undated records "
                          "may align to truth by relative amount distance "
                          "<= this (the cohort's registry_tol); 0 disables")
