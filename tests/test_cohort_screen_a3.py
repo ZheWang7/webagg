@@ -23,8 +23,8 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from webagg.cohort_screen import (formd_stats, name_score, norm_name,  # noqa: E402
-                                  parse_browse_atom, read_candidates,
-                                  screen_one)
+                                  parse_browse_atom, parse_browse_html,
+                                  read_candidates, screen_one)
 from webagg.formd import build_truth_entity, parse_form_d  # noqa: E402
 from webagg.formd import load_truth_entity, save_truth_entity  # noqa: E402
 from webagg.risk_control import (TruthEntity, TruthRecord,  # noqa: E402
@@ -92,6 +92,15 @@ def test_norm_and_score():
     assert name_score("Databricks", "DATABRICKS INC") >= 0.95
     assert name_score("Figure AI", "FIGURE AI INC") >= 0.95
     assert name_score("Glow Security", "GLOWING GARDENS LLC") < 0.60
+    # Strict-subset containment lands in the weak_match band (0.60-0.85):
+    # a press name can't tell the company from a same-named fund vehicle,
+    # so the CIK needs a human eye (attempt-#3 instrument, pre-registered
+    # before any human_verdict existed).
+    assert 0.60 <= name_score("Robinhood", "ROBINHOOD CASINO LLC") < 0.85
+    assert 0.60 <= name_score("Ramp", "RAMP BUSINESS CORP") < 0.85
+    # difflib near-miss on a DIFFERENT company: must stay under min_ok=0.90
+    # so a human confirms the CIK (AFFIRMXH is not Affirm).
+    assert 0.60 <= name_score("Affirm", "AFFIRMXH INC.") < 0.90
 
 
 def test_parse_browse_atom_multi():
@@ -141,5 +150,93 @@ def test_screen_one_offline():
 
     client = httpx.Client(transport=httpx.MockTransport(handler))
     row = screen_one("Ramp", client, pause_s=0.0)
-    assert row["verdict"] == "ok" and row["cik"] == "0001799567"
+    # weak_match, not ok: "BUSINESS" is an extra distinctive token, so the
+    # CIK gets flagged for human confirmation (subset-demotion rule).
+    assert row["verdict"] == "weak_match" and row["cik"] == "0001799567"
     assert row["n_formd"] == "2" and row["first_formd"] == "2020-02-01"
+
+
+# --- SEC Atom regression (2026-08) + HTML fallback --------------------------
+
+# The broken multi-match shape actually served by SEC: title is an entry
+# ATTRIBUTE holding a Perl array artifact, no <title> child, no
+# conformed-name element -- only the CIK survives.
+_BROKEN_ATOM = """<?xml version="1.0" encoding="ISO-8859-1" ?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <entry title="ARRAY(0x55d7321182b8)">
+    <content type="text/xml">
+      <company-info name="ARRAY(0x55d7321232e8)">
+        <cik>0001786927</cik>
+      </company-info>
+    </content>
+    <link href="https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&amp;CIK=0001786927&amp;type=D" type="text/html"/>
+  </entry>
+</feed>"""
+
+_HTML_MULTI = """<html><body><table class="tableFile2">
+<tr><td><a href="/cgi-bin/browse-edgar?action=getcompany&amp;CIK=0001786927&amp;type=D">0001786927</a></td>
+<td>Robinhood Casino LLC</td><td>NY</td></tr>
+<tr><td><a href="/cgi-bin/browse-edgar?action=getcompany&amp;CIK=0001783879&amp;type=D">0001783879</a></td>
+<td>Robinhood Markets, Inc.</td><td>CA</td></tr>
+</table></body></html>"""
+
+_HTML_SINGLE = """<html><body>
+<span class="companyName">Snowflake Inc.
+<acronym title="Central Index Key">CIK</acronym>#:
+<a href="/cgi-bin/browse-edgar?action=getcompany&amp;CIK=0001640147">0001640147</a></span>
+</body></html>"""
+
+
+def test_parse_browse_atom_broken_yields_nothing():
+    # No names anywhere -> nothing to match on; the caller must fall back.
+    assert parse_browse_atom(_BROKEN_ATOM) == []
+
+
+def test_parse_browse_html_multi_and_single():
+    out = parse_browse_html(_HTML_MULTI)
+    assert ("0001786927", "Robinhood Casino LLC") in out
+    assert ("0001783879", "Robinhood Markets, Inc.") in out
+    assert parse_browse_html(_HTML_SINGLE) == [("0001640147",
+                                                "Snowflake Inc.")]
+
+
+def test_screen_one_falls_back_to_html():
+    """Broken atom -> one HTML request -> best match resolved from HTML."""
+    subs = {"filings": {"recent": {"form": ["D"],
+                                   "filingDate": ["2019-05-01"]}}}
+    calls = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        url = str(request.url)
+        calls.append(url)
+        if "browse-edgar" in url and "output=atom" in url:
+            return httpx.Response(200, text=_BROKEN_ATOM)
+        if "browse-edgar" in url:                      # HTML fallback
+            return httpx.Response(200, text=_HTML_MULTI)
+        return httpx.Response(200, json=subs)
+
+    client = httpx.Client(transport=httpx.MockTransport(handler))
+    row = screen_one("Robinhood", client, pause_s=0.0)
+    # Both same-scored (0.75) candidates are subset matches; either way the
+    # verdict is weak_match with a real CIK attached -- the human decides.
+    assert row["verdict"] == "weak_match" and row["cik"]
+    assert row["n_formd"] == "1"
+    assert row["note"].startswith("alts: ")   # runner-up visible to human
+    assert sum("output=atom" in u for u in calls) == 1  # atom tried once
+    assert any("browse-edgar" in u and "output=atom" not in u
+               for u in calls)                          # fallback happened
+
+
+def test_get_retry_survives_timeouts():
+    from webagg.cohort_screen import _get_retry
+    state = {"n": 0}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        state["n"] += 1
+        if state["n"] < 3:
+            raise httpx.ReadTimeout("slow SEC")        # first two attempts
+        return httpx.Response(200, text="ok")
+
+    client = httpx.Client(transport=httpx.MockTransport(handler))
+    r = _get_retry(client, "https://x", tries=3, backoff_s=0.0)
+    assert r.status_code == 200 and state["n"] == 3
