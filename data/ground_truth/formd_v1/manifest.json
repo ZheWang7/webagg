@@ -1,0 +1,65 @@
+{
+  "blocked": true,
+  "blocking_predicate": {
+    "ciks": [
+      "1181412",
+      "1321655",
+      "1579091",
+      "1543151"
+    ],
+    "forms": [
+      "D",
+      "D/A"
+    ]
+  },
+  "built_at": "2026-08-04T01:49:32.398119",
+  "cohort": "formd_v1",
+  "entities": {
+    "cik0001181412": {
+      "entity_name": "SPACE EXPLORATION TECHNOLOGIES CORP",
+      "n_rounds": 15,
+      "true_sum": 9034058369.0
+    },
+    "cik0001321655": {
+      "entity_name": "Palantir Technologies Inc.",
+      "n_rounds": 14,
+      "true_sum": 2524018233.0
+    },
+    "cik0001543151": {
+      "entity_name": "Uber Technologies, Inc",
+      "n_rounds": 8,
+      "true_sum": 7107818268.0
+    },
+    "cik0001579091": {
+      "entity_name": "Maplebear Inc.",
+      "n_rounds": 10,
+      "true_sum": 1955643321.0
+    }
+  },
+  "keys_swept": 4,
+  "parse_failures": [],
+  "query_filter": {
+    "ciks": [
+      "1181412",
+      "1321655",
+      "1579091",
+      "1543151"
+    ],
+    "forms": [
+      "D",
+      "D/A"
+    ]
+  },
+  "seed": 0,
+  "split": {
+    "calibration": [
+      "cik0001543151",
+      "cik0001579091"
+    ],
+    "validation": [
+      "cik0001181412",
+      "cik0001321655"
+    ]
+  },
+  "truth_db": "D:\\Projects\\webagg\\data\\runs\\formd_v1_truth.sqlite"
+}
