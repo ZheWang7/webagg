@@ -85,11 +85,15 @@ def _hoeffding_floor(n_cal: int) -> float:
 def _summary(rows: list[dict]) -> None:
     acc = sum(1 for r in rows if r["human_verdict"] == "accept")
     rej = sum(1 for r in rows if r["human_verdict"] == "reject")
+    dead = sum(1 for r in rows if r["verdict"] != "no_match"
+               and r["n_formd"] in ("", "0"))
     todo = sum(1 for r in rows
-               if r["verdict"] != "no_match" and not r["human_verdict"])
+               if r["verdict"] != "no_match"
+               and r["n_formd"] not in ("", "0") and not r["human_verdict"])
     n_cal = acc // 2                      # split_cohort takes halves
     floor = _hoeffding_floor(n_cal)
-    print(f"\naccepted={acc}  rejected={rej}  undecided={todo}")
+    print(f"\naccepted={acc}  rejected={rej}  undecided={todo}  "
+          f"no_form_d(auto-excluded)={dead}")
     print(f"calibration half at current count: {n_cal} entities")
     print(f"zero-loss Hoeffding floor: eps_F >= {floor:.3f} "
           f"(DELTA_F={config.DELTA_F}); realized loss raises this.")
@@ -112,8 +116,12 @@ def main() -> None:
         sys.exit(f"no sheet at {path} -- run scripts/screen_cohort.py first")
     rows = _load(path)
 
-    # queue: CIK-carrying rows, unverdicted unless --all
+    # queue: CIK-carrying rows WITH something to grade, unverdicted unless
+    # --all. n_formd=0 rows are mechanically dead (a filer can appear in a
+    # type=D browse via DRS/DEF-14A prefix matches yet have zero actual
+    # Form Ds -- Cerebras); no human judgment can rescue an empty record.
     queue = [r for r in rows if r["verdict"] != "no_match"
+             and r["n_formd"] not in ("", "0")
              and (args.all or not r["human_verdict"])]
     if not queue:
         print("nothing to review")
