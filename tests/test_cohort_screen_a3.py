@@ -227,6 +227,30 @@ def test_screen_one_falls_back_to_html():
                for u in calls)                          # fallback happened
 
 
+def test_merged_submissions_walks_older_pages():
+    """The Coinbase failure: 0 Form Ds in recent, all on the older page.
+    Stats must come from the MERGED filing list, and first_formd must
+    reflect the older page's dates (the Snowflake failure)."""
+    from webagg.cohort_screen import merged_submissions
+    subs = {"filings": {
+        "recent": {"form": ["10-K", "8-K", "D"],
+                   "filingDate": ["2024-01-01", "2023-06-01", "2022-04-20"]},
+        "files": [{"name": "CIK0000000001-submissions-001.json",
+                   "filingCount": 2}]}}
+    older = {"form": ["D", "D/A"],
+             "filingDate": ["2017-04-11", "2018-01-01"]}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        assert "submissions-001" in str(request.url)
+        return httpx.Response(200, json=older)
+
+    client = httpx.Client(transport=httpx.MockTransport(handler))
+    st = formd_stats(merged_submissions(subs, client, pause_s=0.0))
+    assert st["n_formd"] == 3                       # 1 recent + 2 older
+    assert st["first_formd"] == "2017-04-11"        # from the older page
+    assert st["last_formd"] == "2022-04-20"
+
+
 def test_get_retry_survives_timeouts():
     from webagg.cohort_screen import _get_retry
     state = {"n": 0}

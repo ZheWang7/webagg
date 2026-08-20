@@ -172,10 +172,37 @@ def parse_browse_html(html_text: str) -> list[tuple[str, str]]:
     return []
 
 
+SUBMISSIONS_PAGE_URL = "https://data.sec.gov/submissions/{name}"
+
+
+def merged_submissions(subs: dict, client: httpx.Client, *,
+                       pause_s: float = 0.4) -> dict:
+    """Merge EDGAR's paginated older filing pages into a submissions-shaped
+    dict. The recent block truncates at ~1000 filings; a company that IPO'd
+    files fast enough to push ALL its pre-IPO Form Ds off it (Coinbase:
+    0 recent, 4 on the older page; Snowflake's true first D is 2017, not
+    the 2022 the recent block shows). Skipping this walk falsifies exactly
+    the first_formd evidence the full-history judgment rests on. One extra
+    request per older page, prolific filers only.
+    """
+    recent = subs.get("filings", {}).get("recent", {})
+    forms = list(recent.get("form", []))
+    dates = list(recent.get("filingDate", []))
+    for page in subs.get("filings", {}).get("files", []):
+        r = _get_retry(client, SUBMISSIONS_PAGE_URL.format(name=page["name"]))
+        time.sleep(pause_s)
+        if r.status_code != 200:
+            continue                      # partial merge beats a crash
+        old = r.json()
+        forms.extend(old.get("form", []))
+        dates.extend(old.get("filingDate", []))
+    return {"filings": {"recent": {"form": forms, "filingDate": dates}}}
+
+
 def formd_stats(subs: dict) -> dict:
-    """Submissions JSON -> Form D stats (recent block; older pages of very
-    prolific filers are irrelevant to a screen that only needs presence,
-    counts, and the date span)."""
+    """Submissions-shaped dict -> Form D stats. PURE: counts whatever
+    filings the dict carries; callers with paginated filers must merge
+    the older pages first (merged_submissions)."""
     recent = subs.get("filings", {}).get("recent", {})
     forms = recent.get("form", [])
     dates = recent.get("filingDate", [])
@@ -252,7 +279,10 @@ def screen_one(name: str, client: httpx.Client, *,
     s = _get_retry(client, SUBMISSIONS_URL.format(cik=cik))
     time.sleep(pause_s)
     if s.status_code == 200:
-        row.update({k: str(v) for k, v in formd_stats(s.json()).items()})
+        # Merge paginated older filings BEFORE counting: pre-IPO Form Ds
+        # of public-exit filers live there, not in the recent block.
+        merged = merged_submissions(s.json(), client, pause_s=pause_s)
+        row.update({k: str(v) for k, v in formd_stats(merged).items()})
     else:
         row["note"] = f"submissions http {s.status_code}"
     return row
