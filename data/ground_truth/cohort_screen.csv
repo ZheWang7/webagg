@@ -47,7 +47,7 @@ Tempus AI,ok,0001717115,"Tempus AI, Inc.",1.00,4,4,2017-09-25,2022-10-17,reject,
 OneStream,weak_match,0001856374,ONESTREAM SOFTWARE LLC,0.75,1,1,2021-04-20,2021-04-20,reject,
 Navan,weak_match,0001639723,"Navanti Group, LLC",0.83,7,6,2015-05-08,2021-10-26,reject,
 Cerebras Systems,ok,0002021728,Cerebras Systems Inc.,1.00,0,0,,,,
-Hinge Health,ok,0001673743,"Hinge Health, Inc.",1.00,10,9,2016-05-04,2023-12-28,reject,
+Hinge Health,ok,0001673743,"Hinge Health, Inc.",1.00,10,9,2016-05-04,2023-12-28,accept,
 Omada Health,ok,0001611115,"Omada Health, Inc.",1.00,2,2,2014-06-20,2015-10-01,reject,
 Asana,weak_match,0001467890,"Asana Medical, Inc.",0.75,1,1,2009-07-10,2009-07-10,reject,"alts: Asana Medical, Inc. (CIK 1625411); Asana Global Select Fund, LP (CIK 1349056); Asana Partners Fund I, LP (CIK 1689339)"
 Sprout Social,ok,0001517375,"Sprout Social, Inc.",1.00,4,4,2011-04-05,2018-12-20,reject,
@@ -119,7 +119,7 @@ Saronic,ok,0002033142,"Saronic Technologies, Inc.",1.00,3,3,2024-08-21,2026-04-0
 Hadrian,weak_match,0001863211,"Hadrian Automation, Inc.",0.75,7,7,2021-07-21,2025-12-31,accept,alts: Hadrian Ventures LLC (CIK 1678813)
 Varda Space,weak_match,0001839597,"Varda Space Industries, Inc.",0.75,3,3,2021-01-22,2022-01-18,reject,alts: Varda Space Industries a Series of CGF2021 LLC (CIK 2112603); Varda Space Series D Jan 2026 a Series of CGF2021 LLC (CIK 2107426)
 Astranis,weak_match,0001715660,Astranis Space Technologies Corp.,0.75,8,6,2017-08-29,2021-04-19,reject,
-Stoke Space,ok,0001861415,"Stoke Space Technologies, Inc.",1.00,6,6,2021-05-10,2026-04-16,reject,alts: STOKE SPACE Jan 2026 a Series of CGF2021 LLC (CIK 2112227)
+Stoke Space,ok,0001861415,"Stoke Space Technologies, Inc.",1.00,6,6,2021-05-10,2026-04-16,accept,alts: STOKE SPACE Jan 2026 a Series of CGF2021 LLC (CIK 2112227)
 Relativity Space,ok,0001673976,"Relativity Space, Inc.",1.00,6,6,2016-05-12,2021-09-13,reject,"alts: Relativity Space Fund, a series of Evolution Ventures Master LLC (CIK 1787692); Relativity Space, FOI, a series of Republic Master Fund, LP (CIK 1785223); Relativity Space, Raaid, a series of Republic Master Fund, LP (CIK 1789100)"
 Firefly Aerospace,ok,0001860160,Firefly Aerospace Inc.,1.00,7,6,2021-05-11,2026-07-08,reject,
 Vast Space,weak_match,0002105242,Vast Space Dec 2025 a Series of CGF2021 LLC,0.75,1,1,2026-03-24,2026-03-24,reject,alts: Vast Space I a Series of Averleigh Capital LLC (CIK 2105310)
