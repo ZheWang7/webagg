@@ -274,3 +274,372 @@ Magic AI
 Poolside
 Reflection AI
 Liquid AI
+#
+# Tier E
+# -- enterprise SaaS: sales/marketing/CS tech (Pendo-Outreach-Highspot cluster)
+People.ai
+Mindtickle
+Terminus
+Demandbase
+Bombora
+Copado
+Showpad
+Allego
+Vivun
+Walnut
+Reprise
+Catalyst Software
+ChurnZero
+Vitally
+Matik
+Mutiny
+Instantly.ai
+Storylane
+#
+# -- vertical SaaS (ServiceTitan profile without the megarounds)
+Jobber
+Housecall Pro
+Restaurant365
+MarginEdge
+7shifts
+Boulevard
+GlossGenius
+Squire
+Karbon
+Canopy Tax
+Owner.com
+Slice
+AutoLeap
+Shopmonkey
+Curri
+Workiz
+#
+# -- security (Illumio-Dragos-Huntress cluster)
+Expel
+Red Canary
+Corelight
+Vectra AI
+Deepwatch
+Salt Security
+Contrast Security
+Semgrep
+Socket Security
+Endor Labs
+Uptycs
+JupiterOne
+RunZero
+Censys
+GreyNoise
+Panther Labs
+Tines
+Torq
+Material Security
+Sublime Security
+SpecterOps
+Blumira
+Hunters Security
+Twingate
+Tailscale
+Teleport
+StrongDM
+Veza
+ConductorOne
+Chainguard
+Oligo Security
+Cyera
+Island Technology
+#
+# -- defense / space / robotics (highest-yield cluster)
+True Anomaly
+Ursa Major
+Muon Space
+Loft Orbital
+Albedo Space
+Umbra Space
+Slingshot Aerospace
+LeoLabs
+Epirus
+Fortem Technologies
+Overland AI
+Gecko Robotics
+Machina Labs
+Diligent Robotics
+Carbon Robotics
+Verdant Robotics
+AMP Robotics
+Nimble Robotics
+Third Wave Automation
+Outrider
+Forterra
+Skyryse
+Merlin Labs
+Reliable Robotics
+Regent Craft
+Radiant Nuclear
+Aalo Atomics
+Zap Energy
+Thea Energy
+Type One Energy
+Turion Space
+Rain Industries
+CX2
+Vatn Systems
+Allen Control Systems
+Nominal
+Second Front Systems
+Govini
+Rebellion Defense
+#
+# -- biotech / health (Recursion-Cityblock cluster; biotech files religiously)
+Insitro
+Genesis Therapeutics
+Enveda Biosciences
+Valo Health
+Dyno Therapeutics
+Generate Biomedicines
+Profluent Bio
+Tessera Therapeutics
+Overjet
+VideaHealth
+Cleerly
+Aledade
+Waymark
+Pearl Health
+Vytalize Health
+Sprinter Health
+Boulder Care
+Eleanor Health
+Equip Health
+Grow Therapy
+Alma
+SonderMind
+Two Chairs
+Octave Health
+Hazel Health
+Author Health
+Wellvana
+Homeward Health
+Firefly Health
+Oshi Health
+Vori Health
+Midi Health
+Parsley Health
+Tia Health
+Oula Health
+Pomelo Care
+Summer Health
+Imagine Pediatrics
+#
+# -- devtools / data infra (Zed-Supabase cluster, sans AI-boom hypergrowth)
+Fly.io
+Appwrite
+Turso
+Axiom
+Honeycomb
+Checkly
+PostHog
+Pulumi
+Spacelift
+Coder
+Gitpod
+Loft Labs
+LocalStack
+Superblocks
+Appsmith
+Warp Terminal
+Graphite
+Depot
+Namespace Labs
+Blacksmith
+Dagger
+System Initiative
+Speakeasy
+Stainless API
+Fern API
+Mintlify
+ReadMe
+Doppler
+Infisical
+#
+# -- fintech-adjacent B2B (paperwork-culture picks only)
+Rho
+Mesh Payments
+Settle
+Parafin
+Capchase
+FloQast
+Cube Software
+Abacum
+Trullion
+Klarity
+Oyster HR
+Multiplier
+Check Technologies
+Vouch Insurance
+At-Bay
+Cowbell Cyber
+Boost Insurance
+Obie
+Steadily
+Openly
+Branch Insurance
+#
+# -- climate / industrial (Form Energy cluster)
+Antora Energy
+Rondo Energy
+Fervo Energy
+Sage Geosystems
+Quaise Energy
+Electric Hydrogen
+Verdox
+Heirloom Carbon
+Charm Industrial
+Twelve
+Sublime Systems
+Brimstone
+Fortera
+Electra Steel
+Boston Metal
+Lilac Solutions
+Nth Cycle
+WeaveGrid
+Gridware
+Mainspring Energy
+Crusoe Energy
+Amogy
+Avnos
+Ebb Carbon
+Vaulted Deep
+#
+# -- logistics / supply chain / legal-compliance B2B
+FourKites
+Altana
+Overhaul
+Tive
+Loadsmart
+LinkSquares
+SpotDraft
+Darrow
+EvenUp
+Malbek
+Stord
+Platform Science
+#
+# -- food & beverage / CPG (trade-press + filing culture; consumer BRANDS file,
+#    unlike consumer tech apps)
+OLIPOP
+Chomps
+Magic Spoon
+Immi Eats
+Graza
+Omsom
+Fly By Jing
+Lemon Perfect
+Recess
+Cirkul
+Banza
+Goodles
+Fishwife
+Seed Health
+Ritual
+Hiya Health
+Perelel
+Cure Hydration
+Gainful
+Athletic Brewing
+Gorgie
+Salad and Go
+Dig Food Group
+#
+# -- beauty / personal care
+Merit Beauty
+Topicals
+Starface
+Crown Affair
+Ceremonia
+Maude
+Necessaire
+Saie
+Dieux Skin
+#
+# -- consumer products / consumer health
+Cotopaxi
+Caraway Home
+Our Place
+Parachute Home
+Eight Sleep
+Levels Health
+Prenuvo
+Hydrow
+#
+# -- medical devices / diagnostics (FDA-adjacent paperwork culture)
+Exo Imaging
+Eko Health
+Element Science
+Sibel Health
+BioIntelliSense
+Delfi Diagnostics
+BillionToOne
+Mirvie
+#
+# -- agriculture / food production
+Sound Agriculture
+Pattern Ag
+Arable
+Ceres Imaging
+ProducePay
+Full Harvest
+Afresh
+Gotham Greens
+80 Acres Farms
+Oishii
+Plantible Foods
+Mission Barns
+Wildtype
+The Every Company
+#
+# -- construction / manufacturing / industrial
+Built Robotics
+Dusty Robotics
+Canvas Construction
+Mighty Buildings
+OpenSpace
+DroneDeploy
+Kojo
+Billd
+Adaptive Build
+Fictiv
+Divergent Technologies
+Arris Composites
+Seurat Technologies
+Freeform Future
+Atomic Industries
+VulcanForms
+#
+# -- education
+Primer
+Prenda
+Brilliant
+Amira Learning
+Ello Technology
+Sora Schools
+Maven
+Reforge
+Numerade
+#
+# -- real estate / built world
+Higharc
+Abodu
+Samara
+Doorstead
+Density
+HqO
+Homebound
+#
+# -- transportation / mobility
+Harbinger Motors
+Swiftly
+Hayden AI
+AirGarage
+Parallel Systems
+Pietra
