@@ -267,8 +267,23 @@ def adjudicate_llm(m_a, m_b, source_lookup) -> float:
             "B:\n"
             f"surface: {m_b.entity_surface}\ndomain: {s_b.domain}\n"
             f"context: {m_b.passage}")
-    out = call_llm(system=sys, user=user, purpose="er_adjudication")["payload"]
-    return float(out["confidence"]) if out["match"] else 1 - float(out["confidence"])
+    # The live LLM occasionally returns a malformed payload (missing keys,
+    # non-numeric confidence). Mirror the extract layer's policy: retry once,
+    # then fall back to theta = 0.5 -- maximal uncertainty keeps the pair in
+    # the band (no confident merge, no confident split) -- and say so loudly.
+    for attempt in (1, 2):
+        out = call_llm(system=sys, user=user, purpose="er_adjudication")["payload"]
+        try:
+            conf = float(out["confidence"])
+            conf = min(1.0, max(0.0, conf))
+            return conf if out["match"] else 1.0 - conf
+        except (KeyError, TypeError, ValueError):
+            if attempt == 1:
+                continue                      # one retry: usually transient
+            print(f"[er] WARNING: adjudicator payload malformed twice for "
+                  f"({m_a.entity_surface!r}, {m_b.entity_surface!r}); "
+                  f"falling back to theta=0.5 (band). payload={out!r}")
+            return 0.5
 
 
 # --- 9.5  correlation clustering -------------------------------------------
