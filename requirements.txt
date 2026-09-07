@@ -7,7 +7,8 @@ sqlalchemy>=2.0 # storage layer
 sqlite-utils>=3.36 # quick CLI inspection of the DB
 
 # LLM + embeddings
-anthropic>=0.40 # Claude API; or openai>=1.30 if you prefer
+anthropic>=0.40 # Claude API
+openai>=1.30 # GPT models
 tiktoken>=0.7 # token counting
 
 # text + NLP
