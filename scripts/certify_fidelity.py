@@ -136,8 +136,10 @@ def main() -> None:
                                n_cal=len(cal_ids),
                                grading={"amount_tol": tol,
                                         "amount_primary": args.amount_primary,
-                                        "key": "base_kind|date, "
-                                               "amount-tol fallback"})
+                                        "key": ("registry>amount(date ties)"
+                                                ">date" if args.amount_primary
+                                                else "base_kind|date, "
+                                                     "amount-tol fallback")})
     path = save_fidelity_cert(cert)
     print(f"\nCERTIFIED: eps_F={args.eps_f} at 1-delta_F="
           f"{1 - args.delta_f:.2f}  (lambda*={lam_star}, realized mean "
