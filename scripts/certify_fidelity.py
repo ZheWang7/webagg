@@ -73,6 +73,11 @@ def main() -> None:
                     help="PRE-REGISTERED grading fallback: undated records "
                          "may align to truth by relative amount distance "
                          "<= this (the cohort's registry_tol); 0 disables")
+    ap.add_argument("--amount-primary", action="store_true",
+                    help="use the pre-registered amount-primary grading key "
+                         "(PREREGISTRATION.md Sec. 3): registry key, then "
+                         "nearest amount within --amount-tol (date breaks "
+                         "ties), then exact date key as last resort")
     args = ap.parse_args()
     domain = args.domain or args.cohort
 
@@ -103,7 +108,8 @@ def main() -> None:
     run_pipeline, truth = make_callables(index, cohort_dir)
     trace: list = []
     tol = args.amount_tol if args.amount_tol > 0 else None
-    loss_fn = functools.partial(fidelity_loss, amount_tol=tol)
+    loss_fn = functools.partial(fidelity_loss, amount_tol=tol,
+                                amount_primary=args.amount_primary)
     certified = learn_then_test(cal_ids, config.LTT_GRID,
                                 args.eps_f, args.delta_f,
                                 run_pipeline=run_pipeline, truth=truth,
@@ -129,6 +135,7 @@ def main() -> None:
                                lam=lam_star, mean_loss=mean_loss,
                                n_cal=len(cal_ids),
                                grading={"amount_tol": tol,
+                                        "amount_primary": args.amount_primary,
                                         "key": "base_kind|date, "
                                                "amount-tol fallback"})
     path = save_fidelity_cert(cert)

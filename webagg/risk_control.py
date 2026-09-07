@@ -184,7 +184,8 @@ def default_truth_key(record) -> Optional[str]:
 
 def match_to_truth(resolved_g, truth_g: TruthEntity,
                    key_fn: Callable = default_truth_key,
-                   amount_tol: Optional[float] = None
+                   amount_tol: Optional[float] = None,
+                   amount_primary: bool = False
                    ) -> list[tuple[object, Optional[TruthRecord]]]:
     """Align each resolved record with its true counterpart, or None.
 
@@ -207,7 +208,28 @@ def match_to_truth(resolved_g, truth_g: TruthEntity,
     conservative in the right direction: a record whose amount is wrong
     beyond tolerance still takes the full spurious penalty. Date keys keep
     PRECEDENCE; default None = off (core behavior unchanged).
+
+    amount_primary (PRE-REGISTERED grading key, A3 attempt #3, Sec. 3 of
+    data/ground_truth/formd_v2/PREREGISTRATION.md): press dates are
+    ANNOUNCEMENT dates while truth keys carry filing/firstSale dates, so
+    exact date keys misalign systematically. With amount_primary=True the
+    priority inverts, in three one-to-one passes:
+      0. an explicit registry_key (accession quoted by a source) wins;
+      1. greedy nearest-amount within amount_tol (final amount OR any
+         chain snapshot); exact-distance ties broken by nearest DATE,
+         then truth key -- deterministic;
+      2. leftover records with no usable amount fall back to the exact
+         key_fn key (kind|date).
+    Records matching nothing stay SPURIOUS at full value, as always.
+    Requires amount_tol (raises ValueError otherwise -- loud, not silent).
     """
+    if amount_primary:
+        if amount_tol is None:
+            raise ValueError("amount_primary grading requires amount_tol "
+                             "(PREREGISTRATION Sec. 3/4 sets it to "
+                             "config.GRADING_AMOUNT_TOL)")
+        return _match_amount_primary(resolved_g, truth_g, key_fn, amount_tol)
+
     by_key = {t.key: t for t in truth_g.records}
     unused = set(by_key)                     # each truth record usable once
     aligned: list[tuple[object, Optional[TruthRecord]]] = []
@@ -245,6 +267,71 @@ def match_to_truth(resolved_g, truth_g: TruthEntity,
     return aligned
 
 
+def _date_days(iso_a, iso_b, far: int = 10 ** 9) -> int:
+    """|a - b| in days for two ISO dates; `far` when either is unusable,
+    so undated candidates lose exact-distance ties to dated ones."""
+    from datetime import date
+    try:
+        a = date.fromisoformat(str(iso_a)[:10])
+        b = date.fromisoformat(str(iso_b)[:10])
+    except (TypeError, ValueError):
+        return far
+    return abs((a - b).days)
+
+
+def _match_amount_primary(resolved_g, truth_g: TruthEntity,
+                          key_fn: Callable, amount_tol: float
+                          ) -> list[tuple[object, Optional[TruthRecord]]]:
+    """The amount_primary=True body of match_to_truth (see its docstring)."""
+    by_key = {t.key: t for t in truth_g.records}
+    unused = set(by_key)                     # each truth record usable once
+
+    # -- pass 0: explicit registry keys (accessions) always win -----------
+    aligned: list[tuple[object, Optional[TruthRecord]]] = []
+    for r in resolved_g:
+        rk = _attrs(r).get("registry_key")
+        rkv = str(rk.value) if rk is not None and getattr(rk, "value", None) \
+            else None
+        if rkv is not None and rkv in unused:
+            unused.discard(rkv)
+            aligned.append((r, by_key[rkv]))
+        else:
+            aligned.append((r, None))        # provisional
+
+    # -- pass 1: greedy nearest-amount within tolerance -------------------
+    #    sort key = (relative distance, date distance, truth key, index):
+    #    closest amounts first; EXACT ties go to the nearest date -- which
+    #    is what separates the frozen tables' 5 collision pairs (Sec. 3).
+    cands = []
+    for i, (r, t) in enumerate(aligned):
+        if t is not None:
+            continue
+        amt = usd(_attrs(r).get("amount"))
+        if amt <= 0:
+            continue                         # nothing to align on -> pass 2
+        rdate = getattr(_attrs(r).get("date"), "value", None)
+        for k in unused:
+            tr = by_key[k]
+            anchors = (tr.amount, *tr.amount_snapshots)
+            rel = min(abs(amt - a) / max(abs(a), 1e-9) for a in anchors)
+            if rel <= amount_tol:
+                cands.append((rel, _date_days(rdate, tr.date), k, i))
+    for rel, dd, k, i in sorted(cands):      # deterministic
+        if k in unused and aligned[i][1] is None:
+            unused.discard(k)
+            aligned[i] = (aligned[i][0], by_key[k])
+
+    # -- pass 2: exact (kind|date) key, for records amounts could not place
+    for i, (r, t) in enumerate(aligned):
+        if t is not None:
+            continue
+        k = key_fn(r)
+        if k is not None and k in unused:
+            unused.discard(k)
+            aligned[i] = (r, by_key[k])
+    return aligned
+
+
 def ambiguous_truth_pairs(truth_g: TruthEntity,
                           amount_tol: float) -> list[tuple[str, str]]:
     """Truth-record pairs whose amounts sit within 2x the grading tolerance.
@@ -269,7 +356,8 @@ def ambiguous_truth_pairs(truth_g: TruthEntity,
 
 def fidelity_loss(resolved_g, truth_g: TruthEntity,
                   key_fn: Callable = default_truth_key,
-                  amount_tol: Optional[float] = None) -> float:
+                  amount_tol: Optional[float] = None,
+                  amount_primary: bool = False) -> float:
     """L_g in [0,1]: relative error of the aggregate over CONTRIBUTED
     records only. Missing records are completeness, not fidelity, so they
     are excluded (guide Sec. 13.2; paper Theorem 5).
@@ -280,7 +368,8 @@ def fidelity_loss(resolved_g, truth_g: TruthEntity,
     point: we measure the realized composition, including the cancellations
     a per-stage union bound throws away.
     """
-    aligned = match_to_truth(resolved_g, truth_g, key_fn, amount_tol)
+    aligned = match_to_truth(resolved_g, truth_g, key_fn, amount_tol,
+                             amount_primary=amount_primary)
     # value the pipeline assembled for records that DO have a true counterpart
     assembled = sum(usd(_attrs(r).get("amount"))
                     for (r, t) in aligned if t is not None)
