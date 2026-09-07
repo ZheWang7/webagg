@@ -1,0 +1,43 @@
+{
+  "entity_id": "cik0001783955",
+  "entity_name": "System Initiative, Inc.",
+  "n_filings": 3,
+  "n_rounds": 3,
+  "rounds": [
+    {
+      "accession": "0001243233-21-000003",
+      "amount": 2999999.0,
+      "amount_snapshots": [],
+      "date": "2019-07-22",
+      "entity_name": "System Initiative, Inc.",
+      "flags": [],
+      "key": "funding_round|2019-07-22",
+      "n_filings": 1,
+      "root_accession": "0001243233-21-000003"
+    },
+    {
+      "accession": "0001243233-23-000002",
+      "amount": 15000000.0,
+      "amount_snapshots": [],
+      "date": "2021-10-06",
+      "entity_name": "System Initiative, Inc.",
+      "flags": [],
+      "key": "funding_round|2021-10-06",
+      "n_filings": 1,
+      "root_accession": "0001243233-23-000002"
+    },
+    {
+      "accession": "0001243233-25-000004",
+      "amount": 6249999.0,
+      "amount_snapshots": [],
+      "date": "2025-04-02",
+      "entity_name": "System Initiative, Inc.",
+      "flags": [],
+      "key": "funding_round|2025-04-02",
+      "n_filings": 1,
+      "root_accession": "0001243233-25-000004"
+    }
+  ],
+  "true_count": 3,
+  "true_sum": 24249998.0
+}

@@ -1,0 +1,43 @@
+{
+  "entity_id": "cik0001870184",
+  "entity_name": "REGENT CRAFT INC.",
+  "n_filings": 3,
+  "n_rounds": 3,
+  "rounds": [
+    {
+      "accession": "0001870184-21-000001",
+      "amount": 8197500.0,
+      "amount_snapshots": [],
+      "date": "2021-03-08",
+      "entity_name": "REGENT CRAFT INC.",
+      "flags": [],
+      "key": "funding_round|2021-03-08",
+      "n_filings": 1,
+      "root_accession": "0001870184-21-000001"
+    },
+    {
+      "accession": "0001870184-22-000002",
+      "amount": 24789511.0,
+      "amount_snapshots": [],
+      "date": "2021-12-29",
+      "entity_name": "REGENT CRAFT INC.",
+      "flags": [],
+      "key": "funding_round|2021-12-29",
+      "n_filings": 1,
+      "root_accession": "0001870184-22-000002"
+    },
+    {
+      "accession": "0001870184-24-000002",
+      "amount": 60549985.0,
+      "amount_snapshots": [],
+      "date": "2023-07-31",
+      "entity_name": "REGENT CRAFT INC.",
+      "flags": [],
+      "key": "funding_round|2023-07-31",
+      "n_filings": 1,
+      "root_accession": "0001870184-24-000002"
+    }
+  ],
+  "true_count": 3,
+  "true_sum": 93536996.0
+}

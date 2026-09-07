@@ -1,0 +1,96 @@
+{
+  "entity_id": "cik0001699390",
+  "entity_name": "AMP Robotics Corp",
+  "n_filings": 10,
+  "n_rounds": 7,
+  "rounds": [
+    {
+      "accession": "0001699390-17-000001",
+      "amount": 75000.0,
+      "amount_snapshots": [],
+      "date": "2016-12-22",
+      "entity_name": "Cognitive Robotics, LLC",
+      "flags": [],
+      "key": "funding_round|2016-12-22",
+      "n_filings": 1,
+      "root_accession": "0001699390-17-000001"
+    },
+    {
+      "accession": "0001699390-19-000002",
+      "amount": 6577819.0,
+      "amount_snapshots": [
+        3217563.0
+      ],
+      "date": "2017-10-17",
+      "entity_name": "AMP Robotics Corpation",
+      "flags": [],
+      "key": "funding_round|2017-10-17",
+      "n_filings": 2,
+      "root_accession": "0001699390-17-000003"
+    },
+    {
+      "accession": "0001699390-19-000004",
+      "amount": 14649969.0,
+      "amount_snapshots": [],
+      "date": "2019-10-29",
+      "entity_name": "AMP Robotics Corp",
+      "flags": [],
+      "key": "funding_round|2019-10-29",
+      "n_filings": 1,
+      "root_accession": "0001699390-19-000004"
+    },
+    {
+      "accession": "0001699390-20-000001",
+      "amount": 54999712.0,
+      "amount_snapshots": [],
+      "date": "2020-12-17",
+      "entity_name": "AMP Robotics Corp",
+      "flags": [
+        "close_amounts"
+      ],
+      "key": "funding_round|2020-12-17",
+      "n_filings": 1,
+      "root_accession": "0001699390-20-000001"
+    },
+    {
+      "accession": "0001699390-23-000001",
+      "amount": 104205194.0,
+      "amount_snapshots": [
+        71205366.0,
+        91205278.0
+      ],
+      "date": "2022-07-05",
+      "entity_name": "AMP Robotics Corp",
+      "flags": [],
+      "key": "funding_round|2022-07-05",
+      "n_filings": 3,
+      "root_accession": "0001699390-22-000001"
+    },
+    {
+      "accession": "0001699390-24-000001",
+      "amount": 194927148.0,
+      "amount_snapshots": [],
+      "date": "2024-11-21",
+      "entity_name": "AMP Robotics Corp",
+      "flags": [],
+      "key": "funding_round|2024-11-21",
+      "n_filings": 1,
+      "root_accession": "0001699390-24-000001"
+    },
+    {
+      "accession": "0001699390-26-000002",
+      "amount": 52500000.0,
+      "amount_snapshots": [],
+      "date": "2026-06-03",
+      "entity_name": "AMP Robotics Corp",
+      "flags": [
+        "close_amounts"
+      ],
+      "key": "funding_round|2026-06-03",
+      "n_filings": 1,
+      "root_accession": "0001699390-26-000002"
+    }
+  ],
+  "true_count": 7,
+  "true_sum": 427934842.0
+}

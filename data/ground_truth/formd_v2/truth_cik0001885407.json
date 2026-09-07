@@ -1,0 +1,32 @@
+{
+  "entity_id": "cik0001885407",
+  "entity_name": "Loft Labs, Inc.",
+  "n_filings": 2,
+  "n_rounds": 2,
+  "rounds": [
+    {
+      "accession": "0001885407-21-000001",
+      "amount": 3609990.0,
+      "amount_snapshots": [],
+      "date": "2021-03-17",
+      "entity_name": "Loft Labs, Inc.",
+      "flags": [],
+      "key": "funding_round|2021-03-17",
+      "n_filings": 1,
+      "root_accession": "0001885407-21-000001"
+    },
+    {
+      "accession": "0001885407-24-000001",
+      "amount": 23999988.0,
+      "amount_snapshots": [],
+      "date": "2024-02-07",
+      "entity_name": "Loft Labs, Inc.",
+      "flags": [],
+      "key": "funding_round|2024-02-07",
+      "n_filings": 1,
+      "root_accession": "0001885407-24-000001"
+    }
+  ],
+  "true_count": 2,
+  "true_sum": 27609978.0
+}

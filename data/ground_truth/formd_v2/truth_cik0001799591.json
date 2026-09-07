@@ -1,0 +1,73 @@
+{
+  "entity_id": "cik0001799591",
+  "entity_name": "Equip Health, Inc.",
+  "n_filings": 7,
+  "n_rounds": 5,
+  "rounds": [
+    {
+      "accession": "0001799591-20-000001",
+      "amount": 3685000.0,
+      "amount_snapshots": [],
+      "date": "2019-12-23",
+      "entity_name": "Equip Health, Inc",
+      "flags": [],
+      "key": "funding_round|2019-12-23",
+      "n_filings": 1,
+      "root_accession": "0001799591-20-000001"
+    },
+    {
+      "accession": "0001799591-21-000004",
+      "amount": 12979975.0,
+      "amount_snapshots": [],
+      "date": "2021-01-14",
+      "entity_name": "Equip Health, Inc.",
+      "flags": [],
+      "key": "funding_round|2021-01-14",
+      "n_filings": 1,
+      "root_accession": "0001799591-21-000004"
+    },
+    {
+      "accession": "0001799591-22-000001",
+      "amount": 58033903.0,
+      "amount_snapshots": [],
+      "date": "2021-12-21",
+      "entity_name": "Equip Health, Inc.",
+      "flags": [
+        "close_amounts"
+      ],
+      "key": "funding_round|2021-12-21",
+      "n_filings": 1,
+      "root_accession": "0001799591-22-000001"
+    },
+    {
+      "accession": "0001799591-24-000002",
+      "amount": 34999935.0,
+      "amount_snapshots": [
+        19999984.0
+      ],
+      "date": "2023-06-27",
+      "entity_name": "Equip Health, Inc.",
+      "flags": [],
+      "key": "funding_round|2023-06-27",
+      "n_filings": 2,
+      "root_accession": "0001799591-23-000001"
+    },
+    {
+      "accession": "0001799591-25-000004",
+      "amount": 54149339.0,
+      "amount_snapshots": [
+        46649346.0
+      ],
+      "date": "2025-07-22",
+      "entity_name": "Equip Health, Inc.",
+      "flags": [
+        "close_amounts"
+      ],
+      "key": "funding_round|2025-07-22",
+      "n_filings": 2,
+      "root_accession": "0001799591-25-000001"
+    }
+  ],
+  "true_count": 5,
+  "true_sum": 163848152.0
+}

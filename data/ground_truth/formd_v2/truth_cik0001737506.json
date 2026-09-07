@@ -1,0 +1,108 @@
+{
+  "entity_id": "cik0001737506",
+  "entity_name": "Stord, Inc.",
+  "n_filings": 8,
+  "n_rounds": 8,
+  "rounds": [
+    {
+      "accession": "0001737506-18-000001",
+      "amount": 2629997.0,
+      "amount_snapshots": [],
+      "date": "2018-04-05",
+      "entity_name": "Stord, Inc.",
+      "flags": [],
+      "key": "funding_round|2018-04-05",
+      "n_filings": 1,
+      "root_accession": "0001737506-18-000001"
+    },
+    {
+      "accession": "0001737506-19-000001",
+      "amount": 12409993.0,
+      "amount_snapshots": [],
+      "date": "2019-03-22",
+      "entity_name": "Stord, Inc.",
+      "flags": [],
+      "key": "funding_round|2019-03-22",
+      "n_filings": 1,
+      "root_accession": "0001737506-19-000001"
+    },
+    {
+      "accession": "0001737506-20-000001",
+      "amount": 31949975.0,
+      "amount_snapshots": [],
+      "date": "2020-11-19",
+      "entity_name": "Stord, Inc.",
+      "flags": [],
+      "key": "funding_round|2020-11-19",
+      "n_filings": 1,
+      "root_accession": "0001737506-20-000001"
+    },
+    {
+      "accession": "0001737506-21-000001",
+      "amount": 57624899.0,
+      "amount_snapshots": [],
+      "date": "2021-03-19",
+      "entity_name": "Stord, Inc.",
+      "flags": [
+        "close_amounts"
+      ],
+      "key": "funding_round|2021-03-19",
+      "n_filings": 1,
+      "root_accession": "0001737506-21-000001"
+    },
+    {
+      "accession": "0001737506-21-000002",
+      "amount": 95000000.0,
+      "amount_snapshots": [],
+      "date": "2021-08-27",
+      "entity_name": "Stord, Inc.",
+      "flags": [
+        "close_amounts"
+      ],
+      "key": "funding_round|2021-08-27",
+      "n_filings": 1,
+      "root_accession": "0001737506-21-000002"
+    },
+    {
+      "accession": "0001737506-22-000001",
+      "amount": 100000270.0,
+      "amount_snapshots": [],
+      "date": "2022-04-18",
+      "entity_name": "Stord, Inc.",
+      "flags": [
+        "close_amounts"
+      ],
+      "key": "funding_round|2022-04-18",
+      "n_filings": 1,
+      "root_accession": "0001737506-22-000001"
+    },
+    {
+      "accession": "0001737506-25-000004",
+      "amount": 67247511.0,
+      "amount_snapshots": [],
+      "date": "2025-03-18",
+      "entity_name": "Stord, Inc.",
+      "flags": [
+        "close_amounts"
+      ],
+      "key": "funding_round|2025-03-18",
+      "n_filings": 1,
+      "root_accession": "0001737506-25-000004"
+    },
+    {
+      "accession": "0001737506-26-000001",
+      "amount": 61749622.0,
+      "amount_snapshots": [],
+      "date": "2026-05-11",
+      "entity_name": "Stord, Inc.",
+      "flags": [
+        "close_amounts"
+      ],
+      "key": "funding_round|2026-05-11",
+      "n_filings": 1,
+      "root_accession": "0001737506-26-000001"
+    }
+  ],
+  "true_count": 8,
+  "true_sum": 428612267.0
+}

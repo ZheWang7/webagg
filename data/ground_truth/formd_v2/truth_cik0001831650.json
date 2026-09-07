@@ -1,0 +1,65 @@
+{
+  "entity_id": "cik0001831650",
+  "entity_name": "Nth Cycle Inc.",
+  "n_filings": 5,
+  "n_rounds": 5,
+  "rounds": [
+    {
+      "accession": "0001831650-20-000001",
+      "amount": 700000.0,
+      "amount_snapshots": [],
+      "date": "2020-10-30",
+      "entity_name": "Nth Cycle Inc.",
+      "flags": [],
+      "key": "funding_round|2020-10-30",
+      "n_filings": 1,
+      "root_accession": "0001831650-20-000001"
+    },
+    {
+      "accession": "0001831650-21-000001",
+      "amount": 3229031.0,
+      "amount_snapshots": [],
+      "date": "2021-04-30",
+      "entity_name": "Nth Cycle Inc.",
+      "flags": [],
+      "key": "funding_round|2021-04-30",
+      "n_filings": 1,
+      "root_accession": "0001831650-21-000001"
+    },
+    {
+      "accession": "0001831650-21-000002",
+      "amount": 4831514.0,
+      "amount_snapshots": [],
+      "date": "2021-12-17",
+      "entity_name": "Nth Cycle Inc.",
+      "flags": [],
+      "key": "funding_round|2021-12-17",
+      "n_filings": 1,
+      "root_accession": "0001831650-21-000002"
+    },
+    {
+      "accession": "0001831650-23-000001",
+      "amount": 20000004.0,
+      "amount_snapshots": [],
+      "date": "2023-04-05",
+      "entity_name": "Nth Cycle Inc.",
+      "flags": [],
+      "key": "funding_round|2023-04-05",
+      "n_filings": 1,
+      "root_accession": "0001831650-23-000001"
+    },
+    {
+      "accession": "0001831650-26-000003",
+      "amount": 5496228.0,
+      "amount_snapshots": [],
+      "date": "2026-04-24",
+      "entity_name": "Nth Cycle Inc.",
+      "flags": [],
+      "key": "funding_round|2026-04-24",
+      "n_filings": 1,
+      "root_accession": "0001831650-26-000003"
+    }
+  ],
+  "true_count": 5,
+  "true_sum": 34256777.0
+}

@@ -1,0 +1,91 @@
+{
+  "entity_id": "cik0001795606",
+  "entity_name": "Crown Affair, Inc.",
+  "n_filings": 7,
+  "n_rounds": 7,
+  "rounds": [
+    {
+      "accession": "0000897069-19-000543",
+      "amount": 1735000.0,
+      "amount_snapshots": [],
+      "date": "2019-08-23",
+      "entity_name": "Crown Affair, Inc.",
+      "flags": [
+        "close_amounts"
+      ],
+      "key": "funding_round|2019-08-23",
+      "n_filings": 1,
+      "root_accession": "0000897069-19-000543"
+    },
+    {
+      "accession": "0000897069-22-000314",
+      "amount": 3028800.0,
+      "amount_snapshots": [],
+      "date": "2021-05-24",
+      "entity_name": "Crown Affair, Inc.",
+      "flags": [],
+      "key": "funding_round|2021-05-24",
+      "n_filings": 1,
+      "root_accession": "0000897069-22-000314"
+    },
+    {
+      "accession": "0000897069-22-000178",
+      "amount": 4461679.0,
+      "amount_snapshots": [],
+      "date": "2022-03-11",
+      "entity_name": "Crown Affair, Inc.",
+      "flags": [],
+      "key": "funding_round|2022-03-11",
+      "n_filings": 1,
+      "root_accession": "0000897069-22-000178"
+    },
+    {
+      "accession": "0000897069-23-000175",
+      "amount": 2000000.0,
+      "amount_snapshots": [],
+      "date": "2023-03-06",
+      "entity_name": "Crown Affair, Inc.",
+      "flags": [],
+      "key": "funding_round|2023-03-06",
+      "n_filings": 1,
+      "root_accession": "0000897069-23-000175"
+    },
+    {
+      "accession": "0001795606-24-000001",
+      "amount": 1600000.0,
+      "amount_snapshots": [],
+      "date": "2024-05-10",
+      "entity_name": "Crown Affair, Inc.",
+      "flags": [
+        "close_amounts"
+      ],
+      "key": "funding_round|2024-05-10",
+      "n_filings": 1,
+      "root_accession": "0001795606-24-000001"
+    },
+    {
+      "accession": "0001795606-24-000002",
+      "amount": 8999995.0,
+      "amount_snapshots": [],
+      "date": "2024-10-31",
+      "entity_name": "Crown Affair, Inc.",
+      "flags": [],
+      "key": "funding_round|2024-10-31",
+      "n_filings": 1,
+      "root_accession": "0001795606-24-000002"
+    },
+    {
+      "accession": "0001795606-26-000004",
+      "amount": 4999988.0,
+      "amount_snapshots": [],
+      "date": "2026-05-06",
+      "entity_name": "Crown Affair, Inc.",
+      "flags": [],
+      "key": "funding_round|2026-05-06",
+      "n_filings": 1,
+      "root_accession": "0001795606-26-000004"
+    }
+  ],
+  "true_count": 7,
+  "true_sum": 26825462.0
+}

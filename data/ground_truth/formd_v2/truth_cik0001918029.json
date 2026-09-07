@@ -1,0 +1,56 @@
+{
+  "entity_id": "cik0001918029",
+  "entity_name": "Apptronik, Inc",
+  "n_filings": 5,
+  "n_rounds": 4,
+  "rounds": [
+    {
+      "accession": "0001918029-22-000002",
+      "amount": 8004037.0,
+      "amount_snapshots": [],
+      "date": "2022-03-09",
+      "entity_name": "Apptronik, Inc",
+      "flags": [],
+      "key": "funding_round|2022-03-09",
+      "n_filings": 1,
+      "root_accession": "0001918029-22-000002"
+    },
+    {
+      "accession": "0001918029-23-000002",
+      "amount": 10000000.0,
+      "amount_snapshots": [],
+      "date": "2023-02-03",
+      "entity_name": "Apptronik, Inc",
+      "flags": [],
+      "key": "funding_round|2023-02-03",
+      "n_filings": 1,
+      "root_accession": "0001918029-23-000002"
+    },
+    {
+      "accession": "0001918029-25-000004",
+      "amount": 403042193.0,
+      "amount_snapshots": [
+        231237509.0
+      ],
+      "date": "2025-01-31",
+      "entity_name": "Apptronik, Inc",
+      "flags": [],
+      "key": "funding_round|2025-01-31",
+      "n_filings": 2,
+      "root_accession": "0001918029-25-000002"
+    },
+    {
+      "accession": "0001918029-25-000006",
+      "amount": 331397787.0,
+      "amount_snapshots": [],
+      "date": "2025-10-21",
+      "entity_name": "Apptronik, Inc",
+      "flags": [],
+      "key": "funding_round|2025-10-21",
+      "n_filings": 1,
+      "root_accession": "0001918029-25-000006"
+    }
+  ],
+  "true_count": 4,
+  "true_sum": 752444017.0
+}

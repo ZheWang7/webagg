@@ -1,0 +1,115 @@
+{
+  "entity_id": "cik0001673743",
+  "entity_name": "Hinge Health, Inc.",
+  "n_filings": 10,
+  "n_rounds": 9,
+  "rounds": [
+    {
+      "accession": "0001673743-16-000002",
+      "amount": 1332500.0,
+      "amount_snapshots": [
+        1057500.0
+      ],
+      "date": "2016-04-22",
+      "entity_name": "Hinge Health, Inc.",
+      "flags": [],
+      "key": "funding_round|2016-04-22",
+      "n_filings": 2,
+      "root_accession": "0001673743-16-000001"
+    },
+    {
+      "accession": "0001673743-17-000001",
+      "amount": 500001.0,
+      "amount_snapshots": [],
+      "date": "2017-04-14",
+      "entity_name": "Hinge Health, Inc.",
+      "flags": [],
+      "key": "funding_round|2017-04-14",
+      "n_filings": 1,
+      "root_accession": "0001673743-17-000001"
+    },
+    {
+      "accession": "0001673743-17-000005",
+      "amount": 9572546.0,
+      "amount_snapshots": [],
+      "date": "2017-07-07",
+      "entity_name": "Hinge Health, Inc.",
+      "flags": [
+        "close_amounts"
+      ],
+      "key": "funding_round|2017-07-07",
+      "n_filings": 1,
+      "root_accession": "0001673743-17-000005"
+    },
+    {
+      "accession": "0001673743-20-000001",
+      "amount": 25999604.0,
+      "amount_snapshots": [],
+      "date": "2018-07-03",
+      "entity_name": "Hinge Health, Inc.",
+      "flags": [],
+      "key": "funding_round|2018-07-03",
+      "n_filings": 1,
+      "root_accession": "0001673743-20-000001"
+    },
+    {
+      "accession": "0001673743-19-000001",
+      "amount": 15000000.0,
+      "amount_snapshots": [],
+      "date": "2019-05-21",
+      "entity_name": "Hinge Health, Inc.",
+      "flags": [],
+      "key": "funding_round|2019-05-21",
+      "n_filings": 1,
+      "root_accession": "0001673743-19-000001"
+    },
+    {
+      "accession": "0001673743-20-000002",
+      "amount": 91521446.0,
+      "amount_snapshots": [],
+      "date": "2020-01-10",
+      "entity_name": "Hinge Health, Inc.",
+      "flags": [],
+      "key": "funding_round|2020-01-10",
+      "n_filings": 1,
+      "root_accession": "0001673743-20-000002"
+    },
+    {
+      "accession": "0001673743-23-000001",
+      "amount": 309015973.0,
+      "amount_snapshots": [],
+      "date": "2020-12-21",
+      "entity_name": "Hinge Health, Inc.",
+      "flags": [],
+      "key": "funding_round|2020-12-21",
+      "n_filings": 1,
+      "root_accession": "0001673743-23-000001"
+    },
+    {
+      "accession": "0001673743-21-000001",
+      "amount": 9592583.0,
+      "amount_snapshots": [],
+      "date": "2021-03-17",
+      "entity_name": "Hinge Health, Inc.",
+      "flags": [
+        "close_amounts"
+      ],
+      "key": "funding_round|2021-03-17",
+      "n_filings": 1,
+      "root_accession": "0001673743-21-000001"
+    },
+    {
+      "accession": "0001673743-23-000002",
+      "amount": 399999875.0,
+      "amount_snapshots": [],
+      "date": "2021-10-22",
+      "entity_name": "Hinge Health, Inc.",
+      "flags": [],
+      "key": "funding_round|2021-10-22",
+      "n_filings": 1,
+      "root_accession": "0001673743-23-000002"
+    }
+  ],
+  "true_count": 9,
+  "true_sum": 862534528.0
+}

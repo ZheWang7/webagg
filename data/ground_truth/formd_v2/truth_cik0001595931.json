@@ -1,0 +1,109 @@
+{
+  "entity_id": "cik0001595931",
+  "entity_name": "Pendo.io, Inc.",
+  "n_filings": 9,
+  "n_rounds": 9,
+  "rounds": [
+    {
+      "accession": "0001595931-14-000002",
+      "amount": 900000.0,
+      "amount_snapshots": [],
+      "date": "2013-12-23",
+      "entity_name": "Pendo.io, Inc.",
+      "flags": [],
+      "key": "funding_round|2013-12-23",
+      "n_filings": 1,
+      "root_accession": "0001595931-14-000002"
+    },
+    {
+      "accession": "0001595931-15-000001",
+      "amount": 1250000.0,
+      "amount_snapshots": [],
+      "date": "2015-03-02",
+      "entity_name": "Pendo.io, Inc.",
+      "flags": [],
+      "key": "funding_round|2015-03-02",
+      "n_filings": 1,
+      "root_accession": "0001595931-15-000001"
+    },
+    {
+      "accession": "0001595931-15-000002",
+      "amount": 11264864.0,
+      "amount_snapshots": [],
+      "date": "2015-10-01",
+      "entity_name": "Pendo.io, Inc.",
+      "flags": [],
+      "key": "funding_round|2015-10-01",
+      "n_filings": 1,
+      "root_accession": "0001595931-15-000002"
+    },
+    {
+      "accession": "0001595931-16-000004",
+      "amount": 19999947.0,
+      "amount_snapshots": [],
+      "date": "2016-12-07",
+      "entity_name": "Pendo.io, Inc.",
+      "flags": [],
+      "key": "funding_round|2016-12-07",
+      "n_filings": 1,
+      "root_accession": "0001595931-16-000004"
+    },
+    {
+      "accession": "0001595931-17-000001",
+      "amount": 25000000.0,
+      "amount_snapshots": [],
+      "date": "2017-07-06",
+      "entity_name": "Pendo.io, Inc.",
+      "flags": [],
+      "key": "funding_round|2017-07-06",
+      "n_filings": 1,
+      "root_accession": "0001595931-17-000001"
+    },
+    {
+      "accession": "0001595931-18-000001",
+      "amount": 49999997.0,
+      "amount_snapshots": [],
+      "date": "2018-08-30",
+      "entity_name": "Pendo.io, Inc.",
+      "flags": [],
+      "key": "funding_round|2018-08-30",
+      "n_filings": 1,
+      "root_accession": "0001595931-18-000001"
+    },
+    {
+      "accession": "0001595931-19-000001",
+      "amount": 100000004.0,
+      "amount_snapshots": [],
+      "date": "2019-10-08",
+      "entity_name": "Pendo.io, Inc.",
+      "flags": [],
+      "key": "funding_round|2019-10-08",
+      "n_filings": 1,
+      "root_accession": "0001595931-19-000001"
+    },
+    {
+      "accession": "0001595931-21-000001",
+      "amount": 150000012.0,
+      "amount_snapshots": [],
+      "date": "2021-07-15",
+      "entity_name": "Pendo.io, Inc.",
+      "flags": [],
+      "key": "funding_round|2021-07-15",
+      "n_filings": 1,
+      "root_accession": "0001595931-21-000001"
+    },
+    {
+      "accession": "0001595931-24-000001",
+      "amount": 9912849.0,
+      "amount_snapshots": [],
+      "date": "2024-07-31",
+      "entity_name": "Pendo.io, Inc.",
+      "flags": [],
+      "key": "funding_round|2024-07-31",
+      "n_filings": 1,
+      "root_accession": "0001595931-24-000001"
+    }
+  ],
+  "true_count": 9,
+  "true_sum": 368327673.0
+}

@@ -1,0 +1,43 @@
+{
+  "entity_id": "cik0001696488",
+  "entity_name": "Arable Labs, Inc.",
+  "n_filings": 3,
+  "n_rounds": 3,
+  "rounds": [
+    {
+      "accession": "0001696488-17-000001",
+      "amount": 2999000.0,
+      "amount_snapshots": [],
+      "date": "2017-07-18",
+      "entity_name": "Arable Labs, Inc.",
+      "flags": [],
+      "key": "funding_round|2017-07-18",
+      "n_filings": 1,
+      "root_accession": "0001696488-17-000001"
+    },
+    {
+      "accession": "0001696488-20-000002",
+      "amount": 20054053.0,
+      "amount_snapshots": [],
+      "date": "2020-04-29",
+      "entity_name": "Arable Labs, Inc.",
+      "flags": [],
+      "key": "funding_round|2020-04-29",
+      "n_filings": 1,
+      "root_accession": "0001696488-20-000002"
+    },
+    {
+      "accession": "0001696488-22-000002",
+      "amount": 40389048.0,
+      "amount_snapshots": [],
+      "date": "2022-02-18",
+      "entity_name": "Arable Labs, Inc.",
+      "flags": [],
+      "key": "funding_round|2022-02-18",
+      "n_filings": 1,
+      "root_accession": "0001696488-22-000002"
+    }
+  ],
+  "true_count": 3,
+  "true_sum": 63442101.0
+}

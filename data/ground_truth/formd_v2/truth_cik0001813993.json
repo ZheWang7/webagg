@@ -1,0 +1,73 @@
+{
+  "entity_id": "cik0001813993",
+  "entity_name": "Quaise Energy, Inc.",
+  "n_filings": 8,
+  "n_rounds": 5,
+  "rounds": [
+    {
+      "accession": "0001813993-20-000001",
+      "amount": 6031890.0,
+      "amount_snapshots": [],
+      "date": "2020-05-22",
+      "entity_name": "Quaise, Inc.",
+      "flags": [],
+      "key": "funding_round|2020-05-22",
+      "n_filings": 1,
+      "root_accession": "0001813993-20-000001"
+    },
+    {
+      "accession": "0001813993-21-000001",
+      "amount": 12000000.0,
+      "amount_snapshots": [],
+      "date": "2021-07-30",
+      "entity_name": "Quaise, Inc.",
+      "flags": [
+        "close_amounts"
+      ],
+      "key": "funding_round|2021-07-30",
+      "n_filings": 1,
+      "root_accession": "0001813993-21-000001"
+    },
+    {
+      "accession": "0001813993-22-000006",
+      "amount": 51990988.0,
+      "amount_snapshots": [
+        39990999.0
+      ],
+      "date": "2022-01-24",
+      "entity_name": "Quaise Energy, Inc.",
+      "flags": [],
+      "key": "funding_round|2022-01-24",
+      "n_filings": 3,
+      "root_accession": "0001813993-22-000004"
+    },
+    {
+      "accession": "0001813993-23-000001",
+      "amount": 13079903.0,
+      "amount_snapshots": [],
+      "date": "2023-11-29",
+      "entity_name": "Quaise Energy, Inc.",
+      "flags": [
+        "close_amounts"
+      ],
+      "key": "funding_round|2023-11-29",
+      "n_filings": 1,
+      "root_accession": "0001813993-23-000001"
+    },
+    {
+      "accession": "0001813993-26-000004",
+      "amount": 179265022.0,
+      "amount_snapshots": [
+        133791666.0
+      ],
+      "date": "2026-06-30",
+      "entity_name": "Quaise Energy, Inc.",
+      "flags": [],
+      "key": "funding_round|2026-06-30",
+      "n_filings": 2,
+      "root_accession": "0001813993-26-000003"
+    }
+  ],
+  "true_count": 5,
+  "true_sum": 262367803.0
+}

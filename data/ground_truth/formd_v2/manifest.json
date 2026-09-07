@@ -1,0 +1,451 @@
+{
+  "blocked": true,
+  "blocking_predicate": {
+    "ciks": [
+      "1496963",
+      "1601830",
+      "1673743",
+      "1567658",
+      "1863211",
+      "1861415",
+      "1829334",
+      "1614167",
+      "1595931",
+      "1537182",
+      "1577481",
+      "1918029",
+      "1794061",
+      "1973707",
+      "1982311",
+      "1857324",
+      "1959571",
+      "1792473",
+      "1739613",
+      "1613287",
+      "1684049",
+      "2001954",
+      "1699390",
+      "1870184",
+      "1714402",
+      "1817057",
+      "1611176",
+      "1783164",
+      "1799591",
+      "1885407",
+      "1880409",
+      "1783955",
+      "1832759",
+      "1813993",
+      "1831650",
+      "1896284",
+      "1708414",
+      "1722207",
+      "1737506",
+      "1784084",
+      "1783848",
+      "1795606",
+      "1602935",
+      "1824134",
+      "1783735",
+      "1696488",
+      "1796214",
+      "1758464",
+      "1764915",
+      "1712223",
+      "1818001",
+      "1778486"
+    ],
+    "forms": [
+      "D",
+      "D/A"
+    ]
+  },
+  "built_at": "2026-09-07T04:17:19.699228",
+  "cal_frac": 0.6667,
+  "cohort": "formd_v2",
+  "entities": {
+    "cik0001496963": {
+      "entity_name": "Squarespace, Inc.",
+      "n_rounds": 3,
+      "true_sum": 268499998.0
+    },
+    "cik0001537182": {
+      "entity_name": "Outreach Corp",
+      "n_rounds": 14,
+      "true_sum": 489983659.0
+    },
+    "cik0001567658": {
+      "entity_name": "Illumio, Inc.",
+      "n_rounds": 6,
+      "true_sum": 558376224.0
+    },
+    "cik0001577481": {
+      "entity_name": "HIGHSPOT, INC.",
+      "n_rounds": 8,
+      "true_sum": 653845301.0
+    },
+    "cik0001595931": {
+      "entity_name": "Pendo.io, Inc.",
+      "n_rounds": 9,
+      "true_sum": 368327673.0
+    },
+    "cik0001601830": {
+      "entity_name": "RECURSION PHARMACEUTICALS, INC.",
+      "n_rounds": 9,
+      "true_sum": 478416292.0
+    },
+    "cik0001602935": {
+      "entity_name": "Element Science, Inc.",
+      "n_rounds": 4,
+      "true_sum": 97649139.0
+    },
+    "cik0001611176": {
+      "entity_name": "Aledade, Inc.",
+      "n_rounds": 8,
+      "true_sum": 662611844.0
+    },
+    "cik0001613287": {
+      "entity_name": "Canopy Tax, Inc.",
+      "n_rounds": 8,
+      "true_sum": 155851123.0
+    },
+    "cik0001614167": {
+      "entity_name": "FullStory, Inc.",
+      "n_rounds": 7,
+      "true_sum": 197297137.0
+    },
+    "cik0001673743": {
+      "entity_name": "Hinge Health, Inc.",
+      "n_rounds": 9,
+      "true_sum": 862534528.0
+    },
+    "cik0001684049": {
+      "entity_name": "Expel, Inc.",
+      "n_rounds": 6,
+      "true_sum": 284575644.0
+    },
+    "cik0001696488": {
+      "entity_name": "Arable Labs, Inc.",
+      "n_rounds": 3,
+      "true_sum": 63442101.0
+    },
+    "cik0001699390": {
+      "entity_name": "AMP Robotics Corp",
+      "n_rounds": 7,
+      "true_sum": 427934842.0
+    },
+    "cik0001708414": {
+      "entity_name": "Tive, Inc.",
+      "n_rounds": 7,
+      "true_sum": 136464667.0
+    },
+    "cik0001712223": {
+      "entity_name": "Prenda, Inc.",
+      "n_rounds": 7,
+      "true_sum": 42238596.0
+    },
+    "cik0001714402": {
+      "entity_name": "ZAP ENERGY, INC.",
+      "n_rounds": 4,
+      "true_sum": 318958476.0
+    },
+    "cik0001722207": {
+      "entity_name": "LinkSquares, Inc.",
+      "n_rounds": 6,
+      "true_sum": 160155483.0
+    },
+    "cik0001737506": {
+      "entity_name": "Stord, Inc.",
+      "n_rounds": 8,
+      "true_sum": 428612267.0
+    },
+    "cik0001739613": {
+      "entity_name": "MarginEdge Co.",
+      "n_rounds": 5,
+      "true_sum": 81748337.0
+    },
+    "cik0001758464": {
+      "entity_name": "Billd Holdings, Inc.",
+      "n_rounds": 6,
+      "true_sum": 80078626.0
+    },
+    "cik0001764915": {
+      "entity_name": "Arris Composites, Inc.",
+      "n_rounds": 4,
+      "true_sum": 181693259.0
+    },
+    "cik0001778486": {
+      "entity_name": "AirGarage, Inc.",
+      "n_rounds": 3,
+      "true_sum": 27802030.0
+    },
+    "cik0001783164": {
+      "entity_name": "ELEANOR HEALTH HOLDINGS, LLC",
+      "n_rounds": 5,
+      "true_sum": 138012894.0
+    },
+    "cik0001783735": {
+      "entity_name": "Delfi Diagnostics, Inc.",
+      "n_rounds": 5,
+      "true_sum": 365923520.0
+    },
+    "cik0001783848": {
+      "entity_name": "OMSOM, INC.",
+      "n_rounds": 3,
+      "true_sum": 3162065.0
+    },
+    "cik0001783955": {
+      "entity_name": "System Initiative, Inc.",
+      "n_rounds": 3,
+      "true_sum": 24249998.0
+    },
+    "cik0001784084": {
+      "entity_name": "Magic Spoon Inc.",
+      "n_rounds": 4,
+      "true_sum": 124039337.0
+    },
+    "cik0001792473": {
+      "entity_name": "Matik, Inc.",
+      "n_rounds": 2,
+      "true_sum": 23050375.0
+    },
+    "cik0001794061": {
+      "entity_name": "Ambi Robotics, Inc.",
+      "n_rounds": 5,
+      "true_sum": 66665939.0
+    },
+    "cik0001795606": {
+      "entity_name": "Crown Affair, Inc.",
+      "n_rounds": 7,
+      "true_sum": 26825462.0
+    },
+    "cik0001796214": {
+      "entity_name": "Dusty Robotics, Inc.",
+      "n_rounds": 3,
+      "true_sum": 66949967.0
+    },
+    "cik0001799591": {
+      "entity_name": "Equip Health, Inc.",
+      "n_rounds": 5,
+      "true_sum": 163848152.0
+    },
+    "cik0001813993": {
+      "entity_name": "Quaise Energy, Inc.",
+      "n_rounds": 5,
+      "true_sum": 262367803.0
+    },
+    "cik0001817057": {
+      "entity_name": "Second Front Systems, Inc.",
+      "n_rounds": 4,
+      "true_sum": 125108289.0
+    },
+    "cik0001818001": {
+      "entity_name": "Abodu, Inc.",
+      "n_rounds": 3,
+      "true_sum": 29014830.0
+    },
+    "cik0001824134": {
+      "entity_name": "BioIntelliSense, Inc.",
+      "n_rounds": 4,
+      "true_sum": 140332887.0
+    },
+    "cik0001829334": {
+      "entity_name": "Supabase, Inc.",
+      "n_rounds": 7,
+      "true_sum": 962993437.0
+    },
+    "cik0001831650": {
+      "entity_name": "Nth Cycle Inc.",
+      "n_rounds": 5,
+      "true_sum": 34256777.0
+    },
+    "cik0001832759": {
+      "entity_name": "Settle Inc.",
+      "n_rounds": 3,
+      "true_sum": 98719892.0
+    },
+    "cik0001857324": {
+      "entity_name": "Zed Industries, Inc.",
+      "n_rounds": 3,
+      "true_sum": 44817396.0
+    },
+    "cik0001861415": {
+      "entity_name": "Stoke Space Technologies, Inc.",
+      "n_rounds": 6,
+      "true_sum": 1088941535.0
+    },
+    "cik0001863211": {
+      "entity_name": "Hadrian Automation, Inc.",
+      "n_rounds": 7,
+      "true_sum": 418304600.0
+    },
+    "cik0001870184": {
+      "entity_name": "REGENT CRAFT INC.",
+      "n_rounds": 3,
+      "true_sum": 93536996.0
+    },
+    "cik0001880409": {
+      "entity_name": "Dagger, Inc.",
+      "n_rounds": 2,
+      "true_sum": 30392686.0
+    },
+    "cik0001885407": {
+      "entity_name": "Loft Labs, Inc.",
+      "n_rounds": 2,
+      "true_sum": 27609978.0
+    },
+    "cik0001896284": {
+      "entity_name": "Ebb Carbon, Inc.",
+      "n_rounds": 3,
+      "true_sum": 23754932.0
+    },
+    "cik0001918029": {
+      "entity_name": "Apptronik, Inc",
+      "n_rounds": 4,
+      "true_sum": 752444017.0
+    },
+    "cik0001959571": {
+      "entity_name": "Magic AI, Inc",
+      "n_rounds": 4,
+      "true_sum": 466207455.0
+    },
+    "cik0001973707": {
+      "entity_name": "Castelion Corp",
+      "n_rounds": 5,
+      "true_sum": 1081002659.0
+    },
+    "cik0001982311": {
+      "entity_name": "Unstructured Technologies, Inc.",
+      "n_rounds": 2,
+      "true_sum": 68092085.0
+    },
+    "cik0002001954": {
+      "entity_name": "OVERLAND AI INC.",
+      "n_rounds": 5,
+      "true_sum": 122292259.0
+    }
+  },
+  "keys_swept": 52,
+  "parse_failures": [],
+  "query_filter": {
+    "ciks": [
+      "1496963",
+      "1601830",
+      "1673743",
+      "1567658",
+      "1863211",
+      "1861415",
+      "1829334",
+      "1614167",
+      "1595931",
+      "1537182",
+      "1577481",
+      "1918029",
+      "1794061",
+      "1973707",
+      "1982311",
+      "1857324",
+      "1959571",
+      "1792473",
+      "1739613",
+      "1613287",
+      "1684049",
+      "2001954",
+      "1699390",
+      "1870184",
+      "1714402",
+      "1817057",
+      "1611176",
+      "1783164",
+      "1799591",
+      "1885407",
+      "1880409",
+      "1783955",
+      "1832759",
+      "1813993",
+      "1831650",
+      "1896284",
+      "1708414",
+      "1722207",
+      "1737506",
+      "1784084",
+      "1783848",
+      "1795606",
+      "1602935",
+      "1824134",
+      "1783735",
+      "1696488",
+      "1796214",
+      "1758464",
+      "1764915",
+      "1712223",
+      "1818001",
+      "1778486"
+    ],
+    "forms": [
+      "D",
+      "D/A"
+    ]
+  },
+  "seed": 0,
+  "split": {
+    "calibration": [
+      "cik0001496963",
+      "cik0001567658",
+      "cik0001602935",
+      "cik0001611176",
+      "cik0001673743",
+      "cik0001684049",
+      "cik0001696488",
+      "cik0001699390",
+      "cik0001708414",
+      "cik0001712223",
+      "cik0001714402",
+      "cik0001737506",
+      "cik0001739613",
+      "cik0001758464",
+      "cik0001764915",
+      "cik0001778486",
+      "cik0001783164",
+      "cik0001783848",
+      "cik0001783955",
+      "cik0001784084",
+      "cik0001794061",
+      "cik0001795606",
+      "cik0001799591",
+      "cik0001818001",
+      "cik0001829334",
+      "cik0001831650",
+      "cik0001832759",
+      "cik0001861415",
+      "cik0001863211",
+      "cik0001885407",
+      "cik0001896284",
+      "cik0001918029",
+      "cik0001959571",
+      "cik0001982311"
+    ],
+    "validation": [
+      "cik0001537182",
+      "cik0001577481",
+      "cik0001595931",
+      "cik0001601830",
+      "cik0001613287",
+      "cik0001614167",
+      "cik0001722207",
+      "cik0001783735",
+      "cik0001792473",
+      "cik0001796214",
+      "cik0001813993",
+      "cik0001817057",
+      "cik0001824134",
+      "cik0001857324",
+      "cik0001870184",
+      "cik0001880409",
+      "cik0001973707",
+      "cik0002001954"
+    ]
+  },
+  "split_dropped": [],
+  "truth_db": "D:\\Projects\\webagg\\data\\runs\\formd_v2_truth.sqlite"
+}

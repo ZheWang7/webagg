@@ -1,0 +1,91 @@
+{
+  "entity_id": "cik0001614167",
+  "entity_name": "FullStory, Inc.",
+  "n_filings": 7,
+  "n_rounds": 7,
+  "rounds": [
+    {
+      "accession": "0001614167-14-000001",
+      "amount": 1500000.0,
+      "amount_snapshots": [],
+      "date": "2014-06-06",
+      "entity_name": "Monetology, LLC",
+      "flags": [],
+      "key": "funding_round|2014-06-06",
+      "n_filings": 1,
+      "root_accession": "0001614167-14-000001"
+    },
+    {
+      "accession": "0001614167-15-000002",
+      "amount": 10697854.0,
+      "amount_snapshots": [],
+      "date": "2015-05-04",
+      "entity_name": "FullStory, Inc.",
+      "flags": [
+        "close_amounts"
+      ],
+      "key": "funding_round|2015-05-04",
+      "n_filings": 1,
+      "root_accession": "0001614167-15-000002"
+    },
+    {
+      "accession": "0001614167-17-000002",
+      "amount": 14999998.0,
+      "amount_snapshots": [],
+      "date": "2017-05-04",
+      "entity_name": "FullStory, Inc.",
+      "flags": [],
+      "key": "funding_round|2017-05-04",
+      "n_filings": 1,
+      "root_accession": "0001614167-17-000002"
+    },
+    {
+      "accession": "0001614167-19-000001",
+      "amount": 32249991.0,
+      "amount_snapshots": [],
+      "date": "2019-04-10",
+      "entity_name": "FullStory, Inc.",
+      "flags": [],
+      "key": "funding_round|2019-04-10",
+      "n_filings": 1,
+      "root_accession": "0001614167-19-000001"
+    },
+    {
+      "accession": "0001614167-20-000002",
+      "amount": 9999990.0,
+      "amount_snapshots": [],
+      "date": "2020-05-11",
+      "entity_name": "FullStory, Inc.",
+      "flags": [
+        "close_amounts"
+      ],
+      "key": "funding_round|2020-05-11",
+      "n_filings": 1,
+      "root_accession": "0001614167-20-000002"
+    },
+    {
+      "accession": "0001614167-21-000001",
+      "amount": 102849318.0,
+      "amount_snapshots": [],
+      "date": "2021-07-29",
+      "entity_name": "FullStory, Inc.",
+      "flags": [],
+      "key": "funding_round|2021-07-29",
+      "n_filings": 1,
+      "root_accession": "0001614167-21-000001"
+    },
+    {
+      "accession": "0001614167-22-000001",
+      "amount": 24999986.0,
+      "amount_snapshots": [],
+      "date": "2022-07-22",
+      "entity_name": "FullStory, Inc.",
+      "flags": [],
+      "key": "funding_round|2022-07-22",
+      "n_filings": 1,
+      "root_accession": "0001614167-22-000001"
+    }
+  ],
+  "true_count": 7,
+  "true_sum": 197297137.0
+}

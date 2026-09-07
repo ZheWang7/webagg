@@ -1,0 +1,43 @@
+{
+  "entity_id": "cik0001796214",
+  "entity_name": "Dusty Robotics, Inc.",
+  "n_filings": 3,
+  "n_rounds": 3,
+  "rounds": [
+    {
+      "accession": "0001796214-19-000001",
+      "amount": 4999996.0,
+      "amount_snapshots": [],
+      "date": "2019-11-26",
+      "entity_name": "Dusty Robotics, Inc.",
+      "flags": [],
+      "key": "funding_round|2019-11-26",
+      "n_filings": 1,
+      "root_accession": "0001796214-19-000001"
+    },
+    {
+      "accession": "0001796214-21-000001",
+      "amount": 16449992.0,
+      "amount_snapshots": [],
+      "date": "2021-05-28",
+      "entity_name": "Dusty Robotics, Inc.",
+      "flags": [],
+      "key": "funding_round|2021-05-28",
+      "n_filings": 1,
+      "root_accession": "0001796214-21-000001"
+    },
+    {
+      "accession": "0001796214-22-000002",
+      "amount": 45499979.0,
+      "amount_snapshots": [],
+      "date": "2022-03-29",
+      "entity_name": "Dusty Robotics, Inc.",
+      "flags": [],
+      "key": "funding_round|2022-03-29",
+      "n_filings": 1,
+      "root_accession": "0001796214-22-000002"
+    }
+  ],
+  "true_count": 3,
+  "true_sum": 66949967.0
+}

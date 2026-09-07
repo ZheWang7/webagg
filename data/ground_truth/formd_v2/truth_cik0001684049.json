@@ -1,0 +1,76 @@
+{
+  "entity_id": "cik0001684049",
+  "entity_name": "Expel, Inc.",
+  "n_filings": 6,
+  "n_rounds": 6,
+  "rounds": [
+    {
+      "accession": "0001684049-16-000001",
+      "amount": 7499993.0,
+      "amount_snapshots": [],
+      "date": "2016-08-30",
+      "entity_name": "Expel, Inc.",
+      "flags": [],
+      "key": "funding_round|2016-08-30",
+      "n_filings": 1,
+      "root_accession": "0001684049-16-000001"
+    },
+    {
+      "accession": "0001684049-18-000001",
+      "amount": 20000000.0,
+      "amount_snapshots": [],
+      "date": "2018-03-30",
+      "entity_name": "Expel, Inc.",
+      "flags": [],
+      "key": "funding_round|2018-03-30",
+      "n_filings": 1,
+      "root_accession": "0001684049-18-000001"
+    },
+    {
+      "accession": "0001684049-19-000001",
+      "amount": 39999981.0,
+      "amount_snapshots": [],
+      "date": "2019-06-17",
+      "entity_name": "Expel, Inc.",
+      "flags": [],
+      "key": "funding_round|2019-06-17",
+      "n_filings": 1,
+      "root_accession": "0001684049-19-000001"
+    },
+    {
+      "accession": "0001684049-20-000001",
+      "amount": 45775734.0,
+      "amount_snapshots": [],
+      "date": "2020-05-05",
+      "entity_name": "Expel, Inc.",
+      "flags": [],
+      "key": "funding_round|2020-05-05",
+      "n_filings": 1,
+      "root_accession": "0001684049-20-000001"
+    },
+    {
+      "accession": "0001684049-22-000001",
+      "amount": 141299936.0,
+      "amount_snapshots": [],
+      "date": "2021-09-30",
+      "entity_name": "Expel, Inc.",
+      "flags": [],
+      "key": "funding_round|2021-09-30",
+      "n_filings": 1,
+      "root_accession": "0001684049-22-000001"
+    },
+    {
+      "accession": "0001684049-22-000002",
+      "amount": 30000000.0,
+      "amount_snapshots": [],
+      "date": "2022-09-28",
+      "entity_name": "Expel, Inc.",
+      "flags": [],
+      "key": "funding_round|2022-09-28",
+      "n_filings": 1,
+      "root_accession": "0001684049-22-000002"
+    }
+  ],
+  "true_count": 6,
+  "true_sum": 284575644.0
+}

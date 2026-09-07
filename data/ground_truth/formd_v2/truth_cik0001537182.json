@@ -1,0 +1,174 @@
+{
+  "entity_id": "cik0001537182",
+  "entity_name": "Outreach Corp",
+  "n_filings": 16,
+  "n_rounds": 14,
+  "rounds": [
+    {
+      "accession": "0001537182-12-000001",
+      "amount": 445000.0,
+      "amount_snapshots": [
+        20000.0
+      ],
+      "date": "2011-12-01",
+      "entity_name": "ComponentLab Inc.",
+      "flags": [],
+      "key": "funding_round|2011-12-01",
+      "n_filings": 2,
+      "root_accession": "0001537182-11-000001"
+    },
+    {
+      "accession": "0001537182-12-000003",
+      "amount": 600000.0,
+      "amount_snapshots": [],
+      "date": "2012-11-27",
+      "entity_name": "ComponentLab Inc.",
+      "flags": [],
+      "key": "funding_round|2012-11-27",
+      "n_filings": 1,
+      "root_accession": "0001537182-12-000003"
+    },
+    {
+      "accession": "0001537182-14-000001",
+      "amount": 251000.0,
+      "amount_snapshots": [],
+      "date": "2014-02-21",
+      "entity_name": "ComponentLab Inc.",
+      "flags": [],
+      "key": "funding_round|2014-02-21",
+      "n_filings": 1,
+      "root_accession": "0001537182-14-000001"
+    },
+    {
+      "accession": "0001537182-15-000001",
+      "amount": 2366412.0,
+      "amount_snapshots": [],
+      "date": "2015-04-06",
+      "entity_name": "ComponentLab Inc.",
+      "flags": [],
+      "key": "funding_round|2015-04-06",
+      "n_filings": 1,
+      "root_accession": "0001537182-15-000001"
+    },
+    {
+      "accession": "0001537182-16-000004",
+      "amount": 9200000.0,
+      "amount_snapshots": [
+        9081734.0
+      ],
+      "date": "2015-08-25",
+      "entity_name": "ComponentLab Inc.",
+      "flags": [],
+      "key": "funding_round|2015-08-25",
+      "n_filings": 2,
+      "root_accession": "0001537182-15-000002"
+    },
+    {
+      "accession": "0001537182-16-000006",
+      "amount": 17363630.0,
+      "amount_snapshots": [],
+      "date": "2016-06-08",
+      "entity_name": "ComponentLab Inc.",
+      "flags": [],
+      "key": "funding_round|2016-06-08",
+      "n_filings": 1,
+      "root_accession": "0001537182-16-000006"
+    },
+    {
+      "accession": "0001168404-17-000009",
+      "amount": 30000000.0,
+      "amount_snapshots": [],
+      "date": "2017-05-12",
+      "entity_name": "Outreach Corp",
+      "flags": [],
+      "key": "funding_round|2017-05-12",
+      "n_filings": 1,
+      "root_accession": "0001168404-17-000009"
+    },
+    {
+      "accession": "0001168404-18-000004",
+      "amount": 0.0,
+      "amount_snapshots": [],
+      "date": "2018-03-03",
+      "entity_name": "Outreach Corp",
+      "flags": [
+        "close_amounts"
+      ],
+      "key": "funding_round|2018-03-03",
+      "n_filings": 1,
+      "root_accession": "0001168404-18-000004"
+    },
+    {
+      "accession": "0001168404-18-000007",
+      "amount": 64999962.0,
+      "amount_snapshots": [],
+      "date": "2018-05-15",
+      "entity_name": "Outreach Corp",
+      "flags": [],
+      "key": "funding_round|2018-05-15",
+      "n_filings": 1,
+      "root_accession": "0001168404-18-000007"
+    },
+    {
+      "accession": "0001168404-19-000005",
+      "amount": 0.0,
+      "amount_snapshots": [],
+      "date": "2019-01-25",
+      "entity_name": "Outreach Corp",
+      "flags": [
+        "close_amounts"
+      ],
+      "key": "funding_round|2019-01-25",
+      "n_filings": 1,
+      "root_accession": "0001168404-19-000005"
+    },
+    {
+      "accession": "0001168404-19-000002",
+      "amount": 113731045.0,
+      "amount_snapshots": [],
+      "date": "2019-04-10",
+      "entity_name": "Outreach Corp",
+      "flags": [],
+      "key": "funding_round|2019-04-10",
+      "n_filings": 1,
+      "root_accession": "0001168404-19-000002"
+    },
+    {
+      "accession": "0001168404-20-000002",
+      "amount": 49999936.0,
+      "amount_snapshots": [],
+      "date": "2020-06-12",
+      "entity_name": "Outreach Corp",
+      "flags": [],
+      "key": "funding_round|2020-06-12",
+      "n_filings": 1,
+      "root_accession": "0001168404-20-000002"
+    },
+    {
+      "accession": "0001168404-21-000002",
+      "amount": 0.0,
+      "amount_snapshots": [],
+      "date": "2021-04-01",
+      "entity_name": "Outreach Corp",
+      "flags": [
+        "close_amounts"
+      ],
+      "key": "funding_round|2021-04-01",
+      "n_filings": 1,
+      "root_accession": "0001168404-21-000002"
+    },
+    {
+      "accession": "0001168404-21-000006",
+      "amount": 201026674.0,
+      "amount_snapshots": [],
+      "date": "2021-05-27",
+      "entity_name": "Outreach Corp",
+      "flags": [],
+      "key": "funding_round|2021-05-27",
+      "n_filings": 1,
+      "root_accession": "0001168404-21-000006"
+    }
+  ],
+  "true_count": 14,
+  "true_sum": 489983659.0
+}

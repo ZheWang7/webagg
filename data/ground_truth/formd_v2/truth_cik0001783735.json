@@ -1,0 +1,65 @@
+{
+  "entity_id": "cik0001783735",
+  "entity_name": "Delfi Diagnostics, Inc.",
+  "n_filings": 5,
+  "n_rounds": 5,
+  "rounds": [
+    {
+      "accession": "0001567619-19-016457",
+      "amount": 15343.0,
+      "amount_snapshots": [],
+      "date": "2018-06-18",
+      "entity_name": "Delfi Diagnostics, Inc.",
+      "flags": [],
+      "key": "funding_round|2018-06-18",
+      "n_filings": 1,
+      "root_accession": "0001567619-19-016457"
+    },
+    {
+      "accession": "0001567619-19-017584",
+      "amount": 5500000.0,
+      "amount_snapshots": [],
+      "date": "2019-08-12",
+      "entity_name": "Delfi Diagnostics, Inc.",
+      "flags": [],
+      "key": "funding_round|2019-08-12",
+      "n_filings": 1,
+      "root_accession": "0001567619-19-017584"
+    },
+    {
+      "accession": "0001567619-21-001585",
+      "amount": 101074986.0,
+      "amount_snapshots": [],
+      "date": "2021-01-12",
+      "entity_name": "Delfi Diagnostics, Inc.",
+      "flags": [],
+      "key": "funding_round|2021-01-12",
+      "n_filings": 1,
+      "root_accession": "0001567619-21-001585"
+    },
+    {
+      "accession": "0001783735-22-000002",
+      "amount": 224999876.0,
+      "amount_snapshots": [],
+      "date": "2022-06-10",
+      "entity_name": "Delfi Diagnostics, Inc.",
+      "flags": [],
+      "key": "funding_round|2022-06-10",
+      "n_filings": 1,
+      "root_accession": "0001783735-22-000002"
+    },
+    {
+      "accession": "0000905148-25-004422",
+      "amount": 34333315.0,
+      "amount_snapshots": [],
+      "date": "2025-12-01",
+      "entity_name": "Delfi Diagnostics, Inc.",
+      "flags": [],
+      "key": "funding_round|2025-12-01",
+      "n_filings": 1,
+      "root_accession": "0000905148-25-004422"
+    }
+  ],
+  "true_count": 5,
+  "true_sum": 365923520.0
+}

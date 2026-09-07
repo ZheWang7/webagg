@@ -1,0 +1,76 @@
+{
+  "entity_id": "cik0001861415",
+  "entity_name": "Stoke Space Technologies, Inc.",
+  "n_filings": 6,
+  "n_rounds": 6,
+  "rounds": [
+    {
+      "accession": "0001861415-21-000001",
+      "amount": 9141800.0,
+      "amount_snapshots": [],
+      "date": "2020-12-21",
+      "entity_name": "STOKE Space Technologies, Inc.",
+      "flags": [],
+      "key": "funding_round|2020-12-21",
+      "n_filings": 1,
+      "root_accession": "0001861415-21-000001"
+    },
+    {
+      "accession": "0001861415-21-000002",
+      "amount": 64999992.0,
+      "amount_snapshots": [],
+      "date": "2021-11-30",
+      "entity_name": "STOKE Space Technologies, Inc.",
+      "flags": [],
+      "key": "funding_round|2021-11-30",
+      "n_filings": 1,
+      "root_accession": "0001861415-21-000002"
+    },
+    {
+      "accession": "0001861415-25-000001",
+      "amount": 145999814.0,
+      "amount_snapshots": [],
+      "date": "2023-09-15",
+      "entity_name": "STOKE Space Technologies, Inc.",
+      "flags": [],
+      "key": "funding_round|2023-09-15",
+      "n_filings": 1,
+      "root_accession": "0001861415-25-000001"
+    },
+    {
+      "accession": "0001861415-25-000002",
+      "amount": 183799935.0,
+      "amount_snapshots": [],
+      "date": "2024-12-09",
+      "entity_name": "STOKE Space Technologies, Inc.",
+      "flags": [],
+      "key": "funding_round|2024-12-09",
+      "n_filings": 1,
+      "root_accession": "0001861415-25-000002"
+    },
+    {
+      "accession": "0001861415-25-000005",
+      "amount": 409999965.0,
+      "amount_snapshots": [],
+      "date": "2025-09-23",
+      "entity_name": "Stoke Space Technologies, Inc.",
+      "flags": [],
+      "key": "funding_round|2025-09-23",
+      "n_filings": 1,
+      "root_accession": "0001861415-25-000005"
+    },
+    {
+      "accession": "0001861415-26-000001",
+      "amount": 275000029.0,
+      "amount_snapshots": [],
+      "date": "2026-02-06",
+      "entity_name": "Stoke Space Technologies, Inc.",
+      "flags": [],
+      "key": "funding_round|2026-02-06",
+      "n_filings": 1,
+      "root_accession": "0001861415-26-000001"
+    }
+  ],
+  "true_count": 6,
+  "true_sum": 1088941535.0
+}

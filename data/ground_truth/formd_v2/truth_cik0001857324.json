@@ -1,0 +1,43 @@
+{
+  "entity_id": "cik0001857324",
+  "entity_name": "Zed Industries, Inc.",
+  "n_filings": 3,
+  "n_rounds": 3,
+  "rounds": [
+    {
+      "accession": "0001857324-21-000001",
+      "amount": 2527478.0,
+      "amount_snapshots": [],
+      "date": "2021-04-06",
+      "entity_name": "Zed Industries, Inc.",
+      "flags": [],
+      "key": "funding_round|2021-04-06",
+      "n_filings": 1,
+      "root_accession": "0001857324-21-000001"
+    },
+    {
+      "accession": "0001857324-22-000001",
+      "amount": 9854918.0,
+      "amount_snapshots": [],
+      "date": "2022-09-27",
+      "entity_name": "Zed Industries, Inc.",
+      "flags": [],
+      "key": "funding_round|2022-09-27",
+      "n_filings": 1,
+      "root_accession": "0001857324-22-000001"
+    },
+    {
+      "accession": "0001857324-25-000002",
+      "amount": 32435000.0,
+      "amount_snapshots": [],
+      "date": "2024-11-01",
+      "entity_name": "Zed Industries, Inc.",
+      "flags": [],
+      "key": "funding_round|2024-11-01",
+      "n_filings": 1,
+      "root_accession": "0001857324-25-000002"
+    }
+  ],
+  "true_count": 3,
+  "true_sum": 44817396.0
+}

@@ -1,0 +1,32 @@
+{
+  "entity_id": "cik0001880409",
+  "entity_name": "Dagger, Inc.",
+  "n_filings": 2,
+  "n_rounds": 2,
+  "rounds": [
+    {
+      "accession": "0001880409-21-000001",
+      "amount": 10392681.0,
+      "amount_snapshots": [],
+      "date": "2021-07-23",
+      "entity_name": "Dagger, Inc.",
+      "flags": [],
+      "key": "funding_round|2021-07-23",
+      "n_filings": 1,
+      "root_accession": "0001880409-21-000001"
+    },
+    {
+      "accession": "0001880409-22-000001",
+      "amount": 20000005.0,
+      "amount_snapshots": [],
+      "date": "2022-02-11",
+      "entity_name": "Dagger, Inc.",
+      "flags": [],
+      "key": "funding_round|2022-02-11",
+      "n_filings": 1,
+      "root_accession": "0001880409-22-000001"
+    }
+  ],
+  "true_count": 2,
+  "true_sum": 30392686.0
+}

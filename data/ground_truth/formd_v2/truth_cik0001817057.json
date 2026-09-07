@@ -1,0 +1,54 @@
+{
+  "entity_id": "cik0001817057",
+  "entity_name": "Second Front Systems, Inc.",
+  "n_filings": 4,
+  "n_rounds": 4,
+  "rounds": [
+    {
+      "accession": "0001817057-20-000002",
+      "amount": 2575000.0,
+      "amount_snapshots": [],
+      "date": "2020-06-29",
+      "entity_name": "Second Front Systems, Inc.",
+      "flags": [],
+      "key": "funding_round|2020-06-29",
+      "n_filings": 1,
+      "root_accession": "0001817057-20-000002"
+    },
+    {
+      "accession": "0001817057-22-000001",
+      "amount": 19133453.0,
+      "amount_snapshots": [],
+      "date": "2022-10-28",
+      "entity_name": "Second Front Systems, Inc.",
+      "flags": [],
+      "key": "funding_round|2022-10-28",
+      "n_filings": 1,
+      "root_accession": "0001817057-22-000001"
+    },
+    {
+      "accession": "0001817057-23-000004",
+      "amount": 33399976.0,
+      "amount_snapshots": [],
+      "date": "2023-11-22",
+      "entity_name": "Second Front Systems, Inc.",
+      "flags": [],
+      "key": "funding_round|2023-11-22",
+      "n_filings": 1,
+      "root_accession": "0001817057-23-000004"
+    },
+    {
+      "accession": "0001817057-24-000002",
+      "amount": 69999860.0,
+      "amount_snapshots": [],
+      "date": "2024-09-05",
+      "entity_name": "Second Front Systems, Inc.",
+      "flags": [],
+      "key": "funding_round|2024-09-05",
+      "n_filings": 1,
+      "root_accession": "0001817057-24-000002"
+    }
+  ],
+  "true_count": 4,
+  "true_sum": 125108289.0
+}

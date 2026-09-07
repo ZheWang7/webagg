@@ -1,0 +1,47 @@
+{
+  "entity_id": "cik0001896284",
+  "entity_name": "Ebb Carbon, Inc.",
+  "n_filings": 3,
+  "n_rounds": 3,
+  "rounds": [
+    {
+      "accession": "0001896284-21-000001",
+      "amount": 3000000.0,
+      "amount_snapshots": [],
+      "date": "2021-11-19",
+      "entity_name": "Ebb Carbon, Inc.",
+      "flags": [],
+      "key": "funding_round|2021-11-19",
+      "n_filings": 1,
+      "root_accession": "0001896284-21-000001"
+    },
+    {
+      "accession": "0001896284-22-000001",
+      "amount": 10754941.0,
+      "amount_snapshots": [],
+      "date": "2022-10-14",
+      "entity_name": "Ebb Carbon, Inc.",
+      "flags": [
+        "close_amounts"
+      ],
+      "key": "funding_round|2022-10-14",
+      "n_filings": 1,
+      "root_accession": "0001896284-22-000001"
+    },
+    {
+      "accession": "0001896284-23-000001",
+      "amount": 9999991.0,
+      "amount_snapshots": [],
+      "date": "2023-03-27",
+      "entity_name": "Ebb Carbon, Inc.",
+      "flags": [
+        "close_amounts"
+      ],
+      "key": "funding_round|2023-03-27",
+      "n_filings": 1,
+      "root_accession": "0001896284-23-000001"
+    }
+  ],
+  "true_count": 3,
+  "true_sum": 23754932.0
+}

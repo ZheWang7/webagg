@@ -1,0 +1,91 @@
+{
+  "entity_id": "cik0001829334",
+  "entity_name": "Supabase, Inc.",
+  "n_filings": 9,
+  "n_rounds": 7,
+  "rounds": [
+    {
+      "accession": "0001829334-20-000002",
+      "amount": 5005000.0,
+      "amount_snapshots": [
+        500500.0
+      ],
+      "date": "2020-10-09",
+      "entity_name": "Supabase, Inc.",
+      "flags": [],
+      "key": "funding_round|2020-10-09",
+      "n_filings": 2,
+      "root_accession": "0001829334-20-000001"
+    },
+    {
+      "accession": "0001805173-21-000002",
+      "amount": 24899998.0,
+      "amount_snapshots": [],
+      "date": "2021-08-26",
+      "entity_name": "Supabase, Inc.",
+      "flags": [],
+      "key": "funding_round|2021-08-26",
+      "n_filings": 1,
+      "root_accession": "0001805173-21-000002"
+    },
+    {
+      "accession": "0001829334-22-000001",
+      "amount": 64999965.0,
+      "amount_snapshots": [],
+      "date": "2022-04-19",
+      "entity_name": "Supabase, Inc.",
+      "flags": [],
+      "key": "funding_round|2022-04-19",
+      "n_filings": 1,
+      "root_accession": "0001829334-22-000001"
+    },
+    {
+      "accession": "0001829334-24-000003",
+      "amount": 82699979.0,
+      "amount_snapshots": [],
+      "date": "2024-08-30",
+      "entity_name": "Supabase, Inc.",
+      "flags": [],
+      "key": "funding_round|2024-08-30",
+      "n_filings": 1,
+      "root_accession": "0001829334-24-000003"
+    },
+    {
+      "accession": "0001829334-25-000003",
+      "amount": 202289266.0,
+      "amount_snapshots": [],
+      "date": "2025-03-14",
+      "entity_name": "Supabase, Inc.",
+      "flags": [],
+      "key": "funding_round|2025-03-14",
+      "n_filings": 1,
+      "root_accession": "0001829334-25-000003"
+    },
+    {
+      "accession": "0001829334-26-000001",
+      "amount": 143099796.0,
+      "amount_snapshots": [
+        48099883.0
+      ],
+      "date": "2025-10-02",
+      "entity_name": "Supabase, Inc.",
+      "flags": [],
+      "key": "funding_round|2025-10-02",
+      "n_filings": 2,
+      "root_accession": "0001829334-25-000004"
+    },
+    {
+      "accession": "0001829334-26-000002",
+      "amount": 439999433.0,
+      "amount_snapshots": [],
+      "date": "2026-05-13",
+      "entity_name": "Supabase, Inc.",
+      "flags": [],
+      "key": "funding_round|2026-05-13",
+      "n_filings": 1,
+      "root_accession": "0001829334-26-000002"
+    }
+  ],
+  "true_count": 7,
+  "true_sum": 962993437.0
+}

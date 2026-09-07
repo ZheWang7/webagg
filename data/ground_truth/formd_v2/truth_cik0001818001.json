@@ -1,0 +1,43 @@
+{
+  "entity_id": "cik0001818001",
+  "entity_name": "Abodu, Inc.",
+  "n_filings": 3,
+  "n_rounds": 3,
+  "rounds": [
+    {
+      "accession": "0001818001-20-000001",
+      "amount": 3499964.0,
+      "amount_snapshots": [],
+      "date": "2020-03-12",
+      "entity_name": "Abodu, Inc.",
+      "flags": [],
+      "key": "funding_round|2020-03-12",
+      "n_filings": 1,
+      "root_accession": "0001818001-20-000001"
+    },
+    {
+      "accession": "0001818001-21-000001",
+      "amount": 19999866.0,
+      "amount_snapshots": [],
+      "date": "2021-05-17",
+      "entity_name": "Abodu, Inc.",
+      "flags": [],
+      "key": "funding_round|2021-05-17",
+      "n_filings": 1,
+      "root_accession": "0001818001-21-000001"
+    },
+    {
+      "accession": "0001818001-23-000001",
+      "amount": 5515000.0,
+      "amount_snapshots": [],
+      "date": "2023-04-04",
+      "entity_name": "Abodu, Inc.",
+      "flags": [],
+      "key": "funding_round|2023-04-04",
+      "n_filings": 1,
+      "root_accession": "0001818001-23-000001"
+    }
+  ],
+  "true_count": 3,
+  "true_sum": 29014830.0
+}

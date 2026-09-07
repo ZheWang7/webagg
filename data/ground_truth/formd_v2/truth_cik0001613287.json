@@ -1,0 +1,108 @@
+{
+  "entity_id": "cik0001613287",
+  "entity_name": "Canopy Tax, Inc.",
+  "n_filings": 10,
+  "n_rounds": 8,
+  "rounds": [
+    {
+      "accession": "0001613287-14-000001",
+      "amount": 1999000.0,
+      "amount_snapshots": [],
+      "date": "2014-07-07",
+      "entity_name": "Beanstalk Tax, Inc.",
+      "flags": [],
+      "key": "funding_round|2014-07-07",
+      "n_filings": 1,
+      "root_accession": "0001613287-14-000001"
+    },
+    {
+      "accession": "0001613287-15-000002",
+      "amount": 7000000.0,
+      "amount_snapshots": [],
+      "date": "2015-06-04",
+      "entity_name": "Canopy Tax, Inc.",
+      "flags": [],
+      "key": "funding_round|2015-06-04",
+      "n_filings": 1,
+      "root_accession": "0001613287-15-000002"
+    },
+    {
+      "accession": "0001613287-17-000002",
+      "amount": 18616181.0,
+      "amount_snapshots": [],
+      "date": "2017-02-27",
+      "entity_name": "Canopy Tax, Inc.",
+      "flags": [
+        "close_amounts"
+      ],
+      "key": "funding_round|2017-02-27",
+      "n_filings": 1,
+      "root_accession": "0001613287-17-000002"
+    },
+    {
+      "accession": "0001613287-18-000003",
+      "amount": 41724987.0,
+      "amount_snapshots": [
+        27699993.0
+      ],
+      "date": "2018-03-16",
+      "entity_name": "Canopy Tax, Inc.",
+      "flags": [],
+      "key": "funding_round|2018-03-16",
+      "n_filings": 2,
+      "root_accession": "0001613287-18-000002"
+    },
+    {
+      "accession": "0001613287-20-000002",
+      "amount": 8000000.0,
+      "amount_snapshots": [],
+      "date": "2020-01-24",
+      "entity_name": "Canopy Tax, Inc.",
+      "flags": [],
+      "key": "funding_round|2020-01-24",
+      "n_filings": 1,
+      "root_accession": "0001613287-20-000002"
+    },
+    {
+      "accession": "0001613287-21-000003",
+      "amount": 22033848.0,
+      "amount_snapshots": [
+        16547069.0
+      ],
+      "date": "2021-03-17",
+      "entity_name": "Canopy Tax, Inc.",
+      "flags": [
+        "close_amounts"
+      ],
+      "key": "funding_round|2021-03-17",
+      "n_filings": 2,
+      "root_accession": "0001613287-21-000002"
+    },
+    {
+      "accession": "0001613287-24-000002",
+      "amount": 19999966.0,
+      "amount_snapshots": [],
+      "date": "2024-04-25",
+      "entity_name": "Canopy Tax, Inc.",
+      "flags": [
+        "close_amounts"
+      ],
+      "key": "funding_round|2024-04-25",
+      "n_filings": 1,
+      "root_accession": "0001613287-24-000002"
+    },
+    {
+      "accession": "0001613287-25-000002",
+      "amount": 36477141.0,
+      "amount_snapshots": [],
+      "date": "2025-04-10",
+      "entity_name": "Canopy Tax, Inc.",
+      "flags": [],
+      "key": "funding_round|2025-04-10",
+      "n_filings": 1,
+      "root_accession": "0001613287-25-000002"
+    }
+  ],
+  "true_count": 8,
+  "true_sum": 155851123.0
+}

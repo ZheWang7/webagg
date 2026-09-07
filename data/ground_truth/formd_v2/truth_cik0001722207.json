@@ -1,0 +1,80 @@
+{
+  "entity_id": "cik0001722207",
+  "entity_name": "LinkSquares, Inc.",
+  "n_filings": 8,
+  "n_rounds": 6,
+  "rounds": [
+    {
+      "accession": "0001722207-17-000001",
+      "amount": 850000.0,
+      "amount_snapshots": [],
+      "date": "2017-11-03",
+      "entity_name": "LinkSquares, Inc.",
+      "flags": [],
+      "key": "funding_round|2017-11-03",
+      "n_filings": 1,
+      "root_accession": "0001722207-17-000001"
+    },
+    {
+      "accession": "0001722207-19-000002",
+      "amount": 4805671.0,
+      "amount_snapshots": [
+        1420000.0
+      ],
+      "date": "2018-12-11",
+      "entity_name": "LinkSquares, Inc.",
+      "flags": [],
+      "key": "funding_round|2018-12-11",
+      "n_filings": 2,
+      "root_accession": "0001722207-18-000001"
+    },
+    {
+      "accession": "0001722207-19-000004",
+      "amount": 2500000.0,
+      "amount_snapshots": [],
+      "date": "2019-11-22",
+      "entity_name": "LinkSquares, Inc.",
+      "flags": [],
+      "key": "funding_round|2019-11-22",
+      "n_filings": 1,
+      "root_accession": "0001722207-19-000004"
+    },
+    {
+      "accession": "0001722207-20-000002",
+      "amount": 11999955.0,
+      "amount_snapshots": [],
+      "date": "2020-02-12",
+      "entity_name": "LinkSquares, Inc.",
+      "flags": [],
+      "key": "funding_round|2020-02-12",
+      "n_filings": 1,
+      "root_accession": "0001722207-20-000002"
+    },
+    {
+      "accession": "0001722207-21-000004",
+      "amount": 39999968.0,
+      "amount_snapshots": [
+        37949959.0
+      ],
+      "date": "2021-06-02",
+      "entity_name": "LinkSquares, Inc.",
+      "flags": [],
+      "key": "funding_round|2021-06-02",
+      "n_filings": 2,
+      "root_accession": "0001722207-21-000003"
+    },
+    {
+      "accession": "0001722207-22-000002",
+      "amount": 99999889.0,
+      "amount_snapshots": [],
+      "date": "2022-03-18",
+      "entity_name": "LinkSquares, Inc.",
+      "flags": [],
+      "key": "funding_round|2022-03-18",
+      "n_filings": 1,
+      "root_accession": "0001722207-22-000002"
+    }
+  ],
+  "true_count": 6,
+  "true_sum": 160155483.0
+}

@@ -1,0 +1,78 @@
+{
+  "entity_id": "cik0001758464",
+  "entity_name": "Billd Holdings, Inc.",
+  "n_filings": 8,
+  "n_rounds": 6,
+  "rounds": [
+    {
+      "accession": "0001758464-19-000001",
+      "amount": 8433415.0,
+      "amount_snapshots": [],
+      "date": "2018-10-26",
+      "entity_name": "Billd Holdings, LLC",
+      "flags": [],
+      "key": "funding_round|2018-10-26",
+      "n_filings": 2,
+      "root_accession": "0001758464-18-000001"
+    },
+    {
+      "accession": "0001758464-21-000001",
+      "amount": 30000000.0,
+      "amount_snapshots": [],
+      "date": "2021-06-17",
+      "entity_name": "Billd Holdings, LLC",
+      "flags": [],
+      "key": "funding_round|2021-06-17",
+      "n_filings": 1,
+      "root_accession": "0001758464-21-000001"
+    },
+    {
+      "accession": "0001758464-22-000002",
+      "amount": 3500000.0,
+      "amount_snapshots": [],
+      "date": "2022-11-18",
+      "entity_name": "Billd Holdings, Inc.",
+      "flags": [],
+      "key": "funding_round|2022-11-18",
+      "n_filings": 1,
+      "root_accession": "0001758464-22-000002"
+    },
+    {
+      "accession": "0001758464-23-000001",
+      "amount": 18166838.0,
+      "amount_snapshots": [],
+      "date": "2023-05-18",
+      "entity_name": "Billd Holdings, Inc.",
+      "flags": [],
+      "key": "funding_round|2023-05-18",
+      "n_filings": 1,
+      "root_accession": "0001758464-23-000001"
+    },
+    {
+      "accession": "0001758464-24-000002",
+      "amount": 12500000.0,
+      "amount_snapshots": [
+        9500000.0
+      ],
+      "date": "2024-04-02",
+      "entity_name": "Billd Holdings, Inc.",
+      "flags": [],
+      "key": "funding_round|2024-04-02",
+      "n_filings": 2,
+      "root_accession": "0001758464-24-000001"
+    },
+    {
+      "accession": "0001758464-25-000002",
+      "amount": 7478373.0,
+      "amount_snapshots": [],
+      "date": "2025-07-02",
+      "entity_name": "Billd Holdings, Inc.",
+      "flags": [],
+      "key": "funding_round|2025-07-02",
+      "n_filings": 1,
+      "root_accession": "0001758464-25-000002"
+    }
+  ],
+  "true_count": 6,
+  "true_sum": 80078626.0
+}

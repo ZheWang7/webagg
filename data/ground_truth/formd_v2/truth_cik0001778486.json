@@ -1,0 +1,43 @@
+{
+  "entity_id": "cik0001778486",
+  "entity_name": "AirGarage, Inc.",
+  "n_filings": 3,
+  "n_rounds": 3,
+  "rounds": [
+    {
+      "accession": "0001778486-19-000001",
+      "amount": 2012497.0,
+      "amount_snapshots": [],
+      "date": "2019-05-24",
+      "entity_name": "AirGarage, Inc.",
+      "flags": [],
+      "key": "funding_round|2019-05-24",
+      "n_filings": 1,
+      "root_accession": "0001778486-19-000001"
+    },
+    {
+      "accession": "0001778486-21-000002",
+      "amount": 14361036.0,
+      "amount_snapshots": [],
+      "date": "2021-10-14",
+      "entity_name": "AirGarage, Inc.",
+      "flags": [],
+      "key": "funding_round|2021-10-14",
+      "n_filings": 1,
+      "root_accession": "0001778486-21-000002"
+    },
+    {
+      "accession": "0001778486-24-000001",
+      "amount": 11428497.0,
+      "amount_snapshots": [],
+      "date": "2024-10-23",
+      "entity_name": "AirGarage, Inc.",
+      "flags": [],
+      "key": "funding_round|2024-10-23",
+      "n_filings": 1,
+      "root_accession": "0001778486-24-000001"
+    }
+  ],
+  "true_count": 3,
+  "true_sum": 27802030.0
+}

@@ -1,0 +1,65 @@
+{
+  "entity_id": "cik0001739613",
+  "entity_name": "MarginEdge Co.",
+  "n_filings": 5,
+  "n_rounds": 5,
+  "rounds": [
+    {
+      "accession": "0001739613-18-000002",
+      "amount": 3494492.0,
+      "amount_snapshots": [],
+      "date": "2018-05-03",
+      "entity_name": "MarginEdge Co.",
+      "flags": [],
+      "key": "funding_round|2018-05-03",
+      "n_filings": 1,
+      "root_accession": "0001739613-18-000002"
+    },
+    {
+      "accession": "0001739613-21-000001",
+      "amount": 4999994.0,
+      "amount_snapshots": [],
+      "date": "2019-07-29",
+      "entity_name": "MarginEdge Co.",
+      "flags": [],
+      "key": "funding_round|2019-07-29",
+      "n_filings": 1,
+      "root_accession": "0001739613-21-000001"
+    },
+    {
+      "accession": "0001739613-21-000002",
+      "amount": 23198319.0,
+      "amount_snapshots": [],
+      "date": "2021-09-03",
+      "entity_name": "MarginEdge Co.",
+      "flags": [],
+      "key": "funding_round|2021-09-03",
+      "n_filings": 1,
+      "root_accession": "0001739613-21-000002"
+    },
+    {
+      "accession": "0001739613-22-000001",
+      "amount": 29436094.0,
+      "amount_snapshots": [],
+      "date": "2022-10-25",
+      "entity_name": "MarginEdge Co.",
+      "flags": [],
+      "key": "funding_round|2022-10-25",
+      "n_filings": 1,
+      "root_accession": "0001739613-22-000001"
+    },
+    {
+      "accession": "0001739613-26-000004",
+      "amount": 20619438.0,
+      "amount_snapshots": [],
+      "date": "2026-07-15",
+      "entity_name": "MarginEdge Co.",
+      "flags": [],
+      "key": "funding_round|2026-07-15",
+      "n_filings": 1,
+      "root_accession": "0001739613-26-000004"
+    }
+  ],
+  "true_count": 5,
+  "true_sum": 81748337.0
+}

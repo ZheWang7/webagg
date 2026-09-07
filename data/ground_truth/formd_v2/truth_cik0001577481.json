@@ -1,0 +1,102 @@
+{
+  "entity_id": "cik0001577481",
+  "entity_name": "HIGHSPOT, INC.",
+  "n_filings": 10,
+  "n_rounds": 8,
+  "rounds": [
+    {
+      "accession": "0001577481-13-000002",
+      "amount": 2700000.0,
+      "amount_snapshots": [
+        2250000.0
+      ],
+      "date": "2013-05-21",
+      "entity_name": "HIGHSPOT, INC.",
+      "flags": [],
+      "key": "funding_round|2013-05-21",
+      "n_filings": 2,
+      "root_accession": "0001577481-13-000001"
+    },
+    {
+      "accession": "0001577481-14-000002",
+      "amount": 9647308.0,
+      "amount_snapshots": [],
+      "date": "2014-10-24",
+      "entity_name": "HIGHSPOT, INC.",
+      "flags": [],
+      "key": "funding_round|2014-10-24",
+      "n_filings": 1,
+      "root_accession": "0001577481-14-000002"
+    },
+    {
+      "accession": "0001577481-17-000001",
+      "amount": 15000000.0,
+      "amount_snapshots": [],
+      "date": "2017-06-09",
+      "entity_name": "HIGHSPOT, INC.",
+      "flags": [],
+      "key": "funding_round|2017-06-09",
+      "n_filings": 1,
+      "root_accession": "0001577481-17-000001"
+    },
+    {
+      "accession": "0001577481-18-000001",
+      "amount": 34999998.0,
+      "amount_snapshots": [],
+      "date": "2018-09-21",
+      "entity_name": "HIGHSPOT, INC.",
+      "flags": [],
+      "key": "funding_round|2018-09-21",
+      "n_filings": 1,
+      "root_accession": "0001577481-18-000001"
+    },
+    {
+      "accession": "0001577481-19-000002",
+      "amount": 67498099.0,
+      "amount_snapshots": [
+        59999995.0
+      ],
+      "date": "2019-05-24",
+      "entity_name": "HIGHSPOT, INC.",
+      "flags": [],
+      "key": "funding_round|2019-05-24",
+      "n_filings": 2,
+      "root_accession": "0001577481-19-000001"
+    },
+    {
+      "accession": "0001577481-19-000003",
+      "amount": 74999988.0,
+      "amount_snapshots": [],
+      "date": "2019-11-20",
+      "entity_name": "HIGHSPOT, INC.",
+      "flags": [],
+      "key": "funding_round|2019-11-20",
+      "n_filings": 1,
+      "root_accession": "0001577481-19-000003"
+    },
+    {
+      "accession": "0001577481-21-000003",
+      "amount": 200999957.0,
+      "amount_snapshots": [],
+      "date": "2021-02-12",
+      "entity_name": "HIGHSPOT, INC.",
+      "flags": [],
+      "key": "funding_round|2021-02-12",
+      "n_filings": 1,
+      "root_accession": "0001577481-21-000003"
+    },
+    {
+      "accession": "0001577481-22-000001",
+      "amount": 247999951.0,
+      "amount_snapshots": [],
+      "date": "2021-12-30",
+      "entity_name": "HIGHSPOT, INC.",
+      "flags": [],
+      "key": "funding_round|2021-12-30",
+      "n_filings": 1,
+      "root_accession": "0001577481-22-000001"
+    }
+  ],
+  "true_count": 8,
+  "true_sum": 653845301.0
+}

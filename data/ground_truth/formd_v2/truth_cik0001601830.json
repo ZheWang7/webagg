@@ -1,0 +1,117 @@
+{
+  "entity_id": "cik0001601830",
+  "entity_name": "RECURSION PHARMACEUTICALS, INC.",
+  "n_filings": 12,
+  "n_rounds": 9,
+  "rounds": [
+    {
+      "accession": "0001601830-14-000004",
+      "amount": 80000.0,
+      "amount_snapshots": [],
+      "date": "2014-03-19",
+      "entity_name": "Recursion Pharmaceuticals, LLC",
+      "flags": [],
+      "key": "funding_round|2014-03-19",
+      "n_filings": 2,
+      "root_accession": "0001601830-14-000002"
+    },
+    {
+      "accession": "0001601830-15-000001",
+      "amount": 830000.0,
+      "amount_snapshots": [],
+      "date": "2015-02-17",
+      "entity_name": "Recursion Pharmaceuticals, LLC",
+      "flags": [],
+      "key": "funding_round|2015-02-17",
+      "n_filings": 1,
+      "root_accession": "0001601830-15-000001"
+    },
+    {
+      "accession": "0001601830-15-000002",
+      "amount": 2650000.0,
+      "amount_snapshots": [],
+      "date": "2015-11-20",
+      "entity_name": "Recursion Pharmaceuticals, LLC",
+      "flags": [],
+      "key": "funding_round|2015-11-20",
+      "n_filings": 1,
+      "root_accession": "0001601830-15-000002"
+    },
+    {
+      "accession": "0001601830-16-000005",
+      "amount": 4066996.0,
+      "amount_snapshots": [],
+      "date": "2016-09-01",
+      "entity_name": "RECURSION PHARMACEUTICALS, INC.",
+      "flags": [
+        "duplicate_truth_key"
+      ],
+      "key": "funding_round|2016-09-01",
+      "n_filings": 1,
+      "root_accession": "0001601830-16-000005"
+    },
+    {
+      "accession": "0001601830-16-000006",
+      "amount": 32000000.0,
+      "amount_snapshots": [],
+      "date": "2016-09-01",
+      "entity_name": "RECURSION PHARMACEUTICALS, INC.",
+      "flags": [
+        "duplicate_truth_key"
+      ],
+      "key": "funding_round|2016-09-01",
+      "n_filings": 1,
+      "root_accession": "0001601830-16-000006"
+    },
+    {
+      "accession": "0001601830-16-000008",
+      "amount": 15034984.0,
+      "amount_snapshots": [
+        12909987.0
+      ],
+      "date": "2016-09-02",
+      "entity_name": "RECURSION PHARMACEUTICALS, INC.",
+      "flags": [],
+      "key": "funding_round|2016-09-02",
+      "n_filings": 2,
+      "root_accession": "0001601830-16-000007"
+    },
+    {
+      "accession": "0001601830-17-000003",
+      "amount": 55799946.0,
+      "amount_snapshots": [],
+      "date": "2017-09-25",
+      "entity_name": "RECURSION PHARMACEUTICALS, INC.",
+      "flags": [],
+      "key": "funding_round|2017-09-25",
+      "n_filings": 1,
+      "root_accession": "0001601830-17-000003"
+    },
+    {
+      "accession": "0001601830-19-000002",
+      "amount": 122057689.0,
+      "amount_snapshots": [],
+      "date": "2019-02-12",
+      "entity_name": "RECURSION PHARMACEUTICALS, INC.",
+      "flags": [],
+      "key": "funding_round|2019-02-12",
+      "n_filings": 1,
+      "root_accession": "0001601830-19-000002"
+    },
+    {
+      "accession": "0001601830-20-000002",
+      "amount": 245896677.0,
+      "amount_snapshots": [
+        235506731.0
+      ],
+      "date": "2020-09-01",
+      "entity_name": "RECURSION PHARMACEUTICALS, INC.",
+      "flags": [],
+      "key": "funding_round|2020-09-01",
+      "n_filings": 2,
+      "root_accession": "0001601830-20-000001"
+    }
+  ],
+  "true_count": 9,
+  "true_sum": 478416292.0
+}

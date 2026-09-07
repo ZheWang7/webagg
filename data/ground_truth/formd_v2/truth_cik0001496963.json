@@ -1,0 +1,47 @@
+{
+  "entity_id": "cik0001496963",
+  "entity_name": "Squarespace, Inc.",
+  "n_filings": 3,
+  "n_rounds": 3,
+  "rounds": [
+    {
+      "accession": "0001496963-10-000001",
+      "amount": 38500000.0,
+      "amount_snapshots": [],
+      "date": "2010-07-02",
+      "entity_name": "Squarespace, Inc.",
+      "flags": [
+        "close_amounts"
+      ],
+      "key": "funding_round|2010-07-02",
+      "n_filings": 1,
+      "root_accession": "0001496963-10-000001"
+    },
+    {
+      "accession": "0001496963-14-000002",
+      "amount": 39999998.0,
+      "amount_snapshots": [],
+      "date": "2014-04-15",
+      "entity_name": "Squarespace, Inc.",
+      "flags": [
+        "close_amounts"
+      ],
+      "key": "funding_round|2014-04-15",
+      "n_filings": 1,
+      "root_accession": "0001496963-14-000002"
+    },
+    {
+      "accession": "0000950172-21-000056",
+      "amount": 190000000.0,
+      "amount_snapshots": [],
+      "date": "2021-03-31",
+      "entity_name": "Squarespace, Inc.",
+      "flags": [],
+      "key": "funding_round|2021-03-31",
+      "n_filings": 1,
+      "root_accession": "0000950172-21-000056"
+    }
+  ],
+  "true_count": 3,
+  "true_sum": 268499998.0
+}

@@ -1,0 +1,65 @@
+{
+  "entity_id": "cik0002001954",
+  "entity_name": "OVERLAND AI INC.",
+  "n_filings": 5,
+  "n_rounds": 5,
+  "rounds": [
+    {
+      "accession": "0002001954-24-000002",
+      "amount": 1000000.0,
+      "amount_snapshots": [],
+      "date": "2023-01-24",
+      "entity_name": "OVERLAND AI INC.",
+      "flags": [],
+      "key": "funding_round|2023-01-24",
+      "n_filings": 1,
+      "root_accession": "0002001954-24-000002"
+    },
+    {
+      "accession": "0002001954-24-000003",
+      "amount": 1500000.0,
+      "amount_snapshots": [],
+      "date": "2023-05-05",
+      "entity_name": "OVERLAND AI INC.",
+      "flags": [],
+      "key": "funding_round|2023-05-05",
+      "n_filings": 1,
+      "root_accession": "0002001954-24-000003"
+    },
+    {
+      "accession": "0002001954-24-000001",
+      "amount": 7599987.0,
+      "amount_snapshots": [],
+      "date": "2023-12-05",
+      "entity_name": "OVERLAND AI INC.",
+      "flags": [],
+      "key": "funding_round|2023-12-05",
+      "n_filings": 1,
+      "root_accession": "0002001954-24-000001"
+    },
+    {
+      "accession": "0002001954-25-000001",
+      "amount": 32192278.0,
+      "amount_snapshots": [],
+      "date": "2024-10-18",
+      "entity_name": "OVERLAND AI INC.",
+      "flags": [],
+      "key": "funding_round|2024-10-18",
+      "n_filings": 1,
+      "root_accession": "0002001954-25-000001"
+    },
+    {
+      "accession": "0002001954-26-000003",
+      "amount": 79999994.0,
+      "amount_snapshots": [],
+      "date": "2025-11-24",
+      "entity_name": "OVERLAND AI INC.",
+      "flags": [],
+      "key": "funding_round|2025-11-24",
+      "n_filings": 1,
+      "root_accession": "0002001954-26-000003"
+    }
+  ],
+  "true_count": 5,
+  "true_sum": 122292259.0
+}

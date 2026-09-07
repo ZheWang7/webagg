@@ -1,0 +1,56 @@
+{
+  "entity_id": "cik0001824134",
+  "entity_name": "BioIntelliSense, Inc.",
+  "n_filings": 5,
+  "n_rounds": 4,
+  "rounds": [
+    {
+      "accession": "0001824134-20-000002",
+      "amount": 24997665.0,
+      "amount_snapshots": [],
+      "date": "2018-12-14",
+      "entity_name": "BioIntelliSense, Inc.",
+      "flags": [],
+      "key": "funding_round|2018-12-14",
+      "n_filings": 1,
+      "root_accession": "0001824134-20-000002"
+    },
+    {
+      "accession": "0001824134-20-000003",
+      "amount": 12000003.0,
+      "amount_snapshots": [],
+      "date": "2020-08-20",
+      "entity_name": "BioIntelliSense, Inc.",
+      "flags": [],
+      "key": "funding_round|2020-08-20",
+      "n_filings": 1,
+      "root_accession": "0001824134-20-000003"
+    },
+    {
+      "accession": "0001824134-22-000001",
+      "amount": 44985854.0,
+      "amount_snapshots": [],
+      "date": "2021-04-07",
+      "entity_name": "BioIntelliSense, Inc.",
+      "flags": [],
+      "key": "funding_round|2021-04-07",
+      "n_filings": 1,
+      "root_accession": "0001824134-22-000001"
+    },
+    {
+      "accession": "0001824134-26-000001",
+      "amount": 58349365.0,
+      "amount_snapshots": [
+        58050027.0
+      ],
+      "date": "2025-12-04",
+      "entity_name": "BioIntelliSense, Inc.",
+      "flags": [],
+      "key": "funding_round|2025-12-04",
+      "n_filings": 2,
+      "root_accession": "0001824134-25-000003"
+    }
+  ],
+  "true_count": 4,
+  "true_sum": 140332887.0
+}

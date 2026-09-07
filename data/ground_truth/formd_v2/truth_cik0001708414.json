@@ -1,0 +1,87 @@
+{
+  "entity_id": "cik0001708414",
+  "entity_name": "Tive, Inc.",
+  "n_filings": 7,
+  "n_rounds": 7,
+  "rounds": [
+    {
+      "accession": "0001708414-17-000001",
+      "amount": 3141599.0,
+      "amount_snapshots": [],
+      "date": "2017-05-24",
+      "entity_name": "Tive, Inc.",
+      "flags": [],
+      "key": "funding_round|2017-05-24",
+      "n_filings": 1,
+      "root_accession": "0001708414-17-000001"
+    },
+    {
+      "accession": "0001708414-18-000002",
+      "amount": 1929989.0,
+      "amount_snapshots": [],
+      "date": "2018-04-04",
+      "entity_name": "Tive, Inc.",
+      "flags": [],
+      "key": "funding_round|2018-04-04",
+      "n_filings": 1,
+      "root_accession": "0001708414-18-000002"
+    },
+    {
+      "accession": "0001708414-20-000001",
+      "amount": 13943620.0,
+      "amount_snapshots": [],
+      "date": "2020-12-01",
+      "entity_name": "Tive, Inc.",
+      "flags": [],
+      "key": "funding_round|2020-12-01",
+      "n_filings": 1,
+      "root_accession": "0001708414-20-000001"
+    },
+    {
+      "accession": "0001708414-21-000001",
+      "amount": 7449961.0,
+      "amount_snapshots": [],
+      "date": "2021-06-10",
+      "entity_name": "Tive, Inc.",
+      "flags": [],
+      "key": "funding_round|2021-06-10",
+      "n_filings": 1,
+      "root_accession": "0001708414-21-000001"
+    },
+    {
+      "accession": "0001708414-22-000001",
+      "amount": 49999796.0,
+      "amount_snapshots": [],
+      "date": "2022-03-28",
+      "entity_name": "Tive, Inc.",
+      "flags": [],
+      "key": "funding_round|2022-03-28",
+      "n_filings": 1,
+      "root_accession": "0001708414-22-000001"
+    },
+    {
+      "accession": "0001708414-24-000001",
+      "amount": 39999895.0,
+      "amount_snapshots": [],
+      "date": "2024-12-16",
+      "entity_name": "Tive, Inc.",
+      "flags": [],
+      "key": "funding_round|2024-12-16",
+      "n_filings": 1,
+      "root_accession": "0001708414-24-000001"
+    },
+    {
+      "accession": "0001708414-26-000001",
+      "amount": 19999807.0,
+      "amount_snapshots": [],
+      "date": "2025-12-18",
+      "entity_name": "Tive, Inc.",
+      "flags": [],
+      "key": "funding_round|2025-12-18",
+      "n_filings": 1,
+      "root_accession": "0001708414-26-000001"
+    }
+  ],
+  "true_count": 7,
+  "true_sum": 136464667.0
+}

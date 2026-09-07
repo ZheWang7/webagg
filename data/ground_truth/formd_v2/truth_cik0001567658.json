@@ -1,0 +1,76 @@
+{
+  "entity_id": "cik0001567658",
+  "entity_name": "Illumio, Inc.",
+  "n_filings": 6,
+  "n_rounds": 6,
+  "rounds": [
+    {
+      "accession": "0001567658-14-000001",
+      "amount": 7999999.0,
+      "amount_snapshots": [],
+      "date": "2013-01-14",
+      "entity_name": "Illumio, Inc.",
+      "flags": [],
+      "key": "funding_round|2013-01-14",
+      "n_filings": 1,
+      "root_accession": "0001567658-14-000001"
+    },
+    {
+      "accession": "0001567658-13-000002",
+      "amount": 34500056.0,
+      "amount_snapshots": [],
+      "date": "2013-09-10",
+      "entity_name": "Illumio, Inc.",
+      "flags": [],
+      "key": "funding_round|2013-09-10",
+      "n_filings": 1,
+      "root_accession": "0001567658-13-000002"
+    },
+    {
+      "accession": "0001567658-15-000002",
+      "amount": 100531216.0,
+      "amount_snapshots": [],
+      "date": "2015-01-26",
+      "entity_name": "Illumio, Inc.",
+      "flags": [],
+      "key": "funding_round|2015-01-26",
+      "n_filings": 1,
+      "root_accession": "0001567658-15-000002"
+    },
+    {
+      "accession": "0001567658-17-000001",
+      "amount": 125145001.0,
+      "amount_snapshots": [],
+      "date": "2017-04-20",
+      "entity_name": "Illumio, Inc.",
+      "flags": [],
+      "key": "funding_round|2017-04-20",
+      "n_filings": 1,
+      "root_accession": "0001567658-17-000001"
+    },
+    {
+      "accession": "0001567658-19-000002",
+      "amount": 65200000.0,
+      "amount_snapshots": [],
+      "date": "2018-12-21",
+      "entity_name": "Illumio, Inc.",
+      "flags": [],
+      "key": "funding_round|2018-12-21",
+      "n_filings": 1,
+      "root_accession": "0001567658-19-000002"
+    },
+    {
+      "accession": "0001567658-21-000001",
+      "amount": 224999952.0,
+      "amount_snapshots": [],
+      "date": "2021-06-23",
+      "entity_name": "Illumio, Inc.",
+      "flags": [],
+      "key": "funding_round|2021-06-23",
+      "n_filings": 1,
+      "root_accession": "0001567658-21-000001"
+    }
+  ],
+  "true_count": 6,
+  "true_sum": 558376224.0
+}

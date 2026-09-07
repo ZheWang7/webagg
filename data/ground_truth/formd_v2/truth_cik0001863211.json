@@ -1,0 +1,91 @@
+{
+  "entity_id": "cik0001863211",
+  "entity_name": "Hadrian Automation, Inc.",
+  "n_filings": 7,
+  "n_rounds": 7,
+  "rounds": [
+    {
+      "accession": "0001863211-21-000002",
+      "amount": 6076236.0,
+      "amount_snapshots": [],
+      "date": "2021-05-04",
+      "entity_name": "Hadrian Automation, Inc.",
+      "flags": [],
+      "key": "funding_round|2021-05-04",
+      "n_filings": 1,
+      "root_accession": "0001863211-21-000002"
+    },
+    {
+      "accession": "0001863211-22-000003",
+      "amount": 36354187.0,
+      "amount_snapshots": [],
+      "date": "2021-12-23",
+      "entity_name": "Hadrian Automation, Inc.",
+      "flags": [
+        "close_amounts"
+      ],
+      "key": "funding_round|2021-12-23",
+      "n_filings": 1,
+      "root_accession": "0001863211-22-000003"
+    },
+    {
+      "accession": "0001863211-22-000004",
+      "amount": 36798760.0,
+      "amount_snapshots": [],
+      "date": "2022-03-29",
+      "entity_name": "Hadrian Automation, Inc.",
+      "flags": [
+        "close_amounts"
+      ],
+      "key": "funding_round|2022-03-29",
+      "n_filings": 1,
+      "root_accession": "0001863211-22-000004"
+    },
+    {
+      "accession": "0001863211-24-000003",
+      "amount": 86267881.0,
+      "amount_snapshots": [],
+      "date": "2023-12-11",
+      "entity_name": "Hadrian Automation, Inc.",
+      "flags": [],
+      "key": "funding_round|2023-12-11",
+      "n_filings": 1,
+      "root_accession": "0001863211-24-000003"
+    },
+    {
+      "accession": "0001863211-24-000004",
+      "amount": 11499989.0,
+      "amount_snapshots": [],
+      "date": "2024-02-20",
+      "entity_name": "Hadrian Automation, Inc.",
+      "flags": [],
+      "key": "funding_round|2024-02-20",
+      "n_filings": 1,
+      "root_accession": "0001863211-24-000004"
+    },
+    {
+      "accession": "0001863211-25-000002",
+      "amount": 109999953.0,
+      "amount_snapshots": [],
+      "date": "2025-06-27",
+      "entity_name": "Hadrian Automation, Inc.",
+      "flags": [],
+      "key": "funding_round|2025-06-27",
+      "n_filings": 1,
+      "root_accession": "0001863211-25-000002"
+    },
+    {
+      "accession": "0001863211-25-000003",
+      "amount": 131307594.0,
+      "amount_snapshots": [],
+      "date": "2025-12-19",
+      "entity_name": "Hadrian Automation, Inc.",
+      "flags": [],
+      "key": "funding_round|2025-12-19",
+      "n_filings": 1,
+      "root_accession": "0001863211-25-000003"
+    }
+  ],
+  "true_count": 7,
+  "true_sum": 418304600.0
+}

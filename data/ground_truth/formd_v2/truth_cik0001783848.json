@@ -1,0 +1,43 @@
+{
+  "entity_id": "cik0001783848",
+  "entity_name": "OMSOM, INC.",
+  "n_filings": 3,
+  "n_rounds": 3,
+  "rounds": [
+    {
+      "accession": "0001461373-19-000053",
+      "amount": 690000.0,
+      "amount_snapshots": [],
+      "date": "2019-07-12",
+      "entity_name": "Oxtale, Inc.",
+      "flags": [],
+      "key": "funding_round|2019-07-12",
+      "n_filings": 1,
+      "root_accession": "0001461373-19-000053"
+    },
+    {
+      "accession": "0001783848-20-000001",
+      "amount": 482065.0,
+      "amount_snapshots": [],
+      "date": "2020-06-25",
+      "entity_name": "Oxtale, Inc.",
+      "flags": [],
+      "key": "funding_round|2020-06-25",
+      "n_filings": 1,
+      "root_accession": "0001783848-20-000001"
+    },
+    {
+      "accession": "0001783848-20-000003",
+      "amount": 1990000.0,
+      "amount_snapshots": [],
+      "date": "2020-08-28",
+      "entity_name": "OMSOM, INC.",
+      "flags": [],
+      "key": "funding_round|2020-08-28",
+      "n_filings": 1,
+      "root_accession": "0001783848-20-000003"
+    }
+  ],
+  "true_count": 3,
+  "true_sum": 3162065.0
+}

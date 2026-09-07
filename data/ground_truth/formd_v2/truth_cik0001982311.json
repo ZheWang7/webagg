@@ -1,0 +1,32 @@
+{
+  "entity_id": "cik0001982311",
+  "entity_name": "Unstructured Technologies, Inc.",
+  "n_filings": 2,
+  "n_rounds": 2,
+  "rounds": [
+    {
+      "accession": "0001982311-23-000001",
+      "amount": 24924959.0,
+      "amount_snapshots": [],
+      "date": "2023-06-07",
+      "entity_name": "Unstructured Technologies, Inc.",
+      "flags": [],
+      "key": "funding_round|2023-06-07",
+      "n_filings": 1,
+      "root_accession": "0001982311-23-000001"
+    },
+    {
+      "accession": "0001982311-24-000002",
+      "amount": 43167126.0,
+      "amount_snapshots": [],
+      "date": "2024-02-20",
+      "entity_name": "Unstructured Technologies, Inc.",
+      "flags": [],
+      "key": "funding_round|2024-02-20",
+      "n_filings": 1,
+      "root_accession": "0001982311-24-000002"
+    }
+  ],
+  "true_count": 2,
+  "true_sum": 68092085.0
+}

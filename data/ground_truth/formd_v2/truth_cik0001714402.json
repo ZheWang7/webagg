@@ -1,0 +1,56 @@
+{
+  "entity_id": "cik0001714402",
+  "entity_name": "ZAP ENERGY, INC.",
+  "n_filings": 5,
+  "n_rounds": 4,
+  "rounds": [
+    {
+      "accession": "0001714402-19-000002",
+      "amount": 1100000.0,
+      "amount_snapshots": [],
+      "date": "2019-08-28",
+      "entity_name": "ZAP ENERGY, INC.",
+      "flags": [],
+      "key": "funding_round|2019-08-28",
+      "n_filings": 1,
+      "root_accession": "0001714402-19-000002"
+    },
+    {
+      "accession": "0001714402-21-000002",
+      "amount": 25249943.0,
+      "amount_snapshots": [],
+      "date": "2021-04-20",
+      "entity_name": "ZAP ENERGY, INC.",
+      "flags": [],
+      "key": "funding_round|2021-04-20",
+      "n_filings": 1,
+      "root_accession": "0001714402-21-000002"
+    },
+    {
+      "accession": "0001714402-22-000002",
+      "amount": 162610820.0,
+      "amount_snapshots": [
+        110423000.0
+      ],
+      "date": "2022-05-24",
+      "entity_name": "ZAP ENERGY, INC.",
+      "flags": [],
+      "key": "funding_round|2022-05-24",
+      "n_filings": 2,
+      "root_accession": "0001714402-22-000001"
+    },
+    {
+      "accession": "0001714402-24-000001",
+      "amount": 129997713.0,
+      "amount_snapshots": [],
+      "date": "2024-07-15",
+      "entity_name": "ZAP ENERGY, INC.",
+      "flags": [],
+      "key": "funding_round|2024-07-15",
+      "n_filings": 1,
+      "root_accession": "0001714402-24-000001"
+    }
+  ],
+  "true_count": 4,
+  "true_sum": 318958476.0
+}

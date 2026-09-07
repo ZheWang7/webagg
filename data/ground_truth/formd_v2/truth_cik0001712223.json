@@ -1,0 +1,87 @@
+{
+  "entity_id": "cik0001712223",
+  "entity_name": "Prenda, Inc.",
+  "n_filings": 7,
+  "n_rounds": 7,
+  "rounds": [
+    {
+      "accession": "0001712223-17-000001",
+      "amount": 60000.0,
+      "amount_snapshots": [],
+      "date": "2017-07-05",
+      "entity_name": "Prenda, Inc.",
+      "flags": [],
+      "key": "funding_round|2017-07-05",
+      "n_filings": 1,
+      "root_accession": "0001712223-17-000001"
+    },
+    {
+      "accession": "0001712223-18-000001",
+      "amount": 40000.0,
+      "amount_snapshots": [],
+      "date": "2018-11-02",
+      "entity_name": "Prenda, Inc.",
+      "flags": [],
+      "key": "funding_round|2018-11-02",
+      "n_filings": 1,
+      "root_accession": "0001712223-18-000001"
+    },
+    {
+      "accession": "0001712223-19-000001",
+      "amount": 613500.0,
+      "amount_snapshots": [],
+      "date": "2019-04-16",
+      "entity_name": "Prenda, Inc.",
+      "flags": [],
+      "key": "funding_round|2019-04-16",
+      "n_filings": 1,
+      "root_accession": "0001712223-19-000001"
+    },
+    {
+      "accession": "0001712223-20-000001",
+      "amount": 205500.0,
+      "amount_snapshots": [],
+      "date": "2019-08-08",
+      "entity_name": "Prenda, Inc.",
+      "flags": [],
+      "key": "funding_round|2019-08-08",
+      "n_filings": 1,
+      "root_accession": "0001712223-20-000001"
+    },
+    {
+      "accession": "0001712223-20-000002",
+      "amount": 6126991.0,
+      "amount_snapshots": [],
+      "date": "2020-05-15",
+      "entity_name": "Prenda, Inc.",
+      "flags": [],
+      "key": "funding_round|2020-05-15",
+      "n_filings": 1,
+      "root_accession": "0001712223-20-000002"
+    },
+    {
+      "accession": "0001712223-21-000002",
+      "amount": 19192609.0,
+      "amount_snapshots": [],
+      "date": "2021-05-04",
+      "entity_name": "Prenda, Inc.",
+      "flags": [],
+      "key": "funding_round|2021-05-04",
+      "n_filings": 1,
+      "root_accession": "0001712223-21-000002"
+    },
+    {
+      "accession": "0001712223-22-000003",
+      "amount": 15999996.0,
+      "amount_snapshots": [],
+      "date": "2022-10-31",
+      "entity_name": "Prenda, Inc.",
+      "flags": [],
+      "key": "funding_round|2022-10-31",
+      "n_filings": 1,
+      "root_accession": "0001712223-22-000003"
+    }
+  ],
+  "true_count": 7,
+  "true_sum": 42238596.0
+}

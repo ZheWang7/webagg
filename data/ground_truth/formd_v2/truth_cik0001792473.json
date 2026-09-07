@@ -1,0 +1,32 @@
+{
+  "entity_id": "cik0001792473",
+  "entity_name": "Matik, Inc.",
+  "n_filings": 2,
+  "n_rounds": 2,
+  "rounds": [
+    {
+      "accession": "0001792473-19-000001",
+      "amount": 3050387.0,
+      "amount_snapshots": [],
+      "date": "2019-10-11",
+      "entity_name": "Matik, Inc.",
+      "flags": [],
+      "key": "funding_round|2019-10-11",
+      "n_filings": 1,
+      "root_accession": "0001792473-19-000001"
+    },
+    {
+      "accession": "0001792473-21-000002",
+      "amount": 19999988.0,
+      "amount_snapshots": [],
+      "date": "2021-08-09",
+      "entity_name": "Matik, Inc.",
+      "flags": [],
+      "key": "funding_round|2021-08-09",
+      "n_filings": 1,
+      "root_accession": "0001792473-21-000002"
+    }
+  ],
+  "true_count": 2,
+  "true_sum": 23050375.0
+}

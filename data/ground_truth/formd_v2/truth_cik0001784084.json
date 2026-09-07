@@ -1,0 +1,56 @@
+{
+  "entity_id": "cik0001784084",
+  "entity_name": "Magic Spoon Inc.",
+  "n_filings": 7,
+  "n_rounds": 4,
+  "rounds": [
+    {
+      "accession": "0001784084-20-000002",
+      "amount": 6866226.0,
+      "amount_snapshots": [
+        6416235.0
+      ],
+      "date": "2019-07-19",
+      "entity_name": "Magic Spoon Inc.",
+      "flags": [],
+      "key": "funding_round|2019-07-19",
+      "n_filings": 2,
+      "root_accession": "0001784084-19-000002"
+    },
+    {
+      "accession": "0001784084-20-000003",
+      "amount": 1850000.0,
+      "amount_snapshots": [],
+      "date": "2020-06-19",
+      "entity_name": "Magic Spoon Inc.",
+      "flags": [],
+      "key": "funding_round|2020-06-19",
+      "n_filings": 1,
+      "root_accession": "0001784084-20-000003"
+    },
+    {
+      "accession": "0001784084-20-000004",
+      "amount": 8999996.0,
+      "amount_snapshots": [],
+      "date": "2020-11-03",
+      "entity_name": "Magic Spoon Inc.",
+      "flags": [],
+      "key": "funding_round|2020-11-03",
+      "n_filings": 1,
+      "root_accession": "0001784084-20-000004"
+    },
+    {
+      "accession": "0001784084-22-000003",
+      "amount": 106323115.0,
+      "amount_snapshots": [],
+      "date": "2022-06-13",
+      "entity_name": "Magic Spoon Inc.",
+      "flags": [],
+      "key": "funding_round|2022-06-13",
+      "n_filings": 3,
+      "root_accession": "0001784084-22-000001"
+    }
+  ],
+  "true_count": 4,
+  "true_sum": 124039337.0
+}

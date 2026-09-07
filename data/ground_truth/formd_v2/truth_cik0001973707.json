@@ -1,0 +1,65 @@
+{
+  "entity_id": "cik0001973707",
+  "entity_name": "Castelion Corp",
+  "n_filings": 5,
+  "n_rounds": 5,
+  "rounds": [
+    {
+      "accession": "0001973707-23-000001",
+      "amount": 5414995.0,
+      "amount_snapshots": [],
+      "date": "2023-04-06",
+      "entity_name": "Pallas Industries, Inc.",
+      "flags": [],
+      "key": "funding_round|2023-04-06",
+      "n_filings": 1,
+      "root_accession": "0001973707-23-000001"
+    },
+    {
+      "accession": "0001973707-23-000003",
+      "amount": 8588336.0,
+      "amount_snapshots": [],
+      "date": "2023-09-18",
+      "entity_name": "Castelion Corp",
+      "flags": [],
+      "key": "funding_round|2023-09-18",
+      "n_filings": 1,
+      "root_accession": "0001973707-23-000003"
+    },
+    {
+      "accession": "0001973707-25-000002",
+      "amount": 59999916.0,
+      "amount_snapshots": [],
+      "date": "2024-11-04",
+      "entity_name": "Castelion Corp",
+      "flags": [],
+      "key": "funding_round|2024-11-04",
+      "n_filings": 1,
+      "root_accession": "0001973707-25-000002"
+    },
+    {
+      "accession": "0001973707-25-000003",
+      "amount": 359998733.0,
+      "amount_snapshots": [],
+      "date": "2025-08-08",
+      "entity_name": "Castelion Corp",
+      "flags": [],
+      "key": "funding_round|2025-08-08",
+      "n_filings": 1,
+      "root_accession": "0001973707-25-000003"
+    },
+    {
+      "accession": "0001973707-26-000001",
+      "amount": 647000679.0,
+      "amount_snapshots": [],
+      "date": "2026-08-13",
+      "entity_name": "Castelion Corp",
+      "flags": [],
+      "key": "funding_round|2026-08-13",
+      "n_filings": 1,
+      "root_accession": "0001973707-26-000001"
+    }
+  ],
+  "true_count": 5,
+  "true_sum": 1081002659.0
+}

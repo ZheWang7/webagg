@@ -1,0 +1,57 @@
+{
+  "entity_id": "cik0001602935",
+  "entity_name": "Element Science, Inc.",
+  "n_filings": 6,
+  "n_rounds": 4,
+  "rounds": [
+    {
+      "accession": "0001602935-14-000001",
+      "amount": 12499998.0,
+      "amount_snapshots": [],
+      "date": "2014-03-05",
+      "entity_name": "Element Science, Inc.",
+      "flags": [],
+      "key": "funding_round|2014-03-05",
+      "n_filings": 1,
+      "root_accession": "0001602935-14-000001"
+    },
+    {
+      "accession": "0001602935-16-000002",
+      "amount": 24999993.0,
+      "amount_snapshots": [],
+      "date": "2016-08-12",
+      "entity_name": "Element Science, Inc.",
+      "flags": [],
+      "key": "funding_round|2016-08-12",
+      "n_filings": 1,
+      "root_accession": "0001602935-16-000002"
+    },
+    {
+      "accession": "0001602935-19-000002",
+      "amount": 9500000.0,
+      "amount_snapshots": [
+        1500000.0,
+        8500000.0
+      ],
+      "date": "2018-09-17",
+      "entity_name": "Element Science, Inc.",
+      "flags": [],
+      "key": "funding_round|2018-09-17",
+      "n_filings": 3,
+      "root_accession": "0001602935-18-000001"
+    },
+    {
+      "accession": "0001602935-20-000001",
+      "amount": 50649148.0,
+      "amount_snapshots": [],
+      "date": "2020-03-03",
+      "entity_name": "Element Science, Inc.",
+      "flags": [],
+      "key": "funding_round|2020-03-03",
+      "n_filings": 1,
+      "root_accession": "0001602935-20-000001"
+    }
+  ],
+  "true_count": 4,
+  "true_sum": 97649139.0
+}

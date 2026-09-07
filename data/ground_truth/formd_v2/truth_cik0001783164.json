@@ -1,0 +1,72 @@
+{
+  "entity_id": "cik0001783164",
+  "entity_name": "ELEANOR HEALTH HOLDINGS, LLC",
+  "n_filings": 7,
+  "n_rounds": 5,
+  "rounds": [
+    {
+      "accession": "0001405086-19-000353",
+      "amount": 11999881.0,
+      "amount_snapshots": [
+        4499903.0,
+        7499978.0
+      ],
+      "date": "2019-07-10",
+      "entity_name": "ELEANOR HEALTH HOLDINGS, LLC",
+      "flags": [],
+      "key": "funding_round|2019-07-10",
+      "n_filings": 3,
+      "root_accession": "0001405086-19-000224"
+    },
+    {
+      "accession": "0001405086-20-000061",
+      "amount": 3124787.0,
+      "amount_snapshots": [],
+      "date": "2020-02-19",
+      "entity_name": "ELEANOR HEALTH HOLDINGS, LLC",
+      "flags": [],
+      "key": "funding_round|2020-02-19",
+      "n_filings": 1,
+      "root_accession": "0001405086-20-000061"
+    },
+    {
+      "accession": "0001783164-21-000002",
+      "amount": 22073466.0,
+      "amount_snapshots": [],
+      "date": "2021-05-12",
+      "entity_name": "ELEANOR HEALTH HOLDINGS, LLC",
+      "flags": [
+        "close_amounts"
+      ],
+      "key": "funding_round|2021-05-12",
+      "n_filings": 1,
+      "root_accession": "0001783164-21-000002"
+    },
+    {
+      "accession": "0001783164-22-000002",
+      "amount": 78578952.0,
+      "amount_snapshots": [],
+      "date": "2022-03-30",
+      "entity_name": "ELEANOR HEALTH HOLDINGS, LLC",
+      "flags": [],
+      "key": "funding_round|2022-03-30",
+      "n_filings": 1,
+      "root_accession": "0001783164-22-000002"
+    },
+    {
+      "accession": "0001783164-24-000001",
+      "amount": 22235808.0,
+      "amount_snapshots": [],
+      "date": "2024-02-09",
+      "entity_name": "ELEANOR HEALTH HOLDINGS, LLC",
+      "flags": [
+        "close_amounts"
+      ],
+      "key": "funding_round|2024-02-09",
+      "n_filings": 1,
+      "root_accession": "0001783164-24-000001"
+    }
+  ],
+  "true_count": 5,
+  "true_sum": 138012894.0
+}

@@ -1,0 +1,103 @@
+{
+  "entity_id": "cik0001611176",
+  "entity_name": "Aledade, Inc.",
+  "n_filings": 11,
+  "n_rounds": 8,
+  "rounds": [
+    {
+      "accession": "0001611176-14-000001",
+      "amount": 4500000.0,
+      "amount_snapshots": [],
+      "date": "2014-06-13",
+      "entity_name": "Aledade, Inc.",
+      "flags": [],
+      "key": "funding_round|2014-06-13",
+      "n_filings": 1,
+      "root_accession": "0001611176-14-000001"
+    },
+    {
+      "accession": "0001611176-15-000001",
+      "amount": 15000000.0,
+      "amount_snapshots": [],
+      "date": "2015-05-29",
+      "entity_name": "Aledade, Inc.",
+      "flags": [],
+      "key": "funding_round|2015-05-29",
+      "n_filings": 1,
+      "root_accession": "0001611176-15-000001"
+    },
+    {
+      "accession": "0001611176-17-000003",
+      "amount": 40249996.0,
+      "amount_snapshots": [
+        19999997.0
+      ],
+      "date": "2016-12-13",
+      "entity_name": "Aledade, Inc.",
+      "flags": [],
+      "key": "funding_round|2016-12-13",
+      "n_filings": 2,
+      "root_accession": "0001611176-17-000001"
+    },
+    {
+      "accession": "0001611176-19-000001",
+      "amount": 56149963.0,
+      "amount_snapshots": [
+        22999974.0,
+        46149963.0
+      ],
+      "date": "2017-12-11",
+      "entity_name": "Aledade, Inc.",
+      "flags": [],
+      "key": "funding_round|2017-12-11",
+      "n_filings": 3,
+      "root_accession": "0001611176-17-000005"
+    },
+    {
+      "accession": "0001611176-20-000001",
+      "amount": 64444536.0,
+      "amount_snapshots": [],
+      "date": "2020-04-03",
+      "entity_name": "Aledade, Inc.",
+      "flags": [],
+      "key": "funding_round|2020-04-03",
+      "n_filings": 1,
+      "root_accession": "0001611176-20-000001"
+    },
+    {
+      "accession": "0001611176-21-000001",
+      "amount": 100000030.0,
+      "amount_snapshots": [],
+      "date": "2021-01-08",
+      "entity_name": "Aledade, Inc.",
+      "flags": [],
+      "key": "funding_round|2021-01-08",
+      "n_filings": 1,
+      "root_accession": "0001611176-21-000001"
+    },
+    {
+      "accession": "0001611176-22-000001",
+      "amount": 122267552.0,
+      "amount_snapshots": [],
+      "date": "2022-05-20",
+      "entity_name": "Aledade, Inc.",
+      "flags": [],
+      "key": "funding_round|2022-05-20",
+      "n_filings": 1,
+      "root_accession": "0001611176-22-000001"
+    },
+    {
+      "accession": "0001611176-23-000001",
+      "amount": 259999767.0,
+      "amount_snapshots": [],
+      "date": "2023-06-07",
+      "entity_name": "Aledade, Inc.",
+      "flags": [],
+      "key": "funding_round|2023-06-07",
+      "n_filings": 1,
+      "root_accession": "0001611176-23-000001"
+    }
+  ],
+  "true_count": 8,
+  "true_sum": 662611844.0
+}
