@@ -1,0 +1,512 @@
+{
+  "cik0001496963": {
+    "db": "D:\\Projects\\webagg\\data\\runs\\cert_formd_v2_cik0001496963.sqlite",
+    "delta": 0.1,
+    "delta_E_ref": 0.05,
+    "deny": [
+      "sec.gov",
+      "www.sec.gov",
+      "data.sec.gov"
+    ],
+    "entity_name": "Squarespace",
+    "eps": 0.1,
+    "max_steps": 60,
+    "query": "total equity funding raised by Squarespace in private funding rounds, excluding debt, IPO proceeds, and share sales",
+    "run_id": "cert_formd_v2_cik0001496963"
+  },
+  "cik0001567658": {
+    "db": "D:\\Projects\\webagg\\data\\runs\\cert_formd_v2_cik0001567658.sqlite",
+    "delta": 0.1,
+    "delta_E_ref": 0.05,
+    "deny": [
+      "sec.gov",
+      "www.sec.gov",
+      "data.sec.gov"
+    ],
+    "entity_name": "Illumio",
+    "eps": 0.1,
+    "max_steps": 60,
+    "query": "total equity funding raised by Illumio in private funding rounds, excluding debt, IPO proceeds, and share sales",
+    "run_id": "cert_formd_v2_cik0001567658"
+  },
+  "cik0001602935": {
+    "db": "D:\\Projects\\webagg\\data\\runs\\cert_formd_v2_cik0001602935.sqlite",
+    "delta": 0.1,
+    "delta_E_ref": 0.05,
+    "deny": [
+      "sec.gov",
+      "www.sec.gov",
+      "data.sec.gov"
+    ],
+    "entity_name": "Element Science",
+    "eps": 0.1,
+    "max_steps": 60,
+    "query": "total equity funding raised by Element Science in private funding rounds, excluding debt, IPO proceeds, and share sales",
+    "run_id": "cert_formd_v2_cik0001602935"
+  },
+  "cik0001611176": {
+    "db": "D:\\Projects\\webagg\\data\\runs\\cert_formd_v2_cik0001611176.sqlite",
+    "delta": 0.1,
+    "delta_E_ref": 0.05,
+    "deny": [
+      "sec.gov",
+      "www.sec.gov",
+      "data.sec.gov"
+    ],
+    "entity_name": "Aledade",
+    "eps": 0.1,
+    "max_steps": 60,
+    "query": "total equity funding raised by Aledade in private funding rounds, excluding debt, IPO proceeds, and share sales",
+    "run_id": "cert_formd_v2_cik0001611176"
+  },
+  "cik0001673743": {
+    "db": "D:\\Projects\\webagg\\data\\runs\\cert_formd_v2_cik0001673743.sqlite",
+    "delta": 0.1,
+    "delta_E_ref": 0.05,
+    "deny": [
+      "sec.gov",
+      "www.sec.gov",
+      "data.sec.gov"
+    ],
+    "entity_name": "Hinge Health",
+    "eps": 0.1,
+    "max_steps": 60,
+    "query": "total equity funding raised by Hinge Health in private funding rounds, excluding debt, IPO proceeds, and share sales",
+    "run_id": "cert_formd_v2_cik0001673743"
+  },
+  "cik0001684049": {
+    "db": "D:\\Projects\\webagg\\data\\runs\\cert_formd_v2_cik0001684049.sqlite",
+    "delta": 0.1,
+    "delta_E_ref": 0.05,
+    "deny": [
+      "sec.gov",
+      "www.sec.gov",
+      "data.sec.gov"
+    ],
+    "entity_name": "Expel",
+    "eps": 0.1,
+    "max_steps": 60,
+    "query": "total equity funding raised by Expel in private funding rounds, excluding debt, IPO proceeds, and share sales",
+    "run_id": "cert_formd_v2_cik0001684049"
+  },
+  "cik0001696488": {
+    "db": "D:\\Projects\\webagg\\data\\runs\\cert_formd_v2_cik0001696488.sqlite",
+    "delta": 0.1,
+    "delta_E_ref": 0.05,
+    "deny": [
+      "sec.gov",
+      "www.sec.gov",
+      "data.sec.gov"
+    ],
+    "entity_name": "Arable",
+    "eps": 0.1,
+    "max_steps": 60,
+    "query": "total equity funding raised by Arable in private funding rounds, excluding debt, IPO proceeds, and share sales",
+    "run_id": "cert_formd_v2_cik0001696488"
+  },
+  "cik0001699390": {
+    "db": "D:\\Projects\\webagg\\data\\runs\\cert_formd_v2_cik0001699390.sqlite",
+    "delta": 0.1,
+    "delta_E_ref": 0.05,
+    "deny": [
+      "sec.gov",
+      "www.sec.gov",
+      "data.sec.gov"
+    ],
+    "entity_name": "AMP Robotics",
+    "eps": 0.1,
+    "max_steps": 60,
+    "query": "total equity funding raised by AMP Robotics in private funding rounds, excluding debt, IPO proceeds, and share sales",
+    "run_id": "cert_formd_v2_cik0001699390"
+  },
+  "cik0001708414": {
+    "db": "D:\\Projects\\webagg\\data\\runs\\cert_formd_v2_cik0001708414.sqlite",
+    "delta": 0.1,
+    "delta_E_ref": 0.05,
+    "deny": [
+      "sec.gov",
+      "www.sec.gov",
+      "data.sec.gov"
+    ],
+    "entity_name": "Tive",
+    "eps": 0.1,
+    "max_steps": 60,
+    "query": "total equity funding raised by Tive in private funding rounds, excluding debt, IPO proceeds, and share sales",
+    "run_id": "cert_formd_v2_cik0001708414"
+  },
+  "cik0001712223": {
+    "db": "D:\\Projects\\webagg\\data\\runs\\cert_formd_v2_cik0001712223.sqlite",
+    "delta": 0.1,
+    "delta_E_ref": 0.05,
+    "deny": [
+      "sec.gov",
+      "www.sec.gov",
+      "data.sec.gov"
+    ],
+    "entity_name": "Prenda",
+    "eps": 0.1,
+    "max_steps": 60,
+    "query": "total equity funding raised by Prenda in private funding rounds, excluding debt, IPO proceeds, and share sales",
+    "run_id": "cert_formd_v2_cik0001712223"
+  },
+  "cik0001714402": {
+    "db": "D:\\Projects\\webagg\\data\\runs\\cert_formd_v2_cik0001714402.sqlite",
+    "delta": 0.1,
+    "delta_E_ref": 0.05,
+    "deny": [
+      "sec.gov",
+      "www.sec.gov",
+      "data.sec.gov"
+    ],
+    "entity_name": "Zap Energy",
+    "eps": 0.1,
+    "max_steps": 60,
+    "query": "total equity funding raised by Zap Energy in private funding rounds, excluding debt, IPO proceeds, and share sales",
+    "run_id": "cert_formd_v2_cik0001714402"
+  },
+  "cik0001737506": {
+    "db": "D:\\Projects\\webagg\\data\\runs\\cert_formd_v2_cik0001737506.sqlite",
+    "delta": 0.1,
+    "delta_E_ref": 0.05,
+    "deny": [
+      "sec.gov",
+      "www.sec.gov",
+      "data.sec.gov"
+    ],
+    "entity_name": "Stord",
+    "eps": 0.1,
+    "max_steps": 60,
+    "query": "total equity funding raised by Stord in private funding rounds, excluding debt, IPO proceeds, and share sales",
+    "run_id": "cert_formd_v2_cik0001737506"
+  },
+  "cik0001739613": {
+    "db": "D:\\Projects\\webagg\\data\\runs\\cert_formd_v2_cik0001739613.sqlite",
+    "delta": 0.1,
+    "delta_E_ref": 0.05,
+    "deny": [
+      "sec.gov",
+      "www.sec.gov",
+      "data.sec.gov"
+    ],
+    "entity_name": "MarginEdge",
+    "eps": 0.1,
+    "max_steps": 60,
+    "query": "total equity funding raised by MarginEdge in private funding rounds, excluding debt, IPO proceeds, and share sales",
+    "run_id": "cert_formd_v2_cik0001739613"
+  },
+  "cik0001758464": {
+    "db": "D:\\Projects\\webagg\\data\\runs\\cert_formd_v2_cik0001758464.sqlite",
+    "delta": 0.1,
+    "delta_E_ref": 0.05,
+    "deny": [
+      "sec.gov",
+      "www.sec.gov",
+      "data.sec.gov"
+    ],
+    "entity_name": "Billd",
+    "eps": 0.1,
+    "max_steps": 60,
+    "query": "total equity funding raised by Billd in private funding rounds, excluding debt, IPO proceeds, and share sales",
+    "run_id": "cert_formd_v2_cik0001758464"
+  },
+  "cik0001764915": {
+    "db": "D:\\Projects\\webagg\\data\\runs\\cert_formd_v2_cik0001764915.sqlite",
+    "delta": 0.1,
+    "delta_E_ref": 0.05,
+    "deny": [
+      "sec.gov",
+      "www.sec.gov",
+      "data.sec.gov"
+    ],
+    "entity_name": "Arris Composites",
+    "eps": 0.1,
+    "max_steps": 60,
+    "query": "total equity funding raised by Arris Composites in private funding rounds, excluding debt, IPO proceeds, and share sales",
+    "run_id": "cert_formd_v2_cik0001764915"
+  },
+  "cik0001778486": {
+    "db": "D:\\Projects\\webagg\\data\\runs\\cert_formd_v2_cik0001778486.sqlite",
+    "delta": 0.1,
+    "delta_E_ref": 0.05,
+    "deny": [
+      "sec.gov",
+      "www.sec.gov",
+      "data.sec.gov"
+    ],
+    "entity_name": "AirGarage",
+    "eps": 0.1,
+    "max_steps": 60,
+    "query": "total equity funding raised by AirGarage in private funding rounds, excluding debt, IPO proceeds, and share sales",
+    "run_id": "cert_formd_v2_cik0001778486"
+  },
+  "cik0001783164": {
+    "db": "D:\\Projects\\webagg\\data\\runs\\cert_formd_v2_cik0001783164.sqlite",
+    "delta": 0.1,
+    "delta_E_ref": 0.05,
+    "deny": [
+      "sec.gov",
+      "www.sec.gov",
+      "data.sec.gov"
+    ],
+    "entity_name": "Eleanor Health",
+    "eps": 0.1,
+    "max_steps": 60,
+    "query": "total equity funding raised by Eleanor Health in private funding rounds, excluding debt, IPO proceeds, and share sales",
+    "run_id": "cert_formd_v2_cik0001783164"
+  },
+  "cik0001783848": {
+    "db": "D:\\Projects\\webagg\\data\\runs\\cert_formd_v2_cik0001783848.sqlite",
+    "delta": 0.1,
+    "delta_E_ref": 0.05,
+    "deny": [
+      "sec.gov",
+      "www.sec.gov",
+      "data.sec.gov"
+    ],
+    "entity_name": "Omsom",
+    "eps": 0.1,
+    "max_steps": 60,
+    "query": "total equity funding raised by Omsom in private funding rounds, excluding debt, IPO proceeds, and share sales",
+    "run_id": "cert_formd_v2_cik0001783848"
+  },
+  "cik0001783955": {
+    "db": "D:\\Projects\\webagg\\data\\runs\\cert_formd_v2_cik0001783955.sqlite",
+    "delta": 0.1,
+    "delta_E_ref": 0.05,
+    "deny": [
+      "sec.gov",
+      "www.sec.gov",
+      "data.sec.gov"
+    ],
+    "entity_name": "System Initiative",
+    "eps": 0.1,
+    "max_steps": 60,
+    "query": "total equity funding raised by System Initiative in private funding rounds, excluding debt, IPO proceeds, and share sales",
+    "run_id": "cert_formd_v2_cik0001783955"
+  },
+  "cik0001784084": {
+    "db": "D:\\Projects\\webagg\\data\\runs\\cert_formd_v2_cik0001784084.sqlite",
+    "delta": 0.1,
+    "delta_E_ref": 0.05,
+    "deny": [
+      "sec.gov",
+      "www.sec.gov",
+      "data.sec.gov"
+    ],
+    "entity_name": "Magic Spoon",
+    "eps": 0.1,
+    "max_steps": 60,
+    "query": "total equity funding raised by Magic Spoon in private funding rounds, excluding debt, IPO proceeds, and share sales",
+    "run_id": "cert_formd_v2_cik0001784084"
+  },
+  "cik0001794061": {
+    "db": "D:\\Projects\\webagg\\data\\runs\\cert_formd_v2_cik0001794061.sqlite",
+    "delta": 0.1,
+    "delta_E_ref": 0.05,
+    "deny": [
+      "sec.gov",
+      "www.sec.gov",
+      "data.sec.gov"
+    ],
+    "entity_name": "Ambi Robotics",
+    "eps": 0.1,
+    "max_steps": 60,
+    "query": "total equity funding raised by Ambi Robotics in private funding rounds, excluding debt, IPO proceeds, and share sales",
+    "run_id": "cert_formd_v2_cik0001794061"
+  },
+  "cik0001795606": {
+    "db": "D:\\Projects\\webagg\\data\\runs\\cert_formd_v2_cik0001795606.sqlite",
+    "delta": 0.1,
+    "delta_E_ref": 0.05,
+    "deny": [
+      "sec.gov",
+      "www.sec.gov",
+      "data.sec.gov"
+    ],
+    "entity_name": "Crown Affair",
+    "eps": 0.1,
+    "max_steps": 60,
+    "query": "total equity funding raised by Crown Affair in private funding rounds, excluding debt, IPO proceeds, and share sales",
+    "run_id": "cert_formd_v2_cik0001795606"
+  },
+  "cik0001799591": {
+    "db": "D:\\Projects\\webagg\\data\\runs\\cert_formd_v2_cik0001799591.sqlite",
+    "delta": 0.1,
+    "delta_E_ref": 0.05,
+    "deny": [
+      "sec.gov",
+      "www.sec.gov",
+      "data.sec.gov"
+    ],
+    "entity_name": "Equip Health",
+    "eps": 0.1,
+    "max_steps": 60,
+    "query": "total equity funding raised by Equip Health in private funding rounds, excluding debt, IPO proceeds, and share sales",
+    "run_id": "cert_formd_v2_cik0001799591"
+  },
+  "cik0001818001": {
+    "db": "D:\\Projects\\webagg\\data\\runs\\cert_formd_v2_cik0001818001.sqlite",
+    "delta": 0.1,
+    "delta_E_ref": 0.05,
+    "deny": [
+      "sec.gov",
+      "www.sec.gov",
+      "data.sec.gov"
+    ],
+    "entity_name": "Abodu",
+    "eps": 0.1,
+    "max_steps": 60,
+    "query": "total equity funding raised by Abodu in private funding rounds, excluding debt, IPO proceeds, and share sales",
+    "run_id": "cert_formd_v2_cik0001818001"
+  },
+  "cik0001829334": {
+    "db": "D:\\Projects\\webagg\\data\\runs\\cert_formd_v2_cik0001829334.sqlite",
+    "delta": 0.1,
+    "delta_E_ref": 0.05,
+    "deny": [
+      "sec.gov",
+      "www.sec.gov",
+      "data.sec.gov"
+    ],
+    "entity_name": "Supabase",
+    "eps": 0.1,
+    "max_steps": 60,
+    "query": "total equity funding raised by Supabase in private funding rounds, excluding debt, IPO proceeds, and share sales",
+    "run_id": "cert_formd_v2_cik0001829334"
+  },
+  "cik0001831650": {
+    "db": "D:\\Projects\\webagg\\data\\runs\\cert_formd_v2_cik0001831650.sqlite",
+    "delta": 0.1,
+    "delta_E_ref": 0.05,
+    "deny": [
+      "sec.gov",
+      "www.sec.gov",
+      "data.sec.gov"
+    ],
+    "entity_name": "Nth Cycle",
+    "eps": 0.1,
+    "max_steps": 60,
+    "query": "total equity funding raised by Nth Cycle in private funding rounds, excluding debt, IPO proceeds, and share sales",
+    "run_id": "cert_formd_v2_cik0001831650"
+  },
+  "cik0001832759": {
+    "db": "D:\\Projects\\webagg\\data\\runs\\cert_formd_v2_cik0001832759.sqlite",
+    "delta": 0.1,
+    "delta_E_ref": 0.05,
+    "deny": [
+      "sec.gov",
+      "www.sec.gov",
+      "data.sec.gov"
+    ],
+    "entity_name": "Settle",
+    "eps": 0.1,
+    "max_steps": 60,
+    "query": "total equity funding raised by Settle in private funding rounds, excluding debt, IPO proceeds, and share sales",
+    "run_id": "cert_formd_v2_cik0001832759"
+  },
+  "cik0001861415": {
+    "db": "D:\\Projects\\webagg\\data\\runs\\cert_formd_v2_cik0001861415.sqlite",
+    "delta": 0.1,
+    "delta_E_ref": 0.05,
+    "deny": [
+      "sec.gov",
+      "www.sec.gov",
+      "data.sec.gov"
+    ],
+    "entity_name": "Stoke Space",
+    "eps": 0.1,
+    "max_steps": 60,
+    "query": "total equity funding raised by Stoke Space in private funding rounds, excluding debt, IPO proceeds, and share sales",
+    "run_id": "cert_formd_v2_cik0001861415"
+  },
+  "cik0001863211": {
+    "db": "D:\\Projects\\webagg\\data\\runs\\cert_formd_v2_cik0001863211.sqlite",
+    "delta": 0.1,
+    "delta_E_ref": 0.05,
+    "deny": [
+      "sec.gov",
+      "www.sec.gov",
+      "data.sec.gov"
+    ],
+    "entity_name": "Hadrian",
+    "eps": 0.1,
+    "max_steps": 60,
+    "query": "total equity funding raised by Hadrian in private funding rounds, excluding debt, IPO proceeds, and share sales",
+    "run_id": "cert_formd_v2_cik0001863211"
+  },
+  "cik0001885407": {
+    "db": "D:\\Projects\\webagg\\data\\runs\\cert_formd_v2_cik0001885407.sqlite",
+    "delta": 0.1,
+    "delta_E_ref": 0.05,
+    "deny": [
+      "sec.gov",
+      "www.sec.gov",
+      "data.sec.gov"
+    ],
+    "entity_name": "Loft Labs",
+    "eps": 0.1,
+    "max_steps": 60,
+    "query": "total equity funding raised by Loft Labs in private funding rounds, excluding debt, IPO proceeds, and share sales",
+    "run_id": "cert_formd_v2_cik0001885407"
+  },
+  "cik0001896284": {
+    "db": "D:\\Projects\\webagg\\data\\runs\\cert_formd_v2_cik0001896284.sqlite",
+    "delta": 0.1,
+    "delta_E_ref": 0.05,
+    "deny": [
+      "sec.gov",
+      "www.sec.gov",
+      "data.sec.gov"
+    ],
+    "entity_name": "Ebb Carbon",
+    "eps": 0.1,
+    "max_steps": 60,
+    "query": "total equity funding raised by Ebb Carbon in private funding rounds, excluding debt, IPO proceeds, and share sales",
+    "run_id": "cert_formd_v2_cik0001896284"
+  },
+  "cik0001918029": {
+    "db": "D:\\Projects\\webagg\\data\\runs\\cert_formd_v2_cik0001918029.sqlite",
+    "delta": 0.1,
+    "delta_E_ref": 0.05,
+    "deny": [
+      "sec.gov",
+      "www.sec.gov",
+      "data.sec.gov"
+    ],
+    "entity_name": "Apptronik",
+    "eps": 0.1,
+    "max_steps": 60,
+    "query": "total equity funding raised by Apptronik in private funding rounds, excluding debt, IPO proceeds, and share sales",
+    "run_id": "cert_formd_v2_cik0001918029"
+  },
+  "cik0001959571": {
+    "db": "D:\\Projects\\webagg\\data\\runs\\cert_formd_v2_cik0001959571.sqlite",
+    "delta": 0.1,
+    "delta_E_ref": 0.05,
+    "deny": [
+      "sec.gov",
+      "www.sec.gov",
+      "data.sec.gov"
+    ],
+    "entity_name": "Magic AI",
+    "eps": 0.1,
+    "max_steps": 60,
+    "query": "total equity funding raised by Magic AI in private funding rounds, excluding debt, IPO proceeds, and share sales",
+    "run_id": "cert_formd_v2_cik0001959571"
+  },
+  "cik0001982311": {
+    "db": "D:\\Projects\\webagg\\data\\runs\\cert_formd_v2_cik0001982311.sqlite",
+    "delta": 0.1,
+    "delta_E_ref": 0.05,
+    "deny": [
+      "sec.gov",
+      "www.sec.gov",
+      "data.sec.gov"
+    ],
+    "entity_name": "Unstructured",
+    "eps": 0.1,
+    "max_steps": 60,
+    "query": "total equity funding raised by Unstructured in private funding rounds, excluding debt, IPO proceeds, and share sales",
+    "run_id": "cert_formd_v2_cik0001982311"
+  }
+}
