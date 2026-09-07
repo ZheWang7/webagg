@@ -104,7 +104,7 @@ Zocdoc,ok,0001417902,ZocDoc Inc,1.00,9,9,2009-04-08,2015-08-21,reject,alts: ZocD
 Ro,weak_match,0001770667,RO Acquisition Corp.,0.75,4,3,2019-03-15,2021-12-03,reject,"alts: RO &amp; ELI, INC (CIK 1816582); RO Back Bay Associates, LLC (CIK 1508392); RO Fund I, a series of FDVC, LP (CIK 1935107)"
 Cedar,weak_match,0002012990,Cedar Adams Holdings LLC,0.75,1,1,2024-08-01,2024-08-01,reject,"alts: Cedar Build, Inc. (CIK 1991696); Cedar Cares, Inc. (CIK 1116548); Cedar Adams Shareholder LLC (CIK 1997812)"
 Devoted Health,ok,0001719459,"Devoted Health, Inc.",1.00,1,1,2017-10-20,2017-10-20,reject,alts: Devoted Health SPV II LLC (CIK 2078127)
-Cityblock Health,ok,0001726601,"Cityblock Health, Inc.",1.00,7,6,2018-01-04,2021-09-03,accept,spot-check 2026-09-06: A through D fully chained (sums to announced ~890M); Series E 116M closed 2026-08-20 NOT yet filed - pre-registered rule: include iff covering Form D on EDGAR at truth-build day; else flip to reject
+Cityblock Health,ok,0001726601,"Cityblock Health, Inc.",1.00,7,6,2018-01-04,2021-09-03,reject,spot-check 2026-09-06: A through D fully chained (sums to announced ~890M); Series E 116M closed 2026-08-20 unfiled - pre-registered rule fired 2026-09-07 at truth-build day: no covering Form D on EDGAR -> reject
 Komodo Health,no_match,,,,,,,,,
 Benchling,ok,0001687403,"Benchling, Inc.",1.00,1,1,2016-10-13,2016-10-13,reject,
 Redwood Materials,ok,0001705348,"REDWOOD MATERIALS, INC.",1.00,5,5,2017-05-01,2022-12-29,reject,"alts: Redwood Materials SeriesD NJ 052023, a Series of CGF2021 LLC (CIK 1979002)"

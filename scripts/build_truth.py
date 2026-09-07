@@ -47,7 +47,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from webagg import config                                  # noqa: E402
 from webagg.formd import (build_truth_entity, formd_mentions,  # noqa: E402
                           parse_source, save_truth_entity)
-from webagg.risk_control import split_cohort               # noqa: E402
+from webagg.risk_control import assign_split               # noqa: E402
 from webagg.schema_addressable import (EDGARDriver,        # noqa: E402
                                        run_schema_addressable)
 
@@ -70,6 +70,10 @@ def main() -> None:
                          "recorded in the certificate)")
     ap.add_argument("--seed", type=int, default=0,
                     help="seed for the calibration/validation entity split")
+    ap.add_argument("--cal-frac", type=float, default=0.5,
+                    help="target calibration share of the entity split "
+                         "(pre-registered; e.g. 0.6667 for the 2/3-heavy "
+                         "split); recorded verbatim in the manifest")
     args = ap.parse_args()
 
     # -- the filter IS the cohort definition; it goes in the manifest verbatim
@@ -119,17 +123,29 @@ def main() -> None:
         entities[entity_id] = meta
 
     # -- the entity-level calibration/validation split (Sec. 13 <- Sec. 15).
-    #    split_cohort is the SAME function learn_then_test's harness uses,
-    #    so the split rule is defined in exactly one place.
+    #    APPEND-ONLY: if a manifest already exists, every prior assignment is
+    #    kept as-is -- only new entities are dealt, departures are recorded.
+    #    Re-dealing a changed cohort would move entities across the
+    #    calibration/validation line, which voids the held-out check.
     ids = sorted(entities)              # deterministic input order + seeded
-    cal, val = split_cohort(ids, seed=args.seed)   # permutation = reproducible
+    prior_split = None
+    manifest_path = cohort_dir / "manifest.json"
+    if manifest_path.exists():
+        prior_split = json.loads(manifest_path.read_text()).get("split")
+        print("[build_truth] prior manifest found -- split is append-only "
+              "(existing assignments kept; only new entities are dealt)")
+    cal, val, dropped = assign_split(ids, seed=args.seed,
+                                     cal_frac=args.cal_frac,
+                                     prior=prior_split)
 
     manifest = {
         "cohort": args.cohort,
         "built_at": datetime.utcnow().isoformat(),
         "query_filter": query_filter,
         "seed": args.seed,
+        "cal_frac": args.cal_frac,
         "split": {"calibration": sorted(cal), "validation": sorted(val)},
+        "split_dropped": dropped,       # departures are documented, loudly
         "keys_swept": out["keys_swept"],
         "blocked": out["blocked"],                  # True -> certificate
         "blocking_predicate": out["blocking_predicate"],  # covers closure(K')
@@ -151,7 +167,9 @@ def main() -> None:
     print(f"\ncohort dir : {cohort_dir}")
     print(f"truth db   : {out['db_path']}")
     print(f"split      : {len(cal)} calibration / {len(val)} validation "
-          f"(seed={args.seed})")
+          f"(cal_frac={args.cal_frac}, seed={args.seed})")
+    if dropped:
+        print(f"dropped    : {dropped} (left the cohort; nobody reshuffled)")
     if failures:
         print(f"\n!! {len(failures)} PARSE FAILURES -- the answer key is "
               f"INCOMPLETE until these are resolved:")

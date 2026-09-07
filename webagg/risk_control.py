@@ -370,6 +370,43 @@ def split_cohort(cohort, seed: int = 0):
     return cal, val
 
 
+def assign_split(ids, seed: int = 0, cal_frac: float = 0.5,
+                 prior: dict | None = None):
+    """Append-only calibration/validation assignment (pre-registration rule).
+
+    The split is HISTORY, not a computation: once an entity is dealt to a
+    side it never moves. Re-dealing after any entity has been run would let
+    seen data cross the calibration/validation line and void the honest
+    check behind eps_F (design doc Sec. 13.3, practical rule 2).
+
+    ids   : the CURRENT cohort entity ids (order and duplicates ignored)
+    prior : the "split" dict from an earlier manifest, or None (first build)
+    Rules, in order:
+      1. an id in `prior` keeps its side, forever;
+      2. an id in `prior` but missing from `ids` is DROPPED and reported --
+         a shrinking cohort is a documented event, never a reshuffle;
+      3. new ids are dealt in seeded deterministic order, each to whichever
+         side keeps the calibration share nearest cal_frac.
+    Returns (cal, val, dropped), each sorted.
+    """
+    ids = sorted(set(ids))
+    id_set = set(ids)
+    prior = prior or {}
+    cal = [i for i in prior.get("calibration", []) if i in id_set]
+    val = [i for i in prior.get("validation", []) if i in id_set]
+    dropped = sorted((set(prior.get("calibration", [])) |
+                      set(prior.get("validation", []))) - id_set)
+    new = [i for i in ids if i not in set(cal) | set(val)]
+    order = np.random.RandomState(seed).permutation(len(new))
+    for k in order:
+        # deal to calibration whenever it is below its target share
+        if len(cal) < int((len(cal) + len(val) + 1) * cal_frac):
+            cal.append(new[k])
+        else:
+            val.append(new[k])
+    return sorted(cal), sorted(val), dropped
+
+
 def holdout_report(losses, eps_F: float) -> dict:
     """Summarize realized losses on the UNTOUCHED validation half.
 
