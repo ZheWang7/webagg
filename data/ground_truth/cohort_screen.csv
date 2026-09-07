@@ -47,7 +47,7 @@ Tempus AI,ok,0001717115,"Tempus AI, Inc.",1.00,4,4,2017-09-25,2022-10-17,reject,
 OneStream,weak_match,0001856374,ONESTREAM SOFTWARE LLC,0.75,1,1,2021-04-20,2021-04-20,reject,
 Navan,weak_match,0001639723,"Navanti Group, LLC",0.83,7,6,2015-05-08,2021-10-26,reject,
 Cerebras Systems,ok,0002021728,Cerebras Systems Inc.,1.00,0,0,,,,
-Hinge Health,ok,0001673743,"Hinge Health, Inc.",1.00,10,9,2016-05-04,2023-12-28,accept,
+Hinge Health,ok,0001673743,"Hinge Health, Inc.",1.00,10,9,2016-05-04,2023-12-28,accept,amount audit: B/C/D/E all chained (B D E late-filed in Dec-2023 batch; verified via totalAmountSold + firstSale); seed stubs are filing-derived directory drift; A variance 9.6 vs 8.3
 Omada Health,ok,0001611115,"Omada Health, Inc.",1.00,2,2,2014-06-20,2015-10-01,reject,
 Asana,weak_match,0001467890,"Asana Medical, Inc.",0.75,1,1,2009-07-10,2009-07-10,reject,"alts: Asana Medical, Inc. (CIK 1625411); Asana Global Select Fund, LP (CIK 1349056); Asana Partners Fund I, LP (CIK 1689339)"
 Sprout Social,ok,0001517375,"Sprout Social, Inc.",1.00,4,4,2011-04-05,2018-12-20,reject,
@@ -69,7 +69,7 @@ Perplexity,weak_match,0001972171,"Perplexity AI, Inc.",0.75,1,1,2023-04-05,2023-
 Groq,ok,0001686725,Groq LLC,1.00,4,3,2016-10-20,2026-07-24,reject,alts: Groq Jul 2025 a Series of CGF2021 LLC (CIK 2080572); Groq July 2025 a Series of CGF2021 LLC (CIK 2081326); GROQ Opportunity 7 a Series of CGF2021 LLC (CIK 2086333)
 Ramp,ok,0000890784,Ramp Holdings Inc,1.00,0,0,,,,"alts: Ramp Business Corp (CIK 1803782); Ramp Network, Inc. (CIK 1864433); RAMp Sports LLC (CIK 1467048)"
 Brex,weak_match,0002083653,BREX Briggs MF DST,0.75,12,1,2025-08-28,2026-03-27,reject,alts: BREX Parker MF DST (CIK 2043369); Brex Technology Opportunities Fund I LP (CIK 1890347); Brex Technology Opportunities Fund (Cayman) I LP (CIK 1890330)
-Deel,ok,0001813695,"Deel, Inc.",1.00,8,7,2020-06-02,2024-12-27,reject,"alts: Deeloh Technologies, Inc. (CIK 1733270); Deeli AI, Inc. (CIK 2030085); Deelr Pro, Inc. (CIK 2045097)"
+Deel,ok,0001813695,"Deel, Inc.",1.00,8,7,2020-06-02,2024-12-27,reject,"alts: Deeloh Technologies, Inc. (CIK 1733270); Deeli AI, Inc. (CIK 2030085); Deelr Pro, Inc. (CIK 2045097); Oct-2025 Series E 300M primary unfiled (re-checked 2026-09-06: still unfiled); Feb-2025 300M was pure secondary (excusable); D + ext recovered as late filings"
 Rippling,no_match,,,,,,,,,
 Gusto,ok,0001741294,"Gusto Holdings, LLC",1.00,3,3,2018-06-14,2019-12-30,reject,"alts: Gusto Technologies Inc. (CIK 1631258); Gusto, Inc. (CIK 1639415); Gusto, LLC (CIK 1618045)"
 Plaid,ok,0001677226,"Plaid Technologies, Inc.",1.00,1,1,2016-06-20,2016-06-20,reject,"alts: Plaid for Women, Inc. (CIK 1588805); Plaid Matrix Fund I, L.P. (CIK 2140602); Plaid Mar 2025 a Series of CGF2021 LLC (CIK 2065940)"
@@ -104,7 +104,7 @@ Zocdoc,ok,0001417902,ZocDoc Inc,1.00,9,9,2009-04-08,2015-08-21,reject,alts: ZocD
 Ro,weak_match,0001770667,RO Acquisition Corp.,0.75,4,3,2019-03-15,2021-12-03,reject,"alts: RO &amp; ELI, INC (CIK 1816582); RO Back Bay Associates, LLC (CIK 1508392); RO Fund I, a series of FDVC, LP (CIK 1935107)"
 Cedar,weak_match,0002012990,Cedar Adams Holdings LLC,0.75,1,1,2024-08-01,2024-08-01,reject,"alts: Cedar Build, Inc. (CIK 1991696); Cedar Cares, Inc. (CIK 1116548); Cedar Adams Shareholder LLC (CIK 1997812)"
 Devoted Health,ok,0001719459,"Devoted Health, Inc.",1.00,1,1,2017-10-20,2017-10-20,reject,alts: Devoted Health SPV II LLC (CIK 2078127)
-Cityblock Health,ok,0001726601,"Cityblock Health, Inc.",1.00,7,6,2018-01-04,2021-09-03,accept,
+Cityblock Health,ok,0001726601,"Cityblock Health, Inc.",1.00,7,6,2018-01-04,2021-09-03,accept,spot-check 2026-09-06: A through D fully chained (sums to announced ~890M); Series E 116M closed 2026-08-20 NOT yet filed - pre-registered rule: include iff covering Form D on EDGAR at truth-build day; else flip to reject
 Komodo Health,no_match,,,,,,,,,
 Benchling,ok,0001687403,"Benchling, Inc.",1.00,1,1,2016-10-13,2016-10-13,reject,
 Redwood Materials,ok,0001705348,"REDWOOD MATERIALS, INC.",1.00,5,5,2017-05-01,2022-12-29,reject,"alts: Redwood Materials SeriesD NJ 052023, a Series of CGF2021 LLC (CIK 1979002)"
@@ -114,17 +114,17 @@ Helion Energy,ok,0001615940,"Helion Energy, Inc.",1.00,2,2,2014-08-12,2015-07-06
 Boom Supersonic,weak_match,0002105230,Boom SuperSonic Dec 2025 a Series of CGF2021 LLC,0.75,1,1,2026-02-13,2026-02-13,reject,alts: Boom Supersonic 30 II a Series of Denver Angels LLC (CIK 2067907); Boom Supersonic 30F II a Series of Denver Angels LLC (CIK 2101510)
 Zipline,weak_match,0002033340,"Zipline AI, Ltd.",0.75,1,1,2024-08-13,2024-08-13,reject,"alts: ZIPLINE GAMES, INC. (CIK 1509076); ZIPLINE MEDICAL INC (CIK 1408578); Zipline, a series of Jason&#39;s Syndicate, LLC (CIK 2127566)"
 Skydio,ok,0001848117,"Skydio, Inc.",1.00,2,2,2021-02-25,2023-03-06,reject,
-Shield AI,ok,0001675769,Shield AI Inc,1.00,10,8,2016-05-31,2026-05-01,reject,"alts: SHIELD AI A SERIES OF VUVP FUND LLC (CIK 2140937); Shield AI May 2026 a Series of CGF2021 LLC (CIK 2133771); Shield AI Oct 2022, a Series of CGF2021 LLC (CIK 1978993)"
+Shield AI,ok,0001675769,Shield AI Inc,1.00,10,8,2016-05-31,2026-05-01,reject,"alts: SHIELD AI A SERIES OF VUVP FUND LLC (CIK 2140937); Shield AI May 2026 a Series of CGF2021 LLC (CIK 2133771); Shield AI Oct 2022, a Series of CGF2021 LLC (CIK 1978993); F-1 recovered via late filing 2026-05-01 (591.8M; firstSale 2025-02-07); Series G unfiled (re-checked 2026-09-06: still unfiled)"
 Saronic,ok,0002033142,"Saronic Technologies, Inc.",1.00,3,3,2024-08-21,2026-04-09,reject,alts: Saronic 2026 a Series of What If Ventures Master LLC (CIK 2125472)
 Hadrian,weak_match,0001863211,"Hadrian Automation, Inc.",0.75,7,7,2021-07-21,2025-12-31,accept,alts: Hadrian Ventures LLC (CIK 1678813)
 Varda Space,weak_match,0001839597,"Varda Space Industries, Inc.",0.75,3,3,2021-01-22,2022-01-18,reject,alts: Varda Space Industries a Series of CGF2021 LLC (CIK 2112603); Varda Space Series D Jan 2026 a Series of CGF2021 LLC (CIK 2107426)
 Astranis,weak_match,0001715660,Astranis Space Technologies Corp.,0.75,8,6,2017-08-29,2021-04-19,reject,
-Stoke Space,ok,0001861415,"Stoke Space Technologies, Inc.",1.00,6,6,2021-05-10,2026-04-16,accept,alts: STOKE SPACE Jan 2026 a Series of CGF2021 LLC (CIK 2112227)
+Stoke Space,ok,0001861415,"Stoke Space Technologies, Inc.",1.00,6,6,2021-05-10,2026-04-16,accept,alts: STOKE SPACE Jan 2026 a Series of CGF2021 LLC (CIK 2112227); amount audit: B late-filed (146M chain); D equity 410M exact (announced 510M incl 100M SVB debt); D-ext still selling (275M of 350M) - re-pull chain at truth build
 Relativity Space,ok,0001673976,"Relativity Space, Inc.",1.00,6,6,2016-05-12,2021-09-13,reject,"alts: Relativity Space Fund, a series of Evolution Ventures Master LLC (CIK 1787692); Relativity Space, FOI, a series of Republic Master Fund, LP (CIK 1785223); Relativity Space, Raaid, a series of Republic Master Fund, LP (CIK 1789100)"
 Firefly Aerospace,ok,0001860160,Firefly Aerospace Inc.,1.00,7,6,2021-05-11,2026-07-08,reject,
 Vast Space,weak_match,0002105242,Vast Space Dec 2025 a Series of CGF2021 LLC,0.75,1,1,2026-03-24,2026-03-24,reject,alts: Vast Space I a Series of Averleigh Capital LLC (CIK 2105310)
 Axiom Space,weak_match,0001826762,Axiom Space PML SPV 1 LP,0.75,2,2,2020-10-01,2026-04-14,reject,
-Sierra Space,ok,0001899675,Sierra Space Corp,1.00,10,3,2021-12-16,2026-03-16,accept,
+Sierra Space,ok,0001899675,Sierra Space Corp,1.00,10,3,2021-12-16,2026-03-16,reject,spot-check 2026-09-06: 290M Series B (closed 2023-09-26; MUFG-led) has no covering filing - indefinite offering tops at 30.6M by Apr-2023 and the 2026-03-16 D is the 550M Series C exactly (firstSale 2026-03-02); web-known-but-unfiled
 Impulse Space,ok,0001920171,"Impulse Space, Inc.",1.00,4,4,2022-04-04,2026-06-02,reject,alts: Impulse Space Apr 2026 a Series of CGF2021 LLC (CIK 2129918)
 Applied Intuition,no_match,,,,,,,,,
 Nuro,weak_match,0001552958,Nuro Pharma Inc,0.75,3,2,2012-07-10,2013-06-19,reject,"alts: Nuro Pouches, Inc. (CIK 2108013); Nurocor Inc (CIK 1931921); Nuroyalti, LP (CIK 1482537)"
@@ -142,7 +142,7 @@ PlanetScale,no_match,,,,,,,,,
 Temporal Technologies,no_match,,,,,,,,,
 dbt Labs,no_match,,,,,,,,,
 Hex Technologies,no_match,,,,,,,,,
-Sigma Computing,ok,0001605916,"Sigma Computing, Inc.",1.00,9,7,2014-04-24,2025-01-30,reject,
+Sigma Computing,ok,0001605916,"Sigma Computing, Inc.",1.00,9,7,2014-04-24,2025-01-30,reject,freeze re-check 2026-09-06: no new filings since verdict (last D/A 2025-01-30 already accounted)
 Airbyte,ok,0001864376,"AIRBYTE, INC.",1.00,1,1,2021-05-28,2021-05-28,reject,
 Fivetran,no_match,,,,,,,,,
 Hightouch,no_match,,,,,,,,,
@@ -151,7 +151,7 @@ LaunchDarkly,no_match,,,,,,,,,
 Statsig,no_match,,,,,,,,,
 Mixpanel,no_match,,,,,,,,,
 Heap,ok,0001661572,Heap Inc.,1.00,3,3,2015-12-23,2021-12-09,reject,
-FullStory,ok,0001614167,"FullStory, Inc.",1.00,7,7,2014-07-18,2022-08-09,accept,
+FullStory,ok,0001614167,"FullStory, Inc.",1.00,7,7,2014-07-18,2022-08-09,accept,spot-check 2026-09-06: clean - 7 filings = 7 announced rounds (~196M total; seed 2014 through 25M Aug-2022); tail closed
 Pendo,weak_match,0001595931,"Pendo.io, Inc.",0.75,9,9,2014-01-17,2024-08-13,accept,
 Gong,weak_match,0001821738,Gong i.o Ltd.,0.75,2,2,2020-08-19,2021-06-15,reject,alts: Gong Sheng Yuan Biotechnology Corp (CIK 2004372)
 Outreach,ok,0001537182,Outreach Corp,1.00,16,14,2011-12-14,2021-06-08,accept,"alts: OUTREACH FINANCIAL SERVICES, LLC (CIK 1518383)"
@@ -207,7 +207,7 @@ Physical Intelligence,no_match,,,,,,,,,
 World Labs,no_match,,,,,,,,,
 Skild AI,weak_match,0002069464,Skild AI Apr 2025 a Series of CGF2021 LLC,0.75,1,1,2025-05-21,2025-05-21,reject,
 Chef Robotics,no_match,,,,,,,,,
-Apptronik,ok,0001918029,"Apptronik, Inc",1.00,5,4,2022-03-23,2025-11-05,accept,alts: Apptronik CC Ltd (CIK 2132567); Apptronik 2 CC Ltd (CIK 2120996); Apptronik SPV I LP (CIK 2064373)
+Apptronik,ok,0001918029,"Apptronik, Inc",1.00,5,4,2022-03-23,2025-11-05,accept,alts: Apptronik CC Ltd (CIK 2132567); Apptronik 2 CC Ltd (CIK 2120996); Apptronik SPV I LP (CIK 2064373); freeze re-check 2026-09-06: still selling (331.4M of 500M as of Nov-2025 D); no closing amendment - re-pull at truth build
 Agility Robotics,ok,0001727116,"Agility Robotics, Inc.",1.00,2,2,2018-02-20,2022-07-27,reject,alts: Agility Robotics SPV Feb 2026 a Series of CGF2021 LLC (CIK 2113357)
 Collaborative Robotics,no_match,,,,,,,,,
 Standard Bots,no_match,,,,,,,,,
@@ -216,7 +216,7 @@ Dexterity,ok,0000860131,"Dexterity, Inc.",1.00,0,0,,,,alts: Dexterity GPs LLC (C
 Path Robotics,ok,0001882283,"Path Robotics, Inc.",1.00,2,2,2021-11-10,2021-11-10,reject,
 Rapid Robotics,no_match,,,,,,,,,
 Matternet,ok,0001681608,"Matternet, Inc.",1.00,3,3,2016-08-05,2026-03-19,reject,
-Castelion,ok,0001973707,Castelion Corp,1.00,4,4,2023-04-21,2025-11-20,accept,alts: Castelion Sep 2025 a Series of CGF2021 LLC (CIK 2094402)
+Castelion,ok,0001973707,Castelion Corp,1.00,4,4,2023-04-21,2025-11-20,accept,alts: Castelion Sep 2025 a Series of CGF2021 LLC (CIK 2094402); freeze re-check 2026-09-06: Series C equity 800M filed 2026-08-28 (647M sold; firstSale 2026-08-13; announced 1B = 800M equity + 250M debt facility); still selling - re-pull chain at truth build
 K2 Space,ok,0001969384,K2 Space Corp,1.00,1,1,2023-03-15,2023-03-15,reject,
 Limitless,weak_match,0001707097,"LIMITLESS BLU, LP",0.75,2,1,2017-05-19,2017-05-19,reject,"alts: LIMITLESS CAPITAL LP (CIK 1958427); LIMITLESS COFFEE, LLC (CIK 1685732); Limitless Distillery LLC (CIK 1784504)"
 Rabbit,ok,0001782068,Rabbit Inc.,1.00,1,1,2019-07-10,2019-07-10,reject,"alts: Rabbit, Inc. (CIK 1634638); Rabbit Alpha, LLC (CIK 1737961); Rabbit Inc/DE (CIK 2005606)"
