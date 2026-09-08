@@ -71,3 +71,59 @@ runs it affects.
 - Verdicts in `cohort_screen.csv` are closed; the split is append-only
   history; results are reported regardless of outcome — a failed
   certification is a publishable finding, not a reason to re-run.
+
+---
+
+# Addendum 1 — Attempt #2 (locked 2026-09-08, before any attempt-#2 replay)
+
+## A. Outcome of attempt #1 (recorded)
+
+- NOT CERTIFIED: the first grid config failed E[L] <= 0.25 at delta_F = 0.05
+  (mean L = 0.6834, p = 1.0, n = 34 calibration entities).
+- Diagnosis (calibration half ONLY; the validation half was not consulted):
+  loss was ~entirely the spurious channel (1.709 vs 0.002 amount-error);
+  record dumps showed duplicate copies of true rounds under distinct
+  resolved-entity ids, i.e. ER FALSE SPLITS. Mention-level audit: the
+  fitted matcher carried ~zero weight on name features (no variance in the
+  A2 training pairs, which were same-page aggregator-heavy) and gated
+  merges on same_domain + temporal; cross-domain same-name pairs scored
+  theta ~= 0.09 <= tau_minus and were split without adjudication.
+
+## B. Instrument changes for attempt #2 (all committed before replays)
+
+1. Adjudicator robustness: malformed LLM payloads retry once, then fall
+   back loudly to theta = 0.5 (band); confidences clipped to [0, 1].
+   Crash fix; behavior on well-formed payloads unchanged (pinned by test).
+2. Matcher refit on a deployment-representative pair set: match_pairs.csv
+   grown 320 -> 460 rows (148 same / 312 different) via harvest_er_pairs.py
+   over the frozen calibration pools -- cross-domain same-surface
+   positives, cross-entity look-alike hard negatives, band pairs -- all
+   human-labeled. Refit coefficients are name/embedding-dominated;
+   same_domain is mildly negative. Cheap-matcher out-of-fold error
+   alpha = 0.3739. Consequence, measured offline: tau_plus is unreachable
+   by cheap features, so ALL 5,946 blocked pairs across the cohort
+   escalate to the LLM adjudicator at every grid config. Attempt #2
+   therefore certifies the configuration "blocking -> LLM adjudication ->
+   correlation clustering", with the cheap tier acting as a router only.
+   Thresholds tau+/tau- and the grid are NOT changed.
+3. Per-certification adjudication cache (memoized_adjudicator): each
+   unordered mention pair is judged once per certification and the verdict
+   reused across grid configs -- verdict consistency plus ~4x cost
+   reduction (5,946 calls instead of 23,784). In-memory, never reused
+   across certification runs.
+
+## C. Unchanged, and disclosures
+
+- Cohort, truth tables, and the 34/18 append-only split remain frozen at
+  commit b846882. eps_F = 0.25, delta_F = 0.05, the grading key (Sec. 3),
+  the loss (Sec. 4), and the grid order (Sec. 5) are unchanged.
+- The frozen reference pools are REUSED: every attempt-#2 change is in the
+  replay stage (ER onward). Disclosure: the pooling policy that gathered
+  them (reference discovery config) internally used the attempt-#1 matcher
+  for its stopping statistics; the certificate is, as always in this
+  design, conditional on that fixed pooling policy.
+- The validation half remains untouched by every diagnostic and fix above;
+  it is spent only in the post-certification holdout audit.
+- Procedure unchanged: fixed-sequence LTT, stop at first failure, results
+  reported regardless of outcome. Any further instrument change after this
+  addendum requires Addendum 2 before the replays it affects.
