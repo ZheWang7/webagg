@@ -387,6 +387,17 @@ def run_query(query: str, *, run_id: str, eps: float = config.EPS_G,
                        "certified": S.certified,
                        "spent": spent,
                        "formulation_id": fm.formulation_id})
+
+        # ---- Exp-3 instrumentation: the GLOBAL (pooled) stop statistic ----
+        pool_glob = set(uncertified_strata(state)) or set(state.strata)
+        log_measurement(
+            session, run_id, step, "U_hat_global", state.U_hat(pool_glob),
+            extra={"N": state.N(pool_glob), "f1": state.f(1, pool_glob),
+                   "f2": state.f(2, pool_glob), "T": state.T,
+                   "n_strata": len(state.strata),
+                   "n_uncertified": len(uncertified_strata(state)),
+                   "spent": spent})
+
         session.commit()
 
         # ---- 5. stop test -------------------------------------------------
