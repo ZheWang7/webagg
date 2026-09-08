@@ -28,9 +28,14 @@ pool) is held fixed and Pi_lambda itself is recomputed in full.
   delta_E. The grid satisfies this (0.05 -> 0.02); replay() asserts it.
 
   Replay is offline for search/fetch/extraction but LIVE for the ER
-  adjudicator: band pairs escalate to the real LLM, per lambda. That is the
-  configuration being certified -- stubbing the adjudicator here would
-  certify a pipeline that never runs (the fake-in-path rule).
+  adjudicator: band pairs escalate to the real LLM. Each unordered pair is
+  judged ONCE per certification and the verdict reused across lambdas
+  (memoized_adjudicator) -- the adjudicator is a function of the pair, not
+  of tau, so per-lambda re-asks were noise, not information. Every cached
+  verdict originates from the real LLM on the real pair; stubbing the
+  adjudicator here would certify a pipeline that never runs (the
+  fake-in-path rule), but a memo of the real component is a cache, not a
+  stub.
 
 WHY THE REGISTRY IS DENIED IN REFERENCE RUNS: the same cohort's truth
 tables came from EDGAR (build_truth.py). An agent that read EDGAR would be
@@ -206,7 +211,8 @@ def _fitted_matcher(lam: dict, cache: dict):
 
 
 def replay(db_path: str, lam: dict, *, delta_E_ref: float,
-           matcher_cache: Optional[dict] = None) -> list:
+           matcher_cache: Optional[dict] = None,
+           adjudicator=None) -> list:
     """Pi_lambda over one frozen pool: re-gate, re-resolve, re-corroborate.
 
     Returns the resolved records (the pipeline's plain dicts) --
@@ -229,6 +235,7 @@ def replay(db_path: str, lam: dict, *, delta_E_ref: float,
             gate=_fitted_gate(lam["delta_E"]),
             matcher=_fitted_matcher(lam, matcher_cache
                                     if matcher_cache is not None else {}),
+            adjudicator=adjudicator,
             qbar=lam["qbar"],
             state=None)
         return result["records"]
@@ -236,6 +243,28 @@ def replay(db_path: str, lam: dict, *, delta_E_ref: float,
         engine = session.get_bind()
         session.close()
         engine.dispose()
+
+
+def memoized_adjudicator(cache: dict, base=None):
+    """Wrap an adjudicator so each PAIR is judged once per certification.
+
+    Key = the sorted mention-id pair. Instrument note (attempt #2 addendum):
+    with the refit matcher most pairs sit in the band at every grid config,
+    so an uncached replay asks the LLM the same question once per config.
+    Memoizing makes the verdict consistent across configs -- a pair's
+    same/different status is a fact about the pair, not about tau -- and
+    cuts adjudication cost by ~the grid depth. The cache is in-memory and
+    scoped to one certification run; it is NOT reused across runs.
+    """
+    from .entity_resolution import adjudicate_llm
+    base = base or adjudicate_llm
+
+    def adj(m_a, m_b, source_lookup):
+        key = tuple(sorted((m_a.mention_id, m_b.mention_id)))
+        if key not in cache:
+            cache[key] = base(m_a, m_b, source_lookup)
+        return cache[key]
+    return adj
 
 
 def make_callables(runs_index: dict, cohort_dir: Path
@@ -247,12 +276,15 @@ def make_callables(runs_index: dict, cohort_dir: Path
     """
     truths: dict[str, TruthEntity] = load_truth_cohort(cohort_dir)
     matcher_cache: dict = {}             # shared across entities AND lambdas
+    adj_cache: dict = {}                 # one verdict per pair per certification
+    adjudicator = memoized_adjudicator(adj_cache)
 
     def run_pipeline(g: str, lam: dict):
         info = runs_index[g]
         return replay(info["db"], lam,
                       delta_E_ref=info["delta_E_ref"],
-                      matcher_cache=matcher_cache)
+                      matcher_cache=matcher_cache,
+                      adjudicator=adjudicator)
 
     def truth(g: str) -> TruthEntity:
         return truths[g]

@@ -509,6 +509,7 @@ def resolve_and_aggregate(session, *, run_id: str, query_attributes: set[str],
                           aggregate_attr: str = "amount",
                           eps: float = 0.10, eps_er: float = 0.05,
                           cluster_fn=None, matcher=None, state=None,
+                          adjudicator=None,
                           mode: str = "open_web", domain: str | None = None,
                           eps_F: float | None = None,
                           delta_M: float = config.DELTA_M,
@@ -556,9 +557,10 @@ def resolve_and_aggregate(session, *, run_id: str, query_attributes: set[str],
         # real matcher is actually wanted
         from .entity_resolution import resolve_entities
         from .er_pairs import load_fitted_matcher
+        er_kwargs = {} if adjudicator is None else {"adjudicator": adjudicator}
         er_result = resolve_entities(mentions,
                                      matcher or load_fitted_matcher(),
-                                     sources)
+                                     sources, **er_kwargs)
         mention_to_entity = er_result.mention_to_entity
         er_fragile = er_result.fragile_pairs
         # ch. 9 bookkeeping: how many decisions were one flip from changing
