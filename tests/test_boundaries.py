@@ -182,7 +182,8 @@ class _Client:
     def __init__(self, payloads):
         self.payloads = [_Resp(p) for p in payloads]
 
-    def get(self, url, params=None, headers=None, timeout=None):
+    def get(self, url, params=None, headers=None, timeout=None,
+            proxies=None):
         return self.payloads.pop(0)
 
 

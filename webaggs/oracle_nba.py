@@ -10,6 +10,7 @@ cooldown, and a non-200 or empty payload RAISES instead of returning [].
 """
 from __future__ import annotations
 
+import os
 import time
 
 import requests
@@ -55,6 +56,12 @@ class NBAStatsDriver:
         wait = self.pace - (time.time() - self._last)
         if wait > 0:
             time.sleep(wait)                       # pace EVERY request
+        # stats.nba.com blackholes many non-US networks at the edge (TLS
+        # connects, reads hang — browsers included). WEBAGG_ORACLE_PROXY
+        # routes ONLY these oracle calls through a US exit; Serper/OpenAI
+        # traffic is unaffected. (A system-level VPN needs no setting.)
+        proxy = os.environ.get("WEBAGG_ORACLE_PROXY")
+        proxies = {"http": proxy, "https": proxy} if proxy else None
         detail = "no response"
         for attempt in (1, 2):
             self._last = time.time()
@@ -62,7 +69,8 @@ class NBAStatsDriver:
                 # (connect, read): the bot-wall often streams slowly before
                 # answering — give reads 60 s, and treat a hang as retryable
                 resp = self.client.get(f"{_BASE}/{endpoint}", params=params,
-                                       headers=_HEADERS, timeout=(10, 60))
+                                       headers=_HEADERS, timeout=(10, 60),
+                                       proxies=proxies)
             except (ReqTimeout, ReqConnectionError) as e:
                 detail = f"{type(e).__name__}"      # hang/reset: retryable
                 if attempt == 1:

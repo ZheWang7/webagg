@@ -25,7 +25,8 @@ class _FlakyClient:
         self.payload = payload
         self.calls = 0
 
-    def get(self, url, params=None, headers=None, timeout=None):
+    def get(self, url, params=None, headers=None, timeout=None,
+            proxies=None):
         self.calls += 1
         if self.calls <= self.fail_times:
             raise ReqTimeout("read timed out")
@@ -59,3 +60,24 @@ def test_parse_candidate_line():
     for bad in ("| 123", "Name |", "Name | 12x3"):
         with pytest.raises(ValueError):
             parse_candidate_line(bad)
+
+
+class _ProxySpy:
+    def __init__(self):
+        self.proxies = "unset"
+
+    def get(self, url, params=None, headers=None, timeout=None, proxies=None):
+        self.proxies = proxies
+        return _Resp(_PAYLOAD)
+
+
+def test_oracle_proxy_env_routes_oracle_calls(monkeypatch):
+    spy = _ProxySpy()
+    d = NBAStatsDriver(pace_seconds=0, client=spy, retry_cooldown=0)
+    monkeypatch.delenv("WEBAGG_ORACLE_PROXY", raising=False)
+    d.career_regular_season(1)
+    assert spy.proxies is None                     # unset: direct
+    monkeypatch.setenv("WEBAGG_ORACLE_PROXY", "http://us-proxy:8080")
+    d.career_regular_season(1)
+    assert spy.proxies == {"http": "http://us-proxy:8080",
+                           "https": "http://us-proxy:8080"}
