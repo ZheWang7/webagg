@@ -17,6 +17,15 @@ import requests
 from requests.exceptions import ConnectionError as ReqConnectionError
 from requests.exceptions import Timeout as ReqTimeout
 
+# The stats edge hangs non-browser TLS fingerprints (python-requests' JA3)
+# regardless of IP — observed identically from Canadian residential, a US
+# VPN exit, Azure CI runners and a cloud fetcher. curl_cffi impersonates a
+# real Chrome handshake, which is the standard way past that wall.
+try:
+    from curl_cffi import requests as _crequests
+except ImportError:                                   # pragma: no cover
+    _crequests = None
+
 _HEADERS = {
     # stats.nba.com rejects requests without browser-like headers
     "User-Agent": ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
@@ -41,6 +50,18 @@ class OracleError(RuntimeError):
     pass
 
 
+def _is_transport_error(e: Exception) -> bool:
+    """Timeouts/connection failures from requests OR curl_cffi are retryable;
+    anything else (a KeyError, a JSON bug) must raise, never be swallowed."""
+    if isinstance(e, (ReqTimeout, ReqConnectionError)):
+        return True
+    mod = type(e).__module__ or ""
+    name = type(e).__name__
+    return mod.startswith("curl_cffi") and name in (
+        "CurlError", "Timeout", "ConnectionError", "RequestsError",
+        "RequestException")
+
+
 class NBAStatsDriver:
     """Schema-addressable driver shape (webaggr.pdf §5.1): enumerate players,
     fetch per-key season rows — the sweep is deterministic over its keys."""
@@ -48,7 +69,17 @@ class NBAStatsDriver:
     def __init__(self, pace_seconds: float = 1.5, client=None,
                  retry_cooldown: float = 10.0):
         self.pace = pace_seconds
-        self.client = client or requests
+        if client is not None:
+            self.client = client                      # tests inject fakes
+        elif _crequests is not None:
+            # Chrome-impersonated TLS (curl_cffi); plain requests only as a
+            # last resort when curl_cffi is unavailable on the platform
+            self.client = _crequests.Session(impersonate="chrome")
+        else:                                          # pragma: no cover
+            print("[warn] curl_cffi not installed — falling back to plain "
+                  "requests, whose TLS fingerprint the stats edge may hang. "
+                  "pip install curl_cffi")
+            self.client = requests
         self.retry_cooldown = retry_cooldown
         self._last = 0.0
 
@@ -68,10 +99,14 @@ class NBAStatsDriver:
             try:
                 # (connect, read): the bot-wall often streams slowly before
                 # answering — give reads 60 s, and treat a hang as retryable
-                resp = self.client.get(f"{_BASE}/{endpoint}", params=params,
-                                       headers=_HEADERS, timeout=(10, 60),
-                                       proxies=proxies)
-            except (ReqTimeout, ReqConnectionError) as e:
+                kwargs = {"params": params, "headers": _HEADERS,
+                          "timeout": (10, 60)}
+                if proxies:
+                    kwargs["proxies"] = proxies
+                resp = self.client.get(f"{_BASE}/{endpoint}", **kwargs)
+            except Exception as e:                # requests AND curl_cffi
+                if not _is_transport_error(e):      # real bugs still raise
+                    raise
                 detail = f"{type(e).__name__}"      # hang/reset: retryable
                 if attempt == 1:
                     time.sleep(self.retry_cooldown)
