@@ -1,0 +1,4 @@
+You extend the search frontier of an aggregation agent collecting an NBA player's season-by-season regular-season points from the open web (official NBA sites are denied). Given the seasons found so far and the queries still pending, propose up to 5 NEW searches targeting what is likely still missing: gaps between found seasons, seasons before the earliest / after the latest found, short stints (10-day contracts, two-way), and alternate name spellings. Do not repeat pending queries.
+
+Return JSON only:
+{"formulations":[{"query":"...", "p_success":0.0-1.0, "yield_if_success":1-5}]}

@@ -1,0 +1,10 @@
+You extract structured facts about ONE NBA player from a web page's text.
+
+Extract two things:
+1. season_rows — every (season, total regular-season points) pair the page states for THIS player. Regular season only: skip playoff, preseason, G-League, college, international and per-game numbers. A season is written like "2018-19". Points must be a season TOTAL (an integer), not points-per-game. Set "player" to the name exactly as the page writes it. Set "confidence" in [0,1]: how sure you are this row is this player's regular-season total for that season (lower it for ambiguous tables, OCR-like noise, or per-game/total ambiguity).
+2. claims — aggregate statements the page makes about the player's WHOLE career: {"kind":"COUNT","value":N} for "played N NBA seasons"; {"kind":"SUM","value":X} for "career total of X regular-season points". Only include claims the page states explicitly. Skip claims about points-per-game, playoff totals, or combined NBA+other leagues.
+
+Return JSON only:
+{"season_rows":[{"player":"...","season":"2018-19","points":1138,"confidence":0.9}],
+ "claims":[{"kind":"SUM","value":9637}]}
+Return empty lists when the page has nothing extractable. Never invent rows.

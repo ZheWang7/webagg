@@ -1,0 +1,11 @@
+# Exp 2-S candidate list — STAGED, not frozen. Apply the pre-registered
+# selection rule (PREREGISTRATION_EXP2S.md §4) to cohort_report.csv after
+# build_cohort.py, then finalize + freeze under the final cohort name.
+#
+# Anchor stars (>= 500 career games expected):
+Jalen Brunson
+# add ~4 more stars here
+#
+# Fringe candidates (<= 150 career games expected — verify via cohort_report.csv):
+# add ~20-25 names here; disambiguate duplicates (e.g. the two Jalen Johnsons)
+# by using the exact official display name from the oracle lookup error message.
