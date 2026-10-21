@@ -1,0 +1,22 @@
+# Does GitHub's US-based runner reach stats.nba.com? If yes, the whole truth
+# build can run in CI and your machine never needs to touch the oracle.
+# Trigger: Actions tab -> oracle-preflight -> Run workflow (branch: sports),
+# or via API. No secrets needed: the two oracle tests use no keys.
+name: oracle-preflight
+on:
+  workflow_dispatch:
+
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - name: Oracle reachability (career endpoint hard, name lookup soft)
+        env:
+          RUN_ONLINE: "1"
+        run: pytest -m online -k oracle -v
