@@ -1,7 +1,7 @@
 # TESTING.md — test architecture and verification report
 
-Suite: **87 tests, 9 layers, ~98% line coverage of `webaggs/`**, pyflakes
-clean. Run with `pytest` from the repo root. The suite is the gate: it must
+Suite: **92 tests (87 offline + 5 opt-in online), 10 layers, ~98% line
+coverage of `webaggs/`**, pyflakes clean. Run with `pytest` from the repo root. The suite is the gate: it must
 be green before any live spend (`run_exp2s.py` and the notebook both say so).
 
 ## Layers
@@ -16,7 +16,8 @@ be green before any live spend (`run_exp2s.py` and the notebook both say so).
 | 6. End-to-end pipeline | `test_pipeline_e2e.py`, `test_pipeline_hardening.py`, `test_boundaries.py` | checksum path with exact sums, honest abandonment, post-ER revocation, CWD independence, in-loop denial/paywall, brake→gap-search→closure, Y_CAP, budget/max_steps/economic stops, φ-audit rows, empty-results occasions |
 | 7. Properties & fuzz | `test_properties.py` | **live stop test ≡ replay predicate over 400 random states** (the identity Exp 2's offline arms stand on), f-partition, ψ monotonicities, replay ε-monotonicity over random traces, corroboration echo invariance, claims order-invariance, ER normalization invariance, 1500-string canon fuzz |
 | 8. Failure injection | `test_failure_injection.py` | 429/5xx retry-then-loud for LLM and Serper, malformed-JSON retry with raw persisted, missing keys/prompts, fetch outcome classifier, **crash→fresh_ledger→rerun yields one clean replayable trajectory**, malformed calibration CSV, ledger run-id isolation |
-| 9. Experiment entry points | `test_exp2s_scripts.py`, `test_notebook_execution.py`, `test_stress_random_worlds.py` | the scripts as real subprocesses (CLI, refusal gates, CSV outputs); **the notebook executed headlessly end to end** (S1/S2 assert inside it); 60-world stress with benign and adversarial arms |
+| 9. Online sanity preflight | `test_online_sanity.py` | opt-in (`RUN_ONLINE=1`): oracle reachable + rows parse, open-web fetch `ok`, deny list blocks the real oracle, Serper/LLM keys live (tiny spend); skipped on normal runs |
+| 10. Experiment entry points | `test_exp2s_scripts.py`, `test_notebook_execution.py`, `test_stress_random_worlds.py` | the scripts as real subprocesses (CLI, refusal gates, CSV outputs); **the notebook executed headlessly end to end** (S1/S2 assert inside it); 60-world stress with benign and adversarial arms |
 
 ## Stress invariants (checked on every generated world)
 
