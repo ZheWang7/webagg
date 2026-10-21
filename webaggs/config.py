@@ -6,11 +6,31 @@ guide's parameter table (Table 4). Values changed for Exp 2-S are noted.
 import os
 from pathlib import Path
 
+
+def _load_env_file(path, *, _skip=("RUN_LIVE", "RUN_ONLINE")) -> None:
+    """Auto-load KEY=VALUE lines from .env (same convenience as the finance
+    webagg repo). Shell values win (setdefault), and the two spend/network
+    GATES are never loaded from file — arming spend stays a deliberate,
+    per-session shell decision, not a forgotten line in a dotfile."""
+    path = Path(path)
+    if not path.exists():
+        return
+    for line in path.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, value = line.split("=", 1)
+        key, value = key.strip(), value.strip().strip('"').strip("'")
+        if key and value and key not in _skip:
+            os.environ.setdefault(key, value)
+
+
 # Anchor everything to the package, never the process CWD
 # (prompts opened relative to CWD crash mid-run; see methodology notes).
 ROOT_DIR = Path(__file__).resolve().parent          # .../webaggs
 PROJECT_DIR = ROOT_DIR.parent                       # repo root
 PROMPTS_DIR = ROOT_DIR / "prompts"
+_load_env_file(PROJECT_DIR / ".env")   # keys from .env; gates shell-only
 # Overridable so tests and pilot runs never touch the real experiment data.
 DATA_DIR = Path(os.environ.get("WEBAGG_DATA_DIR", str(PROJECT_DIR / "data")))
 

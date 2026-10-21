@@ -56,8 +56,10 @@ copy .env.example .env     # fill in OPENAI_API_KEY, SERPER_API_KEY
 pytest                     # the gate: green before any live spend
 ```
 
-Load `.env` into the shell before live runs (PyCharm run configs can set env
-vars directly; nothing in the code reads `.env` implicitly).
+`.env` is auto-loaded by `webaggs.config` (shell values win), same as the
+finance repo — with one exception: `RUN_LIVE` and `RUN_ONLINE` are never
+read from it, so arming live spend or the network preflight is always a
+deliberate per-session `$env:` in the shell.
 
 ## Calibration (before the first live run)
 
