@@ -25,14 +25,15 @@ pytestmark = [
 ]
 
 
-def test_oracle_reachable_and_sane():
-    """stats.nba.com answers, the name lookup resolves, and the career rows
-    have the shape the truth builder expects (a dry run of build_cohort)."""
+BRUNSON_ID = 1628973                            # official stats.nba.com id
+
+
+def test_oracle_career_endpoint_reachable_and_sane():
+    """playercareerstats — the endpoint build_cohort actually hammers, one
+    call per candidate — answers, and its rows have the shape the truth
+    builder expects. This is the hard oracle requirement."""
     from webaggs.oracle_nba import NBAStatsDriver
-    driver = NBAStatsDriver()
-    pid, official = driver.find_player_id("Jalen Brunson")
-    assert official == "Jalen Brunson"
-    rows = driver.career_regular_season(pid)
+    rows = NBAStatsDriver().career_regular_season(BRUNSON_ID)
     seasons = [r["season"] for r in rows]
     assert "2018-19" in seasons                 # rookie year: a stable fact
     assert seasons == sorted(seasons) and len(seasons) == len(set(seasons))
@@ -40,6 +41,20 @@ def test_oracle_reachable_and_sane():
         season_key(r["season"])                 # parses, or raises loudly
         assert isinstance(r["pts"], int) and 0 <= r["pts"] <= 60000
         assert r["gp"] >= 0
+
+
+def test_oracle_name_lookup_soft():
+    """commonallplayers — the all-history index behind a bot-wall that is
+    KNOWN to hang some networks. A hang here is survivable (candidates.txt
+    takes 'Name | PLAYER_ID'), so it skips with the remedy instead of
+    failing the preflight; any other outcome must still be correct."""
+    from webaggs.oracle_nba import NBAStatsDriver, OracleError
+    try:
+        pid, official = NBAStatsDriver().find_player_id("Jalen Brunson")
+    except OracleError as e:
+        pytest.skip(f"name-lookup endpoint unavailable from this network "
+                    f"({e}); use 'Name | PLAYER_ID' in candidates.txt")
+    assert (pid, official) == (BRUNSON_ID, "Jalen Brunson")
 
 
 def test_open_web_fetch_classifies_ok():

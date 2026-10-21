@@ -92,6 +92,21 @@ def load_truth(data_dir: Path, cohort: str, *, verify: bool = True):
     return truth
 
 
+def parse_candidate_line(line: str) -> tuple[str, int | None]:
+    """A candidates.txt entry: 'Name' or 'Name | PLAYER_ID'. The explicit id
+    bypasses the oracle's commonallplayers lookup — that endpoint's bot-wall
+    is known to hang (the sports analogue of the EDGAR pacing trap), while
+    the per-player career endpoint is light and reliable."""
+    if "|" in line:
+        name, pid = line.split("|", 1)
+        name, pid = name.strip(), pid.strip()
+        if not name or not pid.isdigit():
+            raise ValueError(f"Bad candidate line {line!r}: expected "
+                             "'Name | PLAYER_ID' with a numeric id.")
+        return name, int(pid)
+    return line.strip(), None
+
+
 def load_display_names(data_dir: Path, cohort: str) -> dict[str, str]:
     """-> {player_norm: official display name}. Live runs search with the
     official casing ('Jalen Brunson', not 'jalen brunson') — better queries,

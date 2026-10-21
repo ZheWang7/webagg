@@ -27,7 +27,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from webaggs import config                       # noqa: E402
 from webaggs.oracle_nba import NBAStatsDriver    # noqa: E402
-from webaggs.truth import write_truth            # noqa: E402
+from webaggs.truth import parse_candidate_line, write_truth  # noqa: E402
 
 
 def main() -> None:
@@ -44,8 +44,12 @@ def main() -> None:
 
     driver = NBAStatsDriver()
     rows, report = [], []
-    for name in names:
-        pid, official = driver.find_player_id(name)
+    for line in names:
+        name, pid = parse_candidate_line(line)
+        if pid is None:                       # no explicit id: oracle lookup
+            pid, official = driver.find_player_id(name)
+        else:                                 # 'Name | ID' bypasses the flaky
+            official = name                   # lookup; name taken as written
         seasons = driver.career_regular_season(pid)
         games = sum(r["gp"] for r in seasons)
         print(f"  {official}: {len(seasons)} seasons, {games} games, "

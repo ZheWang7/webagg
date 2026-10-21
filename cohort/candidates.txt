@@ -2,8 +2,11 @@
 # selection rule (PREREGISTRATION_EXP2S.md §4) to cohort_report.csv after
 # build_cohort.py, then finalize + freeze under the final cohort name.
 #
+# Lines are 'Name' (oracle name lookup) or 'Name | PLAYER_ID' (bypasses
+# the lookup — use this if commonallplayers hangs from your network).
+#
 # Anchor stars (>= 500 career games expected):
-Jalen Brunson
+Jalen Brunson | 1628973
 # add ~4 more stars here
 #
 # Fringe candidates (<= 150 career games expected — verify via cohort_report.csv):

@@ -13,6 +13,8 @@ from __future__ import annotations
 import time
 
 import requests
+from requests.exceptions import ConnectionError as ReqConnectionError
+from requests.exceptions import Timeout as ReqTimeout
 
 _HEADERS = {
     # stats.nba.com rejects requests without browser-like headers
@@ -23,6 +25,13 @@ _HEADERS = {
     "Accept": "application/json",
     "x-nba-stats-origin": "stats",
     "x-nba-stats-token": "true",
+    # stats.nba.com's bot-wall HANGS incomplete browser fingerprints rather
+    # than refusing them (symptom: connect ok, read times out) — these four
+    # are the ones its heuristics check beyond the UA/referer set above
+    "Accept-Language": "en-US,en;q=0.9",
+    "Accept-Encoding": "gzip, deflate, br",
+    "Connection": "keep-alive",
+    "Cache-Control": "no-cache",
 }
 _BASE = "https://stats.nba.com/stats"
 
@@ -35,28 +44,43 @@ class NBAStatsDriver:
     """Schema-addressable driver shape (webaggr.pdf §5.1): enumerate players,
     fetch per-key season rows — the sweep is deterministic over its keys."""
 
-    def __init__(self, pace_seconds: float = 1.5, client=None):
+    def __init__(self, pace_seconds: float = 1.5, client=None,
+                 retry_cooldown: float = 10.0):
         self.pace = pace_seconds
         self.client = client or requests
+        self.retry_cooldown = retry_cooldown
         self._last = 0.0
 
     def _get(self, endpoint: str, params: dict) -> dict:
         wait = self.pace - (time.time() - self._last)
         if wait > 0:
             time.sleep(wait)                       # pace EVERY request
+        detail = "no response"
         for attempt in (1, 2):
             self._last = time.time()
-            resp = self.client.get(f"{_BASE}/{endpoint}", params=params,
-                                   headers=_HEADERS, timeout=30)
+            try:
+                # (connect, read): the bot-wall often streams slowly before
+                # answering — give reads 60 s, and treat a hang as retryable
+                resp = self.client.get(f"{_BASE}/{endpoint}", params=params,
+                                       headers=_HEADERS, timeout=(10, 60))
+            except (ReqTimeout, ReqConnectionError) as e:
+                detail = f"{type(e).__name__}"      # hang/reset: retryable
+                if attempt == 1:
+                    time.sleep(self.retry_cooldown)
+                continue
             if resp.status_code == 200:
                 data = resp.json()
                 if data.get("resultSets"):
                     return data
+            detail = f"HTTP {resp.status_code}"
             if attempt == 1:
-                time.sleep(10)                     # cooldown, then one retry
-        raise OracleError(f"Oracle request failed twice: {endpoint} {params} "
-                          f"(HTTP {resp.status_code}). Raising loudly — an "
-                          "empty truth table must never look like data.")
+                time.sleep(self.retry_cooldown)     # cooldown, then one retry
+        raise OracleError(
+            f"Oracle request failed twice: {endpoint} {params} ({detail}). "
+            "Raising loudly — an empty truth table must never look like "
+            "data. If this is the commonallplayers lookup hanging (a known "
+            "stats.nba.com bot-wall behavior), bypass it with explicit ids "
+            "in cohort/candidates.txt: 'Name | PLAYER_ID'.")
 
     def find_player_id(self, name: str) -> tuple[int, str]:
         """Resolve a player name to (official id, official display name)."""
