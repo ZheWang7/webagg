@@ -1,0 +1,42 @@
+# Dispatch-only dev helper for the SPORTS branch: resolves/verifies the Exp
+# 2-S cohort candidate ids against the NHL's own endpoints (two-factor:
+# league search name->id, landing id->name with self-validated rows) and
+# commits the resolved candidates.txt + resolution_report.csv back to the
+# sports branch. Touches no finance code. Safe to delete.
+name: resolve-candidates
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  resolve:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: sports
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install requests
+      - name: resolve and verify candidate ids
+        run: python scripts/resolve_candidates.py
+      - name: commit resolved ids back to sports
+        if: always()
+        run: |
+          git config user.name "Zhe Wang"
+          git config user.email "jameswangzhe1110@gmail.com"
+          git add cohort/candidates.txt cohort/resolution_report.csv || true
+          git diff --cached --quiet && echo "nothing to commit" && exit 0
+          git commit -m "Resolve cohort candidate ids via league endpoints (CI)
+
+Two-factor verified: league search name->id, landing id->name with
+self-validated career rows. resolution_report.csv carries GP and the
+prereg §4 bucket per player.
+
+Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01QRRix2uLG54HPuUbB2BLeQ"
+          git push origin HEAD:sports
