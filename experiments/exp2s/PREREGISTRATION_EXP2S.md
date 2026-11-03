@@ -140,11 +140,30 @@ revalidated post-ER and revocations are logged.
 4. Anchor stars certify only via checksum — the statistical path never fires
    even in the easy regime.
 
-Note on ψ (carried over from the NBA spec, still open): at career sizes
-(n ≤ ~26 seasons) the implementation-guide ψ may make the statistical
-certificate unreachable by arithmetic. Reconcile `webaggs/frontier.py::psi`
-with the production finance ψ before the live run, or outcomes 3/4 are
-guaranteed by construction rather than by data.
+Note on ψ (RESOLVED 2026-11-03, decision pending supervisor): the
+production finance ψ was ported verbatim (`webaggs/frontier.py::psi`) —
+same formula, plus an optional realized-V tightening (V_t = Σc_t²,
+StratumState.V), which is now TRACKED AND LOGGED on every measurement row
+(`V_realized`, `psi_realized`) while the stop test keeps the conservative
+default, so a pre-registered switch replays from the same ledgers. The
+arithmetic consequence, stated here before sign-off: with Y_CAP = 12,
+β = 1, δ_M = 0.05, τ_max = 200, the conservative ψ < ε requires n ≥ 16,616
+records (ε = 0.05) or n ≥ 2,770 (ε = 0.30); the realized-V variant is
+bounded below by its first-occasion term (c₁ = 24 ⇒ ψ ≥ 58.7). NHL careers
+have n ≤ 26, so NO ε in the replay grid is statistically reachable under
+either variant — identical to the guide's own small-strata behavior
+("tiny strata close via claims or registries, not by statistics").
+Pre-registered implication: on this cohort the statistical stopping path
+is expected to yield ZERO certificates BY ARITHMETIC; bad outcome 3 is
+therefore the null result, not a finding against the calibration. The
+experiment's primary deliverables are (a) the C1 calibration plot
+(Û + ψ vs realized unseen — Assumption 1(a)'s audit, valid regardless)
+and (b) the checksum/COUNT-closure stopping path, reported as the
+Theorem-4 mechanism it is. Any statistical stop that DOES fire would be
+an anomaly to investigate, not a success to report. If the finance runs'
+statistical certificates (Exp 1: 29) imply a tighter production ψ input
+than this port captures, that reconciliation happens BEFORE sign-off, as
+a correction to this note.
 
 ## 10. Execution order
 

@@ -50,6 +50,8 @@ class StratumState:
     #                                  coerces None->NaN and NaN is truthy
     #                                  (the exp3 replay bug), so empty string.
     claimed_count: int | None = None # corroborated COUNT claim (App. E brake)
+    V: float = 0.0                   # running sum of c_t^2 (realized V_t —
+    #                                  the guide's sanctioned psi tightening)
 
 
 @dataclass
@@ -84,12 +86,36 @@ class FrontierState:
                      if not fm.issued and (fm.stratum in pool or fm.stratum is None))
         return self.f(1, pool) / n + self.BETA * credit / n
 
-    def psi(self, pool, delta_m: float, w_g: float, max_occasions: int) -> float:
-        """Anytime-valid radius (Thm 1 via Ville; Thm 2 splits delta by w_g)."""
+    def psi(self, pool, delta_m: float, w_g: float, max_occasions: int,
+            V_realized: float | None = None) -> float:
+        """Anytime-valid confidence radius for U_hat (ported VERBATIM from the
+        finance webagg's production psi, self-normalized empirical-Bernstein
+        form):
+
+            psi = sqrt( 2 * V * log(1 / (delta_M * w_g)) )
+
+        where V bounds the sum of squared per-occasion increments. The
+        conservative default V_max = max_occasions * c^2 uses the worst case
+        c = Y_CAP*(1+BETA)/n per occasion; passing the REALIZED
+        V_t = sum c_t^2 (StratumState.V) is the guide's sanctioned
+        tightening. w_g is this stratum's share of the confidence budget.
+        NOTE (production quirk kept verbatim): V_realized that is 0 or None
+        falls back to the conservative bound — V=0 means no occasions yet.
+
+        HONESTY NOTE (guide): at toy scale this dwarfs eps_g BY DESIGN —
+        tiny strata close via claims/registries, not statistics. Do not
+        shrink Y_CAP or drop psi to force a stop; the calibration plot
+        will tattle."""
         n = max(self.N(pool), 1)
         c = self.Y_CAP * (1 + self.BETA) / n    # per-occasion increment bound c_t
-        v_max = max_occasions * c * c           # conservative V bound
-        return math.sqrt(2 * v_max * math.log(1 / (delta_m * w_g)))
+        V = V_realized if V_realized else max_occasions * c * c
+        return math.sqrt(2 * V * math.log(1 / (delta_m * w_g)))
+
+    def pre_occasion_c(self, pool) -> float:
+        """c_t for the NEXT occasion — H_{t-1}-measurable (Assumption 1b):
+        computed from n BEFORE the occasion. Accumulated into StratumState.V
+        by the pipeline, one c_t^2 per capture occasion."""
+        return self.Y_CAP * (1 + self.BETA) / max(self.N(pool), 1)
 
     # --- the stop test ---------------------------------------------------
     def uncertified_strata(self) -> list[str]:

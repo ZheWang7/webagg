@@ -108,3 +108,25 @@ def test_prompts_load_from_foreign_cwd(tmp_path, gate, monkeypatch):
     assert ans.n_records == 3
     ledger.close()
     assert os.getcwd() == str(tmp_path)
+
+
+def test_realized_V_accumulates_and_both_psis_logged(tmp_path, gate):
+    """Production-psi wiring: every measurement row carries V_realized
+    (non-decreasing, one c_t^2 per occasion) and psi_realized, while the
+    stop test still uses the conservative psi — S1 replay must be unmoved."""
+    import math
+    ledger, _ = _run(tmp_path, gate, run_id="t7")
+    ms = ledger.measurements("t7", metric="U_hat")
+    assert ms
+    prev_v = 0.0
+    for _s, _g, _m, _u, extra in ms:
+        assert "V_realized" in extra and "psi_realized" in extra
+        assert extra["V_realized"] >= prev_v > -1          # non-decreasing
+        prev_v = extra["V_realized"]
+        expect = math.sqrt(2 * extra["V_realized"]
+                           * math.log(1 / (0.05 * 1.0)))
+        assert math.isclose(extra["psi_realized"], expect, rel_tol=1e-6)
+    live = ledger.stop("t7")
+    from webaggs.replay import replay_stop
+    assert replay_stop(ms, 0.05).stop_step == live[0]      # S1 untouched
+    ledger.close()

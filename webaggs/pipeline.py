@@ -122,6 +122,11 @@ def run_query(player: str, run_id: str, ledger, *, search, gate,
             break
 
         # 2. issue the search = ONE capture occasion (Def. 4)
+        # c_t is fixed BEFORE the occasion (H_{t-1}-measurable, A1b); its
+        # square accumulates into the realized V_t (production psi tightening)
+        pre_c = {g: state.pre_occasion_c(pool)
+                 for g, pool in state.stratum_pools()
+                 if not state.strata[g].certified}
         state.T += 1
         new = 0
         new_keys_this_step: list[str] = []
@@ -181,6 +186,8 @@ def run_query(player: str, run_id: str, ledger, *, search, gate,
             url_cache[url] = covered_keys
         fm.issued, fm.realized_yield = True, new
         spent += fm.cost
+        for g, c_t in pre_c.items():            # realized V_t += c_t^2
+            state.strata[g].V += c_t * c_t
 
         if new_keys_this_step:
             unissued = [f.query for f in state.formulations.values() if not f.issued]
@@ -211,9 +218,15 @@ def run_query(player: str, run_id: str, ledger, *, search, gate,
             u = state.U_hat(pool)
             psi = state.psi(pool, delta_m, 1.0 / n_strata, max_steps)
             s = state.strata[g]
+            # realized-V variant logged ALONGSIDE the conservative psi the
+            # stop test uses: a future pre-registered switch to it replays
+            # from the same ledgers (nothing is lost, nothing is re-spent)
+            psi_realized = state.psi(pool, delta_m, 1.0 / n_strata,
+                                     max_steps, V_realized=s.V)
             ledger.log_measurement(run_id, step, g, "U_hat", u, extra={
                 "N": state.N(pool), "f1": state.f(1, pool),
                 "f2": state.f(2, pool), "psi": psi,
+                "V_realized": round(s.V, 6), "psi_realized": psi_realized,
                 "hot": bool(state.hot_frontier(g, eta)),
                 "claimed_count": s.claimed_count,
                 "certified": s.certified,       # "" not None (NaN-proof)

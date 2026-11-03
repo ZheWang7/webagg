@@ -78,3 +78,32 @@ def test_certified_stratum_is_skipped():
     st = _state_with({"p|s1": {"a"}})               # f1=1 -> U_hat high
     st.strata["p"].certified = "checksum"           # stratum left the pool
     assert all_strata_pass(st, 0.05, 0.10, 0.20, 4)
+
+
+def test_production_psi_identity_and_realized_variant():
+    """The ported production psi: (a) with V_realized None/0 it is BIT-
+    IDENTICAL to the conservative form the stop test and replay use — the
+    port cannot have changed any stop decision; (b) with a realized V it is
+    exactly sqrt(2*V*log(1/(delta*w)))."""
+    import random
+    rng = random.Random(3)
+    for _ in range(100):
+        st = _state_with({f"p|s{i}": {"a"} for i in range(rng.randint(0, 40))})
+        st.Y_CAP = rng.choice([1, 4, 12])
+        args = (rng.uniform(0.01, 0.2), rng.uniform(0.05, 1.0),
+                rng.randint(1, 300))
+        base = st.psi({"p"}, *args)
+        assert st.psi({"p"}, *args, V_realized=None) == base
+        assert st.psi({"p"}, *args, V_realized=0.0) == base   # quirk kept
+        V = rng.uniform(0.01, 50)
+        expect = math.sqrt(2 * V * math.log(1 / (args[0] * args[1])))
+        assert math.isclose(st.psi({"p"}, *args, V_realized=V), expect)
+
+
+def test_pre_occasion_c_matches_increment_bound():
+    st = _state_with({f"p|s{i}": {"a"} for i in range(8)})
+    assert math.isclose(st.pre_occasion_c({"p"}),
+                        st.Y_CAP * (1 + st.BETA) / 8)
+    empty = _state_with({})
+    assert math.isclose(empty.pre_occasion_c({"p"}),
+                        empty.Y_CAP * (1 + empty.BETA))      # n floored at 1
