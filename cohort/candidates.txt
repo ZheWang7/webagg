@@ -8,38 +8,38 @@
 Connor McDavid | 8478402
 Patrick Kane | 8474141
 Auston Matthews | 8479318
-Sidney Crosby
-Alex Ovechkin
+Sidney Crosby | 8471675
+Alex Ovechkin | 8471214
 #
 # Fringe candidates (<= 150 GP expected — resolution_report.csv decides).
 # Mix: famous short-career first-rounders (well covered by draft/bust
 # articles -> findable), cult journeymen (fragmented coverage), and
 # one-or-two-game careers (the Cinder analogues).
-Scott Glennie
-Mark McNeill
-Hugh Jessiman
-Griffin Reinhart
-Nikita Filatov
+Scott Glennie | 8475173
+Mark McNeill | 8476471
+Hugh Jessiman | 8470605
+Griffin Reinhart | 8476852
+Nikita Filatov | 8474566
 Josh Ho-Sang
 Lias Andersson
-Michael Dal Colle
-Zach Boychuk
-Hunter Shinkaruk
-Duncan Siemens
-Dylan McIlrath
-Kerby Rychel
-Logan Brown
-Stuart Percy
-Rob Schremp
-Linus Omark
-Fabian Brunnstrom
-Akim Aliu
-Christian Hanson
-Mark Arcobello
-Matt Frattin
-Jerry D'Amigo
-Teemu Hartikainen
-Michael Bournival
-Matt Puempel
+Michael Dal Colle | 8477936
+Zach Boychuk | 8474576
+Hunter Shinkaruk | 8477445
+Duncan Siemens | 8476464
+Dylan McIlrath | 8475795
+Kerby Rychel | 8477510
+Logan Brown | 8479366
+Stuart Percy | 8476478
+Rob Schremp | 8471238
+Linus Omark | 8474059
+Fabian Brunnstrom | 8474552
+Akim Aliu | 8474049
+Christian Hanson | 8475087
+Mark Arcobello | 8476062
+Matt Frattin | 8474192
+Jerry D'Amigo | 8475309
+Teemu Hartikainen | 8474719
+Michael Bournival | 8475739
+Matt Puempel | 8476477
 Nicolas Petan
-Brendan Gaunce
+Brendan Gaunce | 8476867
