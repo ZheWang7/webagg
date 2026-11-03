@@ -62,3 +62,61 @@ def test_run_script_refuses_without_keys_even_when_live(tmp_path):
              extra_env=env)
     assert r.returncode != 0
     assert "not set" in (r.stdout + r.stderr)
+
+
+def test_collect_calibration_refuses_without_live_gate(tmp_path):
+    r = _run("collect_calibration.py", "--player", "Testo Sampleson",
+             data_dir=tmp_path)
+    assert r.returncode != 0
+    assert "refusing live spend" in (r.stdout + r.stderr)
+
+
+def test_collect_calibration_refuses_to_overwrite(tmp_path):
+    cal = tmp_path / "conformal" / "calibration.csv"
+    cal.parent.mkdir(parents=True)
+    cal.write_text("confidence,correct\n0.9,1\n")
+    env = {"RUN_LIVE": "1", "OPENAI_API_KEY": "k", "SERPER_API_KEY": "k"}
+    r = _run("collect_calibration.py", "--player", "Testo Sampleson",
+             data_dir=tmp_path, extra_env=env)
+    assert r.returncode != 0
+    assert "must not be silently overwritten" in (r.stdout + r.stderr)
+
+
+def test_collect_calibration_dump_and_gate_roundtrip(tmp_path):
+    """dump_rows -> hand-label -> ConformalGate.load works end to end,
+    including the extra context columns the loader must tolerate."""
+    import sys
+    sys.path.insert(0, str(REPO / "scripts"))
+    from collect_calibration import dump_rows
+    from webaggs.conformal import ConformalGate
+    from webaggs.storage import Ledger
+    from webaggs.types import Mention, Source
+
+    led = Ledger(tmp_path / "pilot.sqlite")
+    for i in range(25):
+        conf = 0.70 + i * 0.01
+        led.add_source(Source(source_id=f"s{i}", url=f"https://w{i}.test/p",
+                              domain=f"w{i}.test", fetch_time="t",
+                              formulation_id="f", status="ok"))
+        led.add_mention(Mention(mention_id=f"m{i}", source_id=f"s{i}",
+                                entity_surface="Testo Sampleson",
+                                season="2015-16", attribute="points",
+                                value=40 + i, confidence=conf), accepted=True)
+    led.commit()
+    out = tmp_path / "conformal" / "calibration.csv"
+    assert dump_rows(led, "pilot", out) == 25
+    led.close()
+
+    # hand-label: mark all correct (the loader only needs the two columns)
+    import csv as _csv
+    with open(out, newline="", encoding="utf-8") as f:
+        rows = list(_csv.DictReader(f))
+    assert rows and rows[0]["correct"] == ""          # shipped unlabeled
+    for row in rows:
+        row["correct"] = "1"
+    with open(out, "w", newline="", encoding="utf-8") as f:
+        w = _csv.DictWriter(f, fieldnames=list(rows[0].keys()))
+        w.writeheader(); w.writerows(rows)
+
+    gate = ConformalGate.load(out)
+    assert gate.n_cal == 25 and 0.0 < gate.threshold <= 0.30 + 1e-9
