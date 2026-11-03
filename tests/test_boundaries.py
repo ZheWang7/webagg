@@ -5,11 +5,10 @@ from tests.conftest import RoutedSearch, make_fake_llm, make_fetch
 from webaggs.aggregate import aggregate_with_ci
 from webaggs.corroborate import ResolvedRecord
 from webaggs.er import resolve_entity
-from webaggs.oracle_nba import NBAStatsDriver, OracleError
 from webaggs.pipeline import end_to_end
 from webaggs.storage import Ledger
-from webaggs.truth import (grade, load_display_names, load_truth, season_key,
-                           write_truth)
+from webaggs.truth import (grade, load_display_names, load_truth,
+                           season_key, write_truth)
 
 PLAYER = "Edgar Casey"
 
@@ -165,51 +164,15 @@ def test_aggregate_interval_when_eps_f_exists():
 
 
 def test_er_empty_surface_is_rejected():
-    assert resolve_entity("", "Jalen Brunson") is None
-    assert resolve_entity("  . ", "Jalen Brunson") is None
+    assert resolve_entity("", "Connor McDavid") is None
+    assert resolve_entity("  . ", "Connor McDavid") is None
 
 
-class _Resp:
-    def __init__(self, payload):
-        self.status_code = 200
-        self._p = payload
-
-    def json(self):
-        return self._p
-
-
-class _Client:
-    def __init__(self, payloads):
-        self.payloads = [_Resp(p) for p in payloads]
-
-    def get(self, url, params=None, headers=None, timeout=None,
-            proxies=None):
-        return self.payloads.pop(0)
-
-
-def _players_payload(rows):
-    return {"resultSets": [{"headers": ["PERSON_ID", "DISPLAY_FIRST_LAST"],
-                            "rowSet": rows}]}
-
-
-def test_oracle_player_lookup_exact_zero_and_ambiguous():
-    d = NBAStatsDriver(pace_seconds=0, client=_Client([_players_payload(
-        [[1, "Jalen Brunson"], [2, "Jalen Johnson"], [3, "Jalen Johnson"]])]))
-    assert d.find_player_id("Jalen Brunson") == (1, "Jalen Brunson")
-    d = NBAStatsDriver(pace_seconds=0, client=_Client([_players_payload([])]))
-    with pytest.raises(OracleError, match="0 matches"):
-        d.find_player_id("Nobody Atall")
-    d = NBAStatsDriver(pace_seconds=0, client=_Client([_players_payload(
-        [[2, "Jalen Johnson"], [3, "Jalen Johnson"]])]))
-    with pytest.raises(OracleError, match="2 matches"):
-        d.find_player_id("Jalen Johnson")
-
-
-def test_oracle_zero_season_rows_raise():
-    payload = {"resultSets": [{"name": "SeasonTotalsRegularSeason",
-                               "headers": ["SEASON_ID", "TEAM_ABBREVIATION",
-                                           "PTS", "GP"],
-                               "rowSet": []}]}
-    d = NBAStatsDriver(pace_seconds=0, client=_Client([payload]))
-    with pytest.raises(OracleError, match="zero regular-season"):
-        d.career_regular_season(1)
+def test_oracle_rejects_candidates_without_ids(tmp_path):
+    """build_cohort requires 'Name | PLAYER_ID' in the NHL domain; the
+    parser accepts a bare name, the SCRIPT refuses it (tested at the CLI
+    level in test_exp2s_scripts-style subprocess runs is overkill here —
+    the contract is the parser + the loud SystemExit message text)."""
+    from webaggs.truth import parse_candidate_line
+    name, pid = parse_candidate_line("Benchy Marks")
+    assert pid is None                        # parses; build_cohort refuses

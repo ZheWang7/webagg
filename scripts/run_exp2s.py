@@ -12,7 +12,7 @@ Guards:
 
 Usage:
     set RUN_LIVE=1   (PowerShell: $env:RUN_LIVE="1")
-    python scripts/run_exp2s.py --cohort nba_v1
+    python scripts/run_exp2s.py --cohort nhl_v1
 """
 from __future__ import annotations
 

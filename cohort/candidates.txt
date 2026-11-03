@@ -2,13 +2,14 @@
 # selection rule (PREREGISTRATION_EXP2S.md §4) to cohort_report.csv after
 # build_cohort.py, then finalize + freeze under the final cohort name.
 #
-# Lines are 'Name' (oracle name lookup) or 'Name | PLAYER_ID' (bypasses
-# the lookup — use this if commonallplayers hangs from your network).
+# Lines are 'Name | PLAYER_ID'. The id is REQUIRED: take it from the
+# player's nhl.com page URL, e.g. nhl.com/player/connor-mcdavid-8478402.
+# The truth table uses the API's own display name; the Name here is a label.
 #
 # Anchor stars (>= 500 career games expected):
-Jalen Brunson | 1628973
+Connor McDavid | 8478402
 # add ~4 more stars here
 #
 # Fringe candidates (<= 150 career games expected — verify via cohort_report.csv):
-# add ~20-25 names here; disambiguate duplicates (e.g. the two Jalen Johnsons)
-# by using the exact official display name from the oracle lookup error message.
+# add ~20-25 names here: short call-ups, AHL tweeners with brief NHL stints,
+# pre-2010 short careers. The §4 rule is applied to cohort_report.csv numbers.

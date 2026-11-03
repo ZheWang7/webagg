@@ -1,11 +1,11 @@
-"""Build and FREEZE the Exp 2-S truth table from the official NBA oracle.
+"""Build and FREEZE the Exp 2-S truth table from the official NHL API.
 
 Usage (PowerShell, from the repo root):
-    python scripts/build_cohort.py --cohort nba_v1 --candidates cohort/candidates.txt
+    python scripts/build_cohort.py --cohort nhl_v1 --candidates cohort/candidates.txt
 
-candidates.txt: one player name per line; '#' comments allowed. Ambiguous
-names (two players share it) make the oracle RAISE — disambiguate in the
-file before rerunning; the script never guesses.
+candidates.txt: one 'Name | PLAYER_ID' per line; '#' comments allowed.
+The id is REQUIRED (from the player's nhl.com page URL); display names in
+the truth table come from the API itself, so the Name part is a label.
 
 Output:
     data/truth/<cohort>/truth.csv + manifest.json (frozen: sha256)
@@ -26,7 +26,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from webaggs import config                       # noqa: E402
-from webaggs.oracle_nba import NBAStatsDriver    # noqa: E402
+from webaggs.oracle_nhl import NHLDriver         # noqa: E402
 from webaggs.truth import parse_candidate_line, write_truth  # noqa: E402
 
 
@@ -42,15 +42,18 @@ def main() -> None:
     if not names:
         raise SystemExit("Candidates file is empty.")
 
-    driver = NBAStatsDriver()
+    driver = NHLDriver()
     rows, report = [], []
     for line in names:
         name, pid = parse_candidate_line(line)
-        if pid is None:                       # no explicit id: oracle lookup
-            pid, official = driver.find_player_id(name)
-        else:                                 # 'Name | ID' bypasses the flaky
-            official = name                   # lookup; name taken as written
-        seasons = driver.career_regular_season(pid)
+        if pid is None:
+            raise SystemExit(
+                f"Candidate {name!r} has no player id. NHL lines must be "
+                "'Name | PLAYER_ID' — the id is in the player's nhl.com "
+                "page URL (e.g. nhl.com/player/connor-mcdavid-8478402).")
+        # official display name comes from the API itself (self-reported),
+        # and the driver self-validates rows against careerTotals
+        official, seasons = driver.career_regular_season(pid)
         games = sum(r["gp"] for r in seasons)
         print(f"  {official}: {len(seasons)} seasons, {games} games, "
               f"{sum(r['pts'] for r in seasons)} pts")

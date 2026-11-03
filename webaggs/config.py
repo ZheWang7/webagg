@@ -1,4 +1,4 @@
-"""Central configuration for webagg-sports (Exp 2-S, NBA domain).
+"""Central configuration for webagg-sports (Exp 2-S, NHL domain).
 
 Parameter names and defaults follow webaggr.pdf and the implementation
 guide's parameter table (Table 4). Values changed for Exp 2-S are noted.
@@ -51,22 +51,28 @@ BUDGET_USD = 5.0           # per-entity search budget
 # --- Reader / fidelity (webaggr.pdf §7) ---------------------------------
 DELTA_E = 0.05      # conformal extraction miscoverage
 TOL_REL = 0.02      # checksum relative tolerance (SUM claims)
-# eps_F is a per-domain calibrated constant (impl guide §13.4). The NBA
+# eps_F is a per-domain calibrated constant (impl guide §13.4). The NHL
 # domain has NO calibrated eps_F yet; reports must say so loudly.
 EPS_F_CALIBRATED = None
 
 # --- Source-class reliability priors (webaggr.pdf §4) -------------------
-# NBA domain analogue of the regulatory/vendor/news/blog ladder.
+# NHL domain analogue of the regulatory/vendor/news/blog ladder.
 CLASS_PRIORS = {
-    "stats_vendor": 0.80,   # basketball-reference, espn, statmuse, landofbasketball
+    "stats_vendor": 0.80,   # hockey-reference, espn, quanthockey, hockeydb, ...
     "news": 0.60,           # press / sports media
     "other": 0.40,          # blogs, forums, everything else
 }
 
+# Typed bound for the points validator (canon.canonical_points): the NHL
+# career record is 2,857 points (Gretzky) and the season record 215, so any
+# value above this is a look-alike number, never a real points figure.
+POINTS_MAX = 4000
+
 # --- Oracle deny list (PREREGISTRATION_EXP2S.md) -------------------------
-# Official NBA data defines truth and is DENIED at run time: the
-# withheld-registry design (webaggr.pdf §9). Everything else is "the web".
-DENY_DOMAINS = ("nba.com", "stats.nba.com")
+# Official NHL data defines truth and is DENIED at run time: the
+# withheld-registry design (webaggr.pdf §9). nhle.com covers the API host
+# (api-web.nhle.com); everything else is "the web".
+DENY_DOMAINS = ("nhl.com", "nhle.com")
 
 # --- LLM (single-provider design: one API, one model) --------------------
 LLM_MODEL = os.environ.get("WEBAGG_LLM_MODEL", "gpt-5-mini")

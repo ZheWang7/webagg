@@ -50,7 +50,7 @@ def test_replay_and_grade_scripts_end_to_end(tmp_path):
 
 def test_run_script_refuses_without_live_gate(tmp_path):
     seed_selftest_cohort(tmp_path)
-    r = _run("run_exp2s.py", "--cohort", "nba_selftest", data_dir=tmp_path)
+    r = _run("run_exp2s.py", "--cohort", "nhl_selftest", data_dir=tmp_path)
     assert r.returncode != 0
     assert "refusing live spend" in (r.stdout + r.stderr)
 
@@ -58,7 +58,7 @@ def test_run_script_refuses_without_live_gate(tmp_path):
 def test_run_script_refuses_without_keys_even_when_live(tmp_path):
     seed_selftest_cohort(tmp_path)
     env = {"RUN_LIVE": "1", "OPENAI_API_KEY": "", "SERPER_API_KEY": ""}
-    r = _run("run_exp2s.py", "--cohort", "nba_selftest", data_dir=tmp_path,
+    r = _run("run_exp2s.py", "--cohort", "nhl_selftest", data_dir=tmp_path,
              extra_env=env)
     assert r.returncode != 0
     assert "not set" in (r.stdout + r.stderr)

@@ -76,11 +76,13 @@ def is_denied(url: str) -> bool:
 def classify_source(url: str) -> str:
     """Rule-based reliability class (webaggr.pdf §4; impl guide §10.2 analogue)."""
     d = domain_of(url)
-    if any(v in d for v in ("basketball-reference", "espn", "statmuse",
-                            "landofbasketball", "realgm", "foxsports")):
+    if any(v in d for v in ("hockey-reference", "espn", "statmuse",
+                            "quanthockey", "hockeydb", "eliteprospects",
+                            "foxsports")):
         return "stats_vendor"
     if any(n in d for n in ("si.com", "cbssports", "theathletic", "yahoo",
-                            "bleacherreport", "apnews", "reuters", "nytimes")):
+                            "sportsnet", "tsn.ca", "apnews", "reuters",
+                            "nytimes")):
         return "news"
     return "other"
 

@@ -28,6 +28,8 @@ def test_bare_year_reads_as_season_start():
 def test_canonical_points_typed_bounds():
     assert canonical_points("1,138 points") == 1138
     assert canonical_points(450.0) == 450
+    assert canonical_points(2857) == 2857            # the NHL career record
     assert canonical_points("-5") is None            # negative: reject
+    assert canonical_points("4,500") is None         # above POINTS_MAX: reject
     assert canonical_points("999999") is None        # absurd: reject
     assert canonical_points("n/a") is None

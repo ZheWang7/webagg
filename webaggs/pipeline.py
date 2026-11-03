@@ -1,7 +1,8 @@
 """FrontierDiscovery loop and end-to-end wiring (webaggr.pdf Alg. 1; impl §14.1).
 
-Exp 2-S instantiation: one run = one player; one stratum per run (the
-player's career), records are (player, season), f_Q = SUM of points.
+Exp 2-S instantiation (NHL): one run = one player; one stratum per run
+(the player's career), records are (player, season), f_Q = SUM of points
+(points = goals + assists).
 
 Ordering (impl guide §14.1): FrontierDiscovery (certified extraction, claim
 ingestion, checksum checks, gap-direction inside) -> ER -> re-key + SECOND
@@ -42,7 +43,7 @@ def seed_formulations(player: str, *, llm=call_llm, ledger=None, run_id="",
             p_success=min(max(float(f.get("p_success", 0.5)), 0.05), 1.0),
             yield_if_success=max(float(f.get("yield_if_success", 2.0)), 0.1)))
     for q in (f"{player} career stats season by season",
-              f"{player} total career points NBA"):
+              f"{player} total career points NHL"):
         fms.append(Formulation(formulation_id=sha16(f"seed|{q}")[:8], query=q,
                                p_success=0.9, yield_if_success=5.0))
     # dedup by query text

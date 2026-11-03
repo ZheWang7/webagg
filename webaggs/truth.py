@@ -93,10 +93,10 @@ def load_truth(data_dir: Path, cohort: str, *, verify: bool = True):
 
 
 def parse_candidate_line(line: str) -> tuple[str, int | None]:
-    """A candidates.txt entry: 'Name' or 'Name | PLAYER_ID'. The explicit id
-    bypasses the oracle's commonallplayers lookup — that endpoint's bot-wall
-    is known to hang (the sports analogue of the EDGAR pacing trap), while
-    the per-player career endpoint is light and reliable."""
+    """A candidates.txt entry: 'Name | PLAYER_ID' (NHL: the id is REQUIRED —
+    no name-search endpoint is verifiably documented, and the id sits in the
+    player's nhl.com page URL, e.g. nhl.com/player/connor-mcdavid-8478402).
+    A bare 'Name' still parses (pid None); build_cohort rejects it loudly."""
     if "|" in line:
         name, pid = line.split("|", 1)
         name, pid = name.strip(), pid.strip()
@@ -109,7 +109,7 @@ def parse_candidate_line(line: str) -> tuple[str, int | None]:
 
 def load_display_names(data_dir: Path, cohort: str) -> dict[str, str]:
     """-> {player_norm: official display name}. Live runs search with the
-    official casing ('Jalen Brunson', not 'jalen brunson') — better queries,
+    official casing ('Connor McDavid', not 'connor mcdavid') — better queries,
     same stratum key (the pipeline normalizes internally)."""
     csv_path, _ = truth_paths(data_dir, cohort)
     names: dict[str, str] = {}

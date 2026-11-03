@@ -1,14 +1,16 @@
 """ONLINE sanity preflight — the only tests that touch the real network.
 
 Opt-in by design: skipped unless RUN_ONLINE=1, so `pytest` stays fully
-offline. Run this once from the machine that will do the live runs, BEFORE
-any spend, to confirm every external dependency is reachable from there:
+offline. Run once from the machine that will do the live runs, BEFORE any
+spend:
 
     $env:RUN_ONLINE="1"; pytest -m online -v        (PowerShell)
 
 The two key-dependent checks cost ~$0.001 (Serper) and <$0.01 (OpenAI) and
-additionally skip when their key is absent. Nothing here asserts exact
-historical numbers — only structural invariants that cannot go stale.
+additionally skip when their key is absent. Nothing asserts numbers that
+can go stale — only structural invariants plus one immutable fact
+(McDavid's rookie season), and the driver ALREADY self-validates every
+career against the API's own careerTotals before returning.
 """
 import os
 
@@ -25,36 +27,24 @@ pytestmark = [
 ]
 
 
-BRUNSON_ID = 1628973                            # official stats.nba.com id
+MCDAVID_ID = 8478402        # from nhl.com/player/connor-mcdavid-8478402
 
 
-def test_oracle_career_endpoint_reachable_and_sane():
-    """playercareerstats — the endpoint build_cohort actually hammers, one
-    call per candidate — answers, and its rows have the shape the truth
-    builder expects. This is the hard oracle requirement."""
-    from webaggs.oracle_nba import NBAStatsDriver
-    rows = NBAStatsDriver().career_regular_season(BRUNSON_ID)
+def test_oracle_reachable_and_self_validates():
+    """The landing endpoint — the only one the truth build uses — answers,
+    the driver's league/game-type filter reproduces the API's own career
+    totals (its built-in self-validation), and the rows have the shape the
+    truth builder expects."""
+    from webaggs.oracle_nhl import NHLDriver
+    name, rows = NHLDriver().career_regular_season(MCDAVID_ID)
+    assert name == "Connor McDavid"
     seasons = [r["season"] for r in rows]
-    assert "2018-19" in seasons                 # rookie year: a stable fact
+    assert "2015-16" in seasons                 # rookie year: immutable fact
     assert seasons == sorted(seasons) and len(seasons) == len(set(seasons))
     for r in rows:
         season_key(r["season"])                 # parses, or raises loudly
-        assert isinstance(r["pts"], int) and 0 <= r["pts"] <= 60000
+        assert isinstance(r["pts"], int) and 0 <= r["pts"] <= config.POINTS_MAX
         assert r["gp"] >= 0
-
-
-def test_oracle_name_lookup_soft():
-    """commonallplayers — the all-history index behind a bot-wall that is
-    KNOWN to hang some networks. A hang here is survivable (candidates.txt
-    takes 'Name | PLAYER_ID'), so it skips with the remedy instead of
-    failing the preflight; any other outcome must still be correct."""
-    from webaggs.oracle_nba import NBAStatsDriver, OracleError
-    try:
-        pid, official = NBAStatsDriver().find_player_id("Jalen Brunson")
-    except OracleError as e:
-        pytest.skip(f"name-lookup endpoint unavailable from this network "
-                    f"({e}); use 'Name | PLAYER_ID' in candidates.txt")
-    assert (pid, official) == (BRUNSON_ID, "Jalen Brunson")
 
 
 def test_open_web_fetch_classifies_ok():
@@ -65,16 +55,18 @@ def test_open_web_fetch_classifies_ok():
 
 
 def test_deny_list_blocks_the_real_oracle():
-    """The contrast line: the oracle URL is refused BEFORE any request."""
-    src = fetch_url("https://stats.nba.com/stats/playercareerstats", "sanity")
-    assert src.status == "denied" and src.main_text == ""
+    """The contrast line: oracle URLs are refused BEFORE any request."""
+    for url in ("https://api-web.nhle.com/v1/player/8478402/landing",
+                "https://www.nhl.com/player/connor-mcdavid-8478402"):
+        src = fetch_url(url, "sanity")
+        assert src.status == "denied" and src.main_text == ""
 
 
 @pytest.mark.skipif(not os.environ.get(config.SERPER_API_KEY_ENV),
                     reason="SERPER_API_KEY not set")
 def test_serper_key_works():
     from webaggs.search import SerperBackend
-    results = SerperBackend().search("NBA", k=3)
+    results = SerperBackend().search("NHL", k=3)
     assert results and all(r["url"].startswith("http") for r in results)
 
 

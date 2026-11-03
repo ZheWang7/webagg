@@ -158,6 +158,8 @@ def test_canon_fuzz_never_crashes_and_outputs_are_typed(seed):
             start, end = int(season[:4]), int(season[5:7])
             assert len(season) == 7 and end == (start + 1) % 100
         pts = canon.canonical_points(s)
-        assert pts is None or (isinstance(pts, int) and 0 <= pts <= 60000)
+        from webaggs import config
+        assert pts is None or (isinstance(pts, int)
+                               and 0 <= pts <= config.POINTS_MAX)
         name = canon.normalize_name(s)
         assert name == name.strip() and name.lower() == name

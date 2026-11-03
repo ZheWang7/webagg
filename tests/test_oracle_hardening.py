@@ -1,83 +1,139 @@
-"""Regressions for the stats.nba.com hardening (found by Zhe's preflight,
-2026-10-20): a read-timeout must be RETRIED, not raised through, and the
-'Name | PLAYER_ID' bypass must parse strictly."""
+"""NHL oracle driver: schema traps, self-validation, transport hardening,
+and the strict candidate-line parser. All clients are fakes — offline."""
 import pytest
 from requests.exceptions import Timeout as ReqTimeout
 
-from webaggs.oracle_nba import NBAStatsDriver, OracleError
+from webaggs.oracle_nhl import NHLDriver, OracleError
 from webaggs.truth import parse_candidate_line
 
 
 class _Resp:
-    def __init__(self, payload):
-        self.status_code = 200
+    def __init__(self, payload, status=200):
+        self.status_code = status
         self._p = payload
 
     def json(self):
         return self._p
 
 
-class _FlakyClient:
-    """Hangs (raises Timeout) n times, then answers."""
-
-    def __init__(self, fail_times, payload):
-        self.fail_times = fail_times
-        self.payload = payload
+class _Client:
+    def __init__(self, payloads):
+        self.payloads = list(payloads)
         self.calls = 0
 
-    def get(self, url, params=None, headers=None, timeout=None,
-            proxies=None):
+    def get(self, url, headers=None, timeout=None):
         self.calls += 1
-        if self.calls <= self.fail_times:
-            raise ReqTimeout("read timed out")
-        return _Resp(self.payload)
+        item = self.payloads.pop(0)
+        if isinstance(item, Exception):
+            raise item
+        return item
 
 
-_PAYLOAD = {"resultSets": [{"name": "SeasonTotalsRegularSeason",
-                            "headers": ["SEASON_ID", "TEAM_ABBREVIATION",
-                                        "PTS", "GP"],
-                            "rowSet": [["2018-19", "DAL", 668, 73]]}]}
+def _landing(season_totals, career_pts, career_gp, first="Benchy",
+             last="Marks"):
+    return {"firstName": {"default": first}, "lastName": {"default": last},
+            "careerTotals": {"regularSeason": {"points": career_pts,
+                                               "gamesPlayed": career_gp}},
+            "seasonTotals": season_totals}
 
 
+def _row(season, pts, gp, league="NHL", game_type=2, team="Oilers"):
+    e = {"season": season, "leagueAbbrev": league, "gamesPlayed": gp,
+         "points": pts, "teamName": {"default": team}}
+    if game_type is not None:
+        e["gameTypeId"] = game_type
+    return e
+
+
+def _drv(payload):
+    return NHLDriver(pace_seconds=0, retry_cooldown=0,
+                     client=_Client([_Resp(payload)]))
+
+
+# --- schema traps ------------------------------------------------------------
+def test_filters_leagues_and_playoffs_and_sums_traded_season():
+    rows = [
+        _row(20152016, 48, 45),                         # NHL regular: in
+        _row(20152016, 10, 12, game_type=3),            # NHL playoffs: OUT
+        _row(20152016, 30, 20, league="AHL"),           # AHL: OUT
+        _row(20142015, 120, 60, league="OHL"),          # junior: OUT
+        _row(20162017, 40, 50, team="Oilers"),          # traded season,
+        _row(20162017, 25, 30, team="Canucks"),         # two NHL rows: SUMMED
+        # v2 leagueAbbrev shape must also be accepted:
+        {"season": 20172018, "leagueAbbrev": {"default": "NHL"},
+         "gameTypeId": 2, "gamesPlayed": 10, "points": 7,
+         "teamName": {"default": "Canucks"}},
+    ]
+    name, out = _drv(_landing(rows, career_pts=48 + 65 + 7,
+                              career_gp=45 + 80 + 10)).career_regular_season(1)
+    assert name == "Benchy Marks"
+    assert [(r["season"], r["pts"], r["gp"]) for r in out] == [
+        ("2015-16", 48, 45), ("2016-17", 65, 80), ("2017-18", 7, 10)]
+    assert out[1]["team"] == "Oilers/Canucks"           # traded: both teams
+
+
+def test_missing_game_type_on_nhl_row_raises_never_guesses():
+    rows = [_row(20152016, 48, 45, game_type=None)]
+    with pytest.raises(OracleError, match="gameTypeId"):
+        _drv(_landing(rows, 48, 45)).career_regular_season(1)
+
+
+def test_unknown_league_shape_raises():
+    rows = [{"season": 20152016, "leagueAbbrev": 7, "gameTypeId": 2,
+             "gamesPlayed": 1, "points": 1, "teamName": {"default": "X"}}]
+    with pytest.raises(OracleError, match="leagueAbbrev"):
+        _drv(_landing(rows, 1, 1)).career_regular_season(1)
+
+
+def test_self_validation_against_career_totals():
+    """THE anti-delusion guard: filtered rows must reproduce the API's own
+    careerTotals, or no truth is emitted."""
+    rows = [_row(20152016, 48, 45)]
+    with pytest.raises(OracleError, match="SELF-VALIDATION"):
+        _drv(_landing(rows, career_pts=50, career_gp=45)).career_regular_season(1)
+    with pytest.raises(OracleError, match="self-validate"):
+        payload = _landing(rows, 48, 45)
+        del payload["careerTotals"]                     # totals absent: refuse
+        _drv(payload).career_regular_season(1)
+
+
+def test_zero_nhl_rows_and_bad_season_raise():
+    with pytest.raises(OracleError, match="zero NHL"):
+        _drv(_landing([_row(20152016, 9, 9, league="AHL")],
+                      0, 0)).career_regular_season(1)
+    with pytest.raises(OracleError, match="season identifier"):
+        _drv(_landing([_row(20152017, 9, 9)], 9, 9)).career_regular_season(1)
+
+
+# --- transport ----------------------------------------------------------------
 def test_timeout_is_retried_once_then_succeeds():
-    client = _FlakyClient(1, _PAYLOAD)
-    d = NBAStatsDriver(pace_seconds=0, client=client, retry_cooldown=0)
-    rows = d.career_regular_season(1628973)
-    assert client.calls == 2 and rows[0]["pts"] == 668
+    ok = _Resp(_landing([_row(20152016, 48, 45)], 48, 45))
+    client = _Client([ReqTimeout("hang"), ok])
+    d = NHLDriver(pace_seconds=0, retry_cooldown=0, client=client)
+    name, rows = d.career_regular_season(1)
+    assert client.calls == 2 and rows[0]["pts"] == 48
 
 
-def test_timeout_twice_raises_with_the_bypass_remedy():
-    d = NBAStatsDriver(pace_seconds=0, client=_FlakyClient(99, _PAYLOAD),
-                       retry_cooldown=0)
-    with pytest.raises(OracleError, match="Name \\| PLAYER_ID"):
-        d.career_regular_season(1628973)
+def test_timeout_twice_raises_loudly():
+    client = _Client([ReqTimeout("hang"), ReqTimeout("hang")])
+    d = NHLDriver(pace_seconds=0, retry_cooldown=0, client=client)
+    with pytest.raises(OracleError, match="Timeout"):
+        d.career_regular_season(1)
 
 
+def test_404_is_not_retried_and_names_the_remedy():
+    client = _Client([_Resp({}, status=404)])
+    d = NHLDriver(pace_seconds=0, retry_cooldown=0, client=client)
+    with pytest.raises(OracleError, match="nhl.com page URL"):
+        d.career_regular_season(999)
+    assert client.calls == 1                            # retrying 404: pointless
+
+
+# --- candidate parser ----------------------------------------------------------
 def test_parse_candidate_line():
-    assert parse_candidate_line("Jalen Brunson") == ("Jalen Brunson", None)
-    assert parse_candidate_line("Jalen Brunson | 1628973") == \
-        ("Jalen Brunson", 1628973)
+    assert parse_candidate_line("Connor McDavid | 8478402") == \
+        ("Connor McDavid", 8478402)
+    assert parse_candidate_line("Connor McDavid") == ("Connor McDavid", None)
     for bad in ("| 123", "Name |", "Name | 12x3"):
         with pytest.raises(ValueError):
             parse_candidate_line(bad)
-
-
-class _ProxySpy:
-    def __init__(self):
-        self.proxies = "unset"
-
-    def get(self, url, params=None, headers=None, timeout=None, proxies=None):
-        self.proxies = proxies
-        return _Resp(_PAYLOAD)
-
-
-def test_oracle_proxy_env_routes_oracle_calls(monkeypatch):
-    spy = _ProxySpy()
-    d = NBAStatsDriver(pace_seconds=0, client=spy, retry_cooldown=0)
-    monkeypatch.delenv("WEBAGG_ORACLE_PROXY", raising=False)
-    d.career_regular_season(1)
-    assert spy.proxies is None                     # unset: direct
-    monkeypatch.setenv("WEBAGG_ORACLE_PROXY", "http://us-proxy:8080")
-    d.career_regular_season(1)
-    assert spy.proxies == {"http": "http://us-proxy:8080",
-                           "https": "http://us-proxy:8080"}

@@ -1,7 +1,10 @@
 """Canonicalization: typed validators for the reader (webaggr.pdf §7.1).
 
+NHL domain: names, seasons ("2015-16") and integer point totals
+(points = goals + assists; per-game averages are look-alikes to reject).
+
 Look-alike numbers are the reader's main hazard; here the types are
-player names, NBA seasons and integer point totals. Everything that
+player names, NHL seasons and integer point totals. Everything that
 enters a record key or a grading comparison passes through here, so
 extraction prompts, ER, truth build and grading all agree on one form.
 """
@@ -9,6 +12,8 @@ from __future__ import annotations
 
 import re
 import unicodedata
+
+from . import config
 
 _SUFFIXES = (" jr", " sr", " ii", " iii", " iv")
 
@@ -31,7 +36,7 @@ _SEASON_SINGLE = re.compile(r"\b((?:19|20)\d{2})\b")
 
 
 def canonical_season(text: str) -> str | None:
-    """Canonical NBA season string 'YYYY-YY' (season starting year + end-year
+    """Canonical NHL season string 'YYYY-YY' (season starting year + end-year
     two digits): '2018-19', '2018–2019', '2018/19' all -> '2018-19'.
     A bare year 'YYYY' is read as the season STARTING that fall only when the
     end-year is absent — ambiguous forms are the reader's job to avoid, and
@@ -59,10 +64,10 @@ _POINTS = re.compile(r"-?\d[\d,]*(\.\d+)?")
 
 
 def canonical_points(value) -> int | None:
-    """Integer points. Rejects negatives, absurd magnitudes (career max ever
-    is < 40,000 regular-season points — a typed bound) AND any fractional
-    value: a decimal is a per-game figure, the look-alike number this
-    validator exists to stop (webaggr.pdf §7.1) — truncating 28.4 to 28
+    """Integer points. Rejects negatives, absurd magnitudes (the NHL career
+    record is 2,857 points, so the bound is config.POINTS_MAX) AND any
+    fractional value: a decimal is a per-game figure, the look-alike number
+    this validator exists to stop (webaggr.pdf §7.1) — truncating 1.4 to 1
     would silently assert a bogus season total."""
     if isinstance(value, bool):
         return None
@@ -79,6 +84,6 @@ def canonical_points(value) -> int | None:
         if m.group(1):                        # matched a decimal part: PPG
             return None
         n = int(m.group(0).replace(",", ""))
-    if n < 0 or n > 60000:
+    if n < 0 or n > config.POINTS_MAX:
         return None
     return n

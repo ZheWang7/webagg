@@ -53,7 +53,7 @@ class Claim:
     """An aggregate claim a page makes about the whole answer (webaggr.pdf §5.2).
 
     Two kinds in this domain:
-      COUNT  — "played N NBA seasons"      -> exact-closure checksum
+      COUNT  — "played N NHL seasons"      -> exact-closure checksum
       SUM    — "career total of X points"  -> missing-value bound Delta+
     """
     claim_id: str

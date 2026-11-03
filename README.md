@@ -1,9 +1,9 @@
-# webagg-sports — WebAggr in the NBA domain (Experiment 2-S)
+# webagg-sports — WebAggr in the NHL domain (Experiment 2-S)
 
 A from-scratch instantiation of the WebAggr pipeline (webaggr.pdf) for the
-query **"What is [player]'s total career regular-season points in the NBA?"**
-— f_Q = SUM over (player, season) records — with **official NBA stats as the
-withheld oracle** (the EDGAR role: defines truth, denied at run time).
+query **"What is [player]'s total career regular-season points in the NHL?"**
+(points = goals + assists) — f_Q = SUM over (player, season) records — with
+**the NHL's official public API as the withheld oracle** (the EDGAR role: defines truth, denied at run time).
 
 Purpose: Exp 2-S, a control experiment for the finance Exp 2 failure. See
 `experiments/exp2s/PREREGISTRATION_EXP2S.md` — read it first; it is the
@@ -22,7 +22,7 @@ webaggs/                 the pipeline package
   extract.py, conformal.py   certified reading + δ_E gate (§7.1)
   er.py, corroborate.py  deterministic ER + echo-collapse corroboration
   aggregate.py           SUM with the honest (ε_C + ε_F) interval (§7.3)
-  oracle_nba.py, truth.py   the withheld oracle, freeze, exact grading
+  oracle_nhl.py, truth.py   the withheld oracle, freeze, exact grading
   storage.py             per-run SQLite ledger (the replay substrate)
   fetch.py               deny list + fetch-outcome classifier (paywall instrument)
   llm.py, search.py      single-provider LLM, Serper
@@ -76,8 +76,9 @@ deliberate per-session `$env:` in the shell.
 $env:RUN_ONLINE="1"; pytest -m online -v
 ```
 
-Five checks, skipped on normal `pytest` runs: the oracle answers and its
-rows parse (a dry run of the truth builder), a public page fetches as
+Five checks, skipped on normal `pytest` runs: the oracle answers and the
+driver self-validates McDavid's career against the API's own totals (a dry
+run of the truth builder), a public page fetches as
 `ok`, the deny list blocks the real oracle, and — when the keys are set —
 one tiny Serper search (~$0.001) and one tiny LLM call (<$0.01). Run it
 before `build_cohort.py` and again before `RUN_LIVE=1`; a red here means a

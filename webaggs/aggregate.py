@@ -4,7 +4,7 @@ f_Q for Exp 2-S: SUM of adopted (player, season) points over distinct
 resolved records. The reported interval is (eps_C + eps_F) * SUM where
   eps_C = the certified unseen-mass level (epsilon if statistically
           certified; U_hat + psi at stop otherwise — honest, possibly wide)
-  eps_F = per-domain calibrated fidelity level. The NBA domain has NO
+  eps_F = per-domain calibrated fidelity level. The NHL domain has NO
           calibrated eps_F yet, so the report carries eps_F=None and is
           labeled 'fidelity uncalibrated' — never a silently-invented number.
 """

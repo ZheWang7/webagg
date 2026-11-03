@@ -1,11 +1,11 @@
-"""Entity resolution for the NBA domain (webaggr.pdf §6) — deterministic.
+"""Entity resolution for the NHL domain (webaggr.pdf §6) — deterministic.
 
 Why no fitted matcher here (a PRE-REGISTERED simplification, disclosed in
 PREREGISTRATION_EXP2S.md): the finance domain lacked a join key, so ER was a
 learned probabilistic matcher with bounded error. Here the record key is
 (player, season) and the season IS a join key once canonicalized; the only
 ER work left is folding name VARIANTS of the one queried player onto one
-canonical entity ('J. Brunson', 'Jalen Brunson Jr.' -> 'jalen brunson').
+canonical entity ('C. McDavid', 'Connor McDavid' -> 'connor mcdavid').
 
 Cross-player contamination (another player sharing the surname on the same
 page) is handled by the guard below, not by merging.
@@ -21,7 +21,7 @@ def resolve_entity(entity_surface: str, target_player: str) -> str | None:
 
     Merge rule (deterministic, pre-registered):
       full normalized match            -> merge
-      last name + first initial match  -> merge ('J. Brunson')
+      last name + first initial match  -> merge ('C. McDavid')
       anything else                    -> reject (never silently merge)
     """
     target = canon.normalize_name(target_player)

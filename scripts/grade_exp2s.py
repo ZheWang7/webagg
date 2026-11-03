@@ -6,7 +6,7 @@ recall, exact recall, spurious count and relative aggregation error, plus
 the certificate path (statistical / checksum / abandoned) for the headline
 split.
 
-Usage: python scripts/grade_exp2s.py --cohort nba_v1
+Usage: python scripts/grade_exp2s.py --cohort nhl_v1
 """
 from __future__ import annotations
 

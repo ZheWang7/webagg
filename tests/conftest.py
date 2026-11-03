@@ -2,7 +2,7 @@
 no fakes in any experiment path (methodology rule); tests monkeypatch via
 the injectable `llm`, `fetch`, `search` parameters instead.
 
-The synthetic world: player 'Testo Sampleson', 3 NBA seasons.
+The synthetic world: player 'Testo Sampleson', 3 NHL seasons.
 """
 from __future__ import annotations
 
@@ -141,7 +141,7 @@ def seed_selftest_cohort(data_dir) -> str:
     from webaggs.truth import write_truth
 
     data_dir = Path(data_dir)
-    cohort = "nba_selftest"
+    cohort = "nhl_selftest"
     rows = []
     for pid, (player, truth) in enumerate(
             ((PLAYER, TRUTH), (BENCHY, BENCHY_TRUTH)), start=1):

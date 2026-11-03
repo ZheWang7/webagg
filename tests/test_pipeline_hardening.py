@@ -10,7 +10,7 @@ TRUTH = {"2015-16": 200, "2016-17": 350, "2018-19": 120, "2019-20": 90}  # 760
 
 PAGES = {
     # the withheld oracle shows up in search results: must be DENIED in-loop
-    "https://stats.nba.com/benchy": {"rows": [], "claims": []},
+    "https://api-web.nhle.com/benchy": {"rows": [], "claims": []},
     # a subscription site: censored observation, logged, no vote
     "https://paywall.test/benchy": {"rows": [], "claims": [],
                                     "status": "paywall"},
@@ -33,7 +33,7 @@ PAGES = {
 SEARCH = RoutedSearch(
     routes=[("rookie", ["https://c.test/benchy-late"]),
             ("early career", ["https://c.test/benchy-late"])],
-    default=["https://stats.nba.com/benchy", "https://paywall.test/benchy",
+    default=["https://api-web.nhle.com/benchy", "https://paywall.test/benchy",
              "https://a.test/benchy", "https://b.test/benchy"])
 
 

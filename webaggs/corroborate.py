@@ -5,7 +5,7 @@ mirrors ONE origin (the official scorer), so 'independent confirmation' in
 the Theorem 2 sense does not exist — Exp 2-S makes NO corroboration claims.
 What survives here is the echo-collapse discipline: identical values on the
 same DOMAIN are one vote, and votes are weighted by source-class reliability
-(config.CLASS_PRIORS), so a scraped blog cannot outvote basketball-reference.
+(config.CLASS_PRIORS), so a scraped blog cannot outvote hockey-reference.
 """
 from __future__ import annotations
 

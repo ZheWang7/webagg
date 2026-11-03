@@ -1,7 +1,7 @@
 """Claims engine: aggregate claims as checksums (webaggr.pdf §5.2, Thm 4).
 
-NBA pages state exactly the two claim kinds the theory wants:
-  COUNT — "played N NBA seasons"      -> exact closure when N_g == N
+NHL pages state exactly the two claim kinds the theory wants:
+  COUNT — "played N NHL seasons"      -> exact closure when N_g == N
   SUM   — "career total of X points"  -> missing-value bound Delta+ and a
                                          tolerance checksum on the assembled sum
 
@@ -84,7 +84,7 @@ class ClaimsEngine:
         to probe: search just before the earliest and after the latest."""
         probes = [f"{player_name} rookie season points",
                   f"{player_name} season by season stats early career",
-                  f"{player_name} final NBA season stats"]
+                  f"{player_name} final NHL season stats"]
         if known_seasons:
             first = min(known_seasons)
             probes.append(f"{player_name} points before {first[:4]}")

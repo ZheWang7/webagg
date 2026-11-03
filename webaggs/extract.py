@@ -61,8 +61,8 @@ def extract_certified(src, player_name: str, gate, *, ledger=None, run_id="",
         val = canon.canonical_points(c.get("value"))
         if kind not in ("COUNT", "SUM") or val is None:
             continue
-        if kind == "COUNT" and not (1 <= val <= 30):
-            continue                            # typed bound: NBA careers <= ~25 seasons
+        if kind == "COUNT" and not (1 <= val <= 35):
+            continue                            # typed bound: NHL careers <= 26 seasons (Howe)
         claims.append(Claim(
             claim_id=f"{src.source_id}:CLAIM:{kind}:{sha16(str(val))[:8]}",
             source_id=src.source_id, domain=src.domain,

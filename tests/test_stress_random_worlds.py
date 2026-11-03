@@ -46,7 +46,8 @@ def _random_world(rng, player, adversarial=False):
                 for s in covered]
         if rng.random() < 0.2:
             rows.append((f"Zork {player.split()[-1]}", rng.choice(seasons),
-                         7777, 0.95))
+                         777, 0.95))   # <= POINTS_MAX so the ER guard, not
+                                        # the typed validator, must reject it
         claims = []
         if adversarial:
             claims.append({"kind": "COUNT", "value": wrong_count})  # every page

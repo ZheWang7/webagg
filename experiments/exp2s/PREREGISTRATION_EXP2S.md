@@ -1,4 +1,4 @@
-# PREREGISTRATION — Experiment 2-S: Certified Stopping in an Accessible Domain (NBA)
+# PREREGISTRATION — Experiment 2-S: Certified Stopping in an Accessible Domain (NHL)
 
 **Status: DRAFT — not in force until (a) the supervisor signs off on the cohort
 selection rule and (b) this file is committed BEFORE the first live run.**
@@ -7,7 +7,7 @@ an addendum to any formd document. No analytical decision below may be changed
 after the first live run; changes require a dated addendum committed before
 any run they affect.
 
-Date drafted: 2026-10-20
+Date drafted: 2026-10-20 (NBA); revised 2026-11-03 (domain changed to NHL — see note)
 Supervisor sign-off: ______________________  (name / date)
 
 ## 1. Purpose and claim scope
@@ -16,8 +16,16 @@ Exp 2-S is a control experiment for the finance Exp 2 failure. The finance
 run produced certificates claiming >= 90% mass at ~41% realized recall; the
 working hypothesis (supervisor meeting, 2026-10-20) is access censoring —
 paywalled sources made the oracle's truth exceed the accessible web and let
-denied fetches masquerade as informative samples. The NBA domain removes the
+denied fetches masquerade as informative samples. The NHL domain removes the
 access ceiling: every official stat is freely mirrored.
+
+**Domain note (2026-11-03):** the experiment was first specified for the NBA,
+but stats.nba.com does not permit programmatic access (it blackholes
+non-browser clients at the TLS-fingerprint level, from every network and
+VPN tried). We moved to the NHL, whose official API (api-web.nhle.com) is
+public and unauthenticated. The design is otherwise unchanged — same claims,
+same stopping machinery, same grading — so this is a substrate swap, not a
+methodological change. "Points" in the NHL = goals + assists.
 
 Claims tested: **C1** (Û + ψ stays above the true unseen mass at every step;
 Assumption 1(a)) and **C2** (at a certified stop, realized recall ≥ 1 − ε at
@@ -37,30 +45,37 @@ Pre-registered interpretations:
 ## 2. Query and aggregation
 
 Query template: *"What is [player]'s total career regular-season points in
-the NBA?"* — f_Q = SUM over (player, season) strata records of integer
-`points`. One stratum per run (the player's career); records are seasons.
+the NHL?"* (points = goals + assists) — f_Q = SUM over (player, season)
+strata records of integer `points`. One stratum per run (the player's
+career); records are seasons.
 
 ## 3. Oracle and deny list
 
-- Oracle: official NBA statistics (stats.nba.com `playercareerstats`,
-  PerMode=Totals, regular season). Truth is complete by construction
-  (two-sided: every played season is scored; no unfiled-record analogue).
-- Deny list at run time: `nba.com`, `stats.nba.com` and subdomains, enforced
-  inside the fetcher; every denial is logged. **Basketball-Reference and all
-  other sites count as "the web"** — a deliberate design choice (denying
-  aggregators too would make this an artificial-scarcity study).
+- Oracle: the NHL's official public API (api-web.nhle.com
+  `/v1/player/{id}/landing`, `seasonTotals`, regular season = gameTypeId 2).
+  Truth is complete by construction (two-sided: every played season is
+  scored; no unfiled-record analogue). The truth-build driver SELF-VALIDATES
+  each player's filtered rows against the API's own
+  `careerTotals.regularSeason` and refuses to emit truth on any mismatch, so
+  a filtering error cannot silently corrupt the key.
+- Deny list at run time: `nhl.com`, `nhle.com` and subdomains (covers the
+  API host api-web.nhle.com), enforced inside the fetcher; every denial is
+  logged. **Hockey-Reference and all other sites count as "the web"** — a
+  deliberate design choice (denying aggregators too would make this an
+  artificial-scarcity study).
 
 ## 4. Cohort selection rule  *(supervisor signs this section)*
 
 Target ~25–30 players, drawn BEFORE any live run from the frozen
 `cohort_report.csv` (official career-games numbers):
 
-- **Anchor stars (~5):** players with ≥ 500 career games (e.g. Jalen
-  Brunson). Expected to certify fast; sanity check, not the test.
+- **Anchor stars (~5):** players with ≥ 500 career games (e.g. Connor
+  McDavid). Expected to certify fast; sanity check, not the test.
 - **Fringe cohort (~20–25):** players with **≤ 150 career regular-season
-  games**, preferring careers with gap seasons, 10-day/two-way stints, or a
+  games**, preferring careers with gap seasons, brief call-up stints, or a
   pre-2010 start — where no single page is complete and stopping is actually
-  exercised.
+  exercised. Player ids come from each player's nhl.com page URL and go in
+  `cohort/candidates.txt` as `Name | PLAYER_ID`.
 
 Names are listed in `cohort/candidates.txt` and frozen with the truth table
 (`data/truth/<cohort>/manifest.json`, SHA-256). Append-only after any entity
@@ -68,18 +83,19 @@ has been run; additions go under a new cohort name.
 
 ## 5. Scope rules (grading key, locked now)
 
-1. **Regular season only.** Playoff, preseason, G-League, international and
-   college points are out of scope; the query is "NBA career regular-season
-   points".
-2. **Traded seasons:** one record per (player, season), league-wide total
-   (the oracle's `TOT` row when present).
+1. **Regular season only.** Playoff (gameTypeId 3), preseason, AHL, junior
+   and international points are out of scope; the query is "NHL career
+   regular-season points".
+2. **Traded seasons:** one record per (player, season), summed across the
+   team rows the API reports for that season.
 3. **Grading: EXACT.** Record key = (player_norm, canonical season
-   "YYYY-YY"); value = integer points. `record_recall` = seasons found /
+   "YYYY-YY"); value = integer points (goals + assists). `record_recall` = seasons found /
    true seasons (the discovery quantity the stopping rule certifies);
    `exact_recall` additionally requires the points value to match. No
    tolerance machinery.
-4. Season canonicalization: "2018–2019", "2018/19", "2018-19" → "2018-19";
-   multi-year spans are rejected by the typed validator, not guessed.
+4. Season canonicalization: "2015–2016", "2015/16", "2015-16" → "2015-16";
+   the oracle's YYYYYYYY form (20152016) maps the same way; multi-year spans
+   are rejected by the typed validator, not guessed.
 
 ## 6. Run design and parameters
 
@@ -124,10 +140,17 @@ revalidated post-ER and revocations are logged.
 4. Anchor stars certify only via checksum — the statistical path never fires
    even in the easy regime.
 
+Note on ψ (carried over from the NBA spec, still open): at career sizes
+(n ≤ ~26 seasons) the implementation-guide ψ may make the statistical
+certificate unreachable by arithmetic. Reconcile `webaggs/frontier.py::psi`
+with the production finance ψ before the live run, or outcomes 3/4 are
+guaranteed by construction rather than by data.
+
 ## 10. Execution order
 
 pytest suite green → supervisor signs §4 → candidates screened →
-`build_cohort.py` freezes truth → conformal gate calibrated (labeled
+`build_cohort.py` freezes truth (driver self-validates every player
+against the API's own career totals) → conformal gate calibrated (labeled
 extraction set, ≥ 20 correct examples; calibration labels come from a
 separate pilot player NOT in the cohort) → commit this file →
 `run_exp2s.py` (live) → `replay_exp2s.py` (offline) → grade → write up.
