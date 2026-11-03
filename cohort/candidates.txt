@@ -1,15 +1,45 @@
-# Exp 2-S candidate list — STAGED, not frozen. Apply the pre-registered
-# selection rule (PREREGISTRATION_EXP2S.md §4) to cohort_report.csv after
-# build_cohort.py, then finalize + freeze under the final cohort name.
+# Exp 2-S candidate list — STAGED, not frozen. scripts/resolve_candidates.py
+# fills/verifies ids two-factor (league search name->id, landing id->name)
+# and writes resolution_report.csv with GP for the PREREGISTRATION §4 rule.
+# Lines: 'Name' (to resolve) or 'Name | PLAYER_ID' (to verify).
 #
-# Lines are 'Name | PLAYER_ID'. The id is REQUIRED: take it from the
-# player's nhl.com page URL, e.g. nhl.com/player/connor-mcdavid-8478402.
-# The truth table uses the API's own display name; the Name here is a label.
-#
-# Anchor stars (>= 500 career games expected):
+# Anchor stars (>= 500 GP expected). McDavid and Kane ids were already
+# live-verified by CI runs; Matthews corroborated by search; all re-verified.
 Connor McDavid | 8478402
-# add ~4 more stars here
+Patrick Kane | 8474141
+Auston Matthews | 8479318
+Sidney Crosby
+Alex Ovechkin
 #
-# Fringe candidates (<= 150 career games expected — verify via cohort_report.csv):
-# add ~20-25 names here: short call-ups, AHL tweeners with brief NHL stints,
-# pre-2010 short careers. The §4 rule is applied to cohort_report.csv numbers.
+# Fringe candidates (<= 150 GP expected — resolution_report.csv decides).
+# Mix: famous short-career first-rounders (well covered by draft/bust
+# articles -> findable), cult journeymen (fragmented coverage), and
+# one-or-two-game careers (the Cinder analogues).
+Scott Glennie
+Mark McNeill
+Hugh Jessiman
+Griffin Reinhart
+Nikita Filatov
+Josh Ho-Sang
+Lias Andersson
+Michael Dal Colle
+Zach Boychuk
+Hunter Shinkaruk
+Duncan Siemens
+Dylan McIlrath
+Kerby Rychel
+Logan Brown
+Stuart Percy
+Rob Schremp
+Linus Omark
+Fabian Brunnstrom
+Akim Aliu
+Christian Hanson
+Mark Arcobello
+Matt Frattin
+Jerry D'Amigo
+Teemu Hartikainen
+Michael Bournival
+Matt Puempel
+Nicolas Petan
+Brendan Gaunce

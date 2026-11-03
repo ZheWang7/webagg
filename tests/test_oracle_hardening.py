@@ -137,3 +137,27 @@ def test_parse_candidate_line():
     for bad in ("| 123", "Name |", "Name | 12x3"):
         with pytest.raises(ValueError):
             parse_candidate_line(bad)
+
+
+# --- candidate resolver helpers (dev tooling, but its matching must be right)
+def test_resolver_name_matching_and_result_parsing():
+    import sys
+    from pathlib import Path
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
+    from resolve_candidates import _result_fields, names_match
+
+    assert names_match("Josh Ho-Sang", "Joshua Ho-Sang")      # nickname fold
+    assert names_match("Fabian Brunnstrom", "Fabian Brunnström")
+    assert names_match("JERRY D'AMIGO", "Jerry D'Amigo")
+    assert not names_match("Sebastian Aho", "Connor McDavid")
+    # same surname + initial IS folded by the ER rule — the reason the
+    # resolver demands a UNIQUE id among matches, never picks a best one
+    assert names_match("Jack Smith", "John Smith")
+
+    assert _result_fields({"playerId": "8478402",
+                           "name": "Connor McDavid"}) == (8478402,
+                                                          "Connor McDavid")
+    assert _result_fields({"id": 1, "firstName": {"default": "A"},
+                           "lastName": {"default": "B"}}) == (1, "A B")
+    assert _result_fields({"weird": 1}) is None
+    assert _result_fields({"playerId": "abc", "name": "X"}) is None
