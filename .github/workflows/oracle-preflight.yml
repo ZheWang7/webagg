@@ -1,7 +1,8 @@
-# Does GitHub's US-based runner reach stats.nba.com? If yes, the whole truth
-# build can run in CI and your machine never needs to touch the oracle.
+# Live validation of the NHL oracle driver against api-web.nhle.com from
+# GitHub's runners: the driver self-validates each career against the
+# API's own careerTotals, so a green run certifies the schema assumptions.
 # Trigger: Actions tab -> oracle-preflight -> Run workflow (branch: sports),
-# or via API. No secrets needed: the two oracle tests use no keys.
+# or via API. No secrets needed: the oracle tests use no keys.
 name: oracle-preflight
 on:
   workflow_dispatch:

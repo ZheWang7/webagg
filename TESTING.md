@@ -45,7 +45,7 @@ discoverable records **never** certifies (the brake holds).
 
 ## Known exclusions (deliberate)
 
-- **Live HTTP** (Serper, OpenAI, stats.nba.com) is mocked; the real wire is
+- **Live HTTP** (Serper, OpenAI, api-web.nhle.com) is mocked; the real wire is
   exercised only in gated live runs. The retry/refusal logic around it is
   fully tested.
 - **The ψ formula** is the impl guide's, verified as implemented — its

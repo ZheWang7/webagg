@@ -4,7 +4,7 @@ from webaggs.canon import canonical_points, canonical_season, normalize_name
 def test_normalize_name_variants_fold_to_one_key():
     assert normalize_name("Luka Dončić") == "luka doncic"
     assert normalize_name("Jaren Jackson Jr.") == "jaren jackson"
-    assert normalize_name("  JALEN   BRUNSON ") == "jalen brunson"
+    assert normalize_name("  CONNOR   MCDAVID ") == "connor mcdavid"
     assert normalize_name("Kelly Oubre Jr") == "kelly oubre"
 
 

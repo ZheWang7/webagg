@@ -35,7 +35,7 @@ def resolve_entity(entity_surface: str, target_player: str) -> str | None:
         same_last = s_parts[-1] == t_parts[-1]
         initial_ok = s_parts[0][0] == t_parts[0][0]
         if same_last and initial_ok:
-            return target                      # 'j brunson' -> 'jalen brunson'
+            return target                      # 'c mcdavid' -> 'connor mcdavid'
     if len(s_parts) == 1 and s_parts[0] == t_parts[-1]:
         return target                          # bare surname on a profile page
     return None                                # different player: contamination

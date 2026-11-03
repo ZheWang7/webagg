@@ -88,14 +88,14 @@ network/key problem, caught before any spend.
 
 ```powershell
 pytest                                                   # 1. gate
-python scripts/build_cohort.py --cohort nba_v1 --candidates cohort/candidates.txt
+python scripts/build_cohort.py --cohort nhl_v1 --candidates cohort/candidates.txt
 #   -> apply the pre-registered selection rule to cohort_report.csv,
 #      finalize candidates, rebuild under the final cohort name, FREEZE
 # 2. supervisor signs PREREGISTRATION_EXP2S.md §4; commit it
 $env:RUN_LIVE="1"
-python scripts/run_exp2s.py    --cohort nba_v1           # 3. live (ε = 0.05)
-python scripts/replay_exp2s.py --cohort nba_v1           # 4. offline arms + C1/C2
-python scripts/grade_exp2s.py  --cohort nba_v1           # 5. exact grading
+python scripts/run_exp2s.py    --cohort nhl_v1           # 3. live (ε = 0.05)
+python scripts/replay_exp2s.py --cohort nhl_v1           # 4. offline arms + C1/C2
+python scripts/grade_exp2s.py  --cohort nhl_v1           # 5. exact grading
 ```
 
 Idempotent: `run_exp2s.py` skips finished players (`runs_index.json`); no

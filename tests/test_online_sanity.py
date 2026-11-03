@@ -28,6 +28,8 @@ pytestmark = [
 
 
 MCDAVID_ID = 8478402        # from nhl.com/player/connor-mcdavid-8478402
+KANE_ID = 8474141           # Patrick Kane — traded mid-season 2022-23
+#                             (CHI -> NYR): exercises per-team row summing
 
 
 def test_oracle_reachable_and_self_validates():
@@ -45,6 +47,23 @@ def test_oracle_reachable_and_self_validates():
         season_key(r["season"])                 # parses, or raises loudly
         assert isinstance(r["pts"], int) and 0 <= r["pts"] <= config.POINTS_MAX
         assert r["gp"] >= 0
+
+
+def test_oracle_traded_season_sums_to_one_record():
+    """McDavid has never been traded, so his career cannot exercise the
+    one remaining schema assumption: a traded season arrives as SEVERAL
+    per-team rows that the driver sums into ONE (player, season) record.
+    Kane's 2022-23 (CHI -> NYR) is the real-world instance. If the API
+    also carried a combined row, the sum would double-count and the
+    driver's self-validation against careerTotals would raise — so a
+    green run here certifies the traded-season rule on live data."""
+    from webaggs.oracle_nhl import NHLDriver
+    name, rows = NHLDriver().career_regular_season(KANE_ID)
+    assert name == "Patrick Kane"
+    by_season = {r["season"]: r for r in rows}
+    assert "2022-23" in by_season
+    assert "/" in by_season["2022-23"]["team"]   # two teams, one record
+    assert len(rows) == len({r["season"] for r in rows})
 
 
 def test_open_web_fetch_classifies_ok():

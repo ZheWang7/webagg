@@ -34,7 +34,11 @@ BUDGET = 5.0
 def _random_world(rng, player, adversarial=False):
     n_seasons = rng.randint(1, 8)
     start = rng.randint(1996, 2018)
-    truth = {f"{y}-{(y + 1) % 100:02d}": rng.randint(5, 2500)
+    # hockey-plausible season totals (record 215): career sums stay under
+    # POINTS_MAX, so TRUTHFUL SUM claims survive the typed validator and the
+    # SUM-checksum path is actually exercised (with the old 5..2500 range,
+    # sums reached ~20k > POINTS_MAX and every SUM claim was silently dropped)
+    truth = {f"{y}-{(y + 1) % 100:02d}": rng.randint(5, 160)
              for y in range(start, start + n_seasons)}
     seasons = list(truth)
     pages, n_pages = {}, rng.randint(1, 5)
@@ -116,11 +120,16 @@ def _check_run(trial, tmp_path, gate, player, truth, pages, adversarial):
 
 def test_invariants_over_benign_random_worlds(tmp_path, gate):
     rng = random.Random(7)
+    certs = set()
     for trial in range(40):
         player = f"Rando Trialson{trial}"
         truth, pages = _random_world(rng, player)
-        _check_run(trial, tmp_path, gate, player, truth, pages,
-                   adversarial=False)
+        ans = _check_run(trial, tmp_path, gate, player, truth, pages,
+                         adversarial=False)
+        certs.add(ans.certificate)
+    # the campaign must exercise BOTH endings (fixed seed: deterministic);
+    # checksum certs disappearing would mean claims are being dropped again
+    assert "checksum" in certs and "abandoned" in certs
 
 
 def test_wrong_count_claims_never_certify(tmp_path, gate):
