@@ -20,8 +20,7 @@ Mark McNeill | 8476471
 Hugh Jessiman | 8470605
 Griffin Reinhart | 8476852
 Nikita Filatov | 8474566
-Josh Ho-Sang
-Lias Andersson
+Joshua Ho-Sang | 8477959
 Michael Dal Colle | 8477936
 Zach Boychuk | 8474576
 Hunter Shinkaruk | 8477445
@@ -41,5 +40,7 @@ Jerry D'Amigo | 8475309
 Teemu Hartikainen | 8474719
 Michael Bournival | 8475739
 Matt Puempel | 8476477
-Nicolas Petan
-Brendan Gaunce | 8476867
+#
+# Dropped after resolution: Brendan Gaunce (214 GP -> neither prereg bucket);
+# Lias Andersson, Nic Petan (league search returned no unique match; not
+# needed — 24 fringe already verified).
