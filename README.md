@@ -76,13 +76,14 @@ deliberate per-session `$env:` in the shell.
 $env:RUN_ONLINE="1"; pytest -m online -v
 ```
 
-Five checks, skipped on normal `pytest` runs: the oracle answers and the
+Six checks, skipped on normal `pytest` runs: the oracle answers and the
 driver self-validates McDavid's career against the API's own totals (a dry
-run of the truth builder), a public page fetches as
-`ok`, the deny list blocks the real oracle, and — when the keys are set —
-one tiny Serper search (~$0.001) and one tiny LLM call (<$0.01). Run it
-before `build_cohort.py` and again before `RUN_LIVE=1`; a red here means a
-network/key problem, caught before any spend.
+run of the truth builder); a traded season (Kane 2022-23) sums into one
+record; a public page fetches as `ok`; the deny list blocks the real
+oracle; and — when the keys are set — one tiny Serper search (~$0.001) and
+one tiny LLM call (<$0.01). Run it before `build_cohort.py` and again
+before `RUN_LIVE=1`; a red here means a network/key problem, caught before
+any spend.
 
 ## Running Exp 2-S (order is part of the pre-registration)
 

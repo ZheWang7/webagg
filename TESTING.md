@@ -1,6 +1,6 @@
 # TESTING.md — test architecture and verification report
 
-Suite: **92 tests (87 offline + 5 opt-in online), 10 layers, ~98% line
+Suite: **101 tests (95 offline + 6 opt-in online), 10 layers, ~98% line
 coverage of `webaggs/`**, pyflakes clean. Run with `pytest` from the repo root. The suite is the gate: it must
 be green before any live spend (`run_exp2s.py` and the notebook both say so).
 
