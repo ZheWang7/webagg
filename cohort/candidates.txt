@@ -28,7 +28,6 @@ Michael Dal Colle | 8477936
 Zach Boychuk | 8474576
 Hunter Shinkaruk | 8477445
 Duncan Siemens | 8476464
-Dylan McIlrath | 8475795
 Kerby Rychel | 8477510
 Logan Brown | 8479366
 Stuart Percy | 8476478
@@ -44,6 +43,7 @@ Teemu Hartikainen | 8474719
 Michael Bournival | 8475739
 Matt Puempel | 8476477
 #
-# Dropped after resolution: Brendan Gaunce (214 GP -> neither prereg bucket);
+# Dropped after resolution: Dylan McIlrath (last_season 2026-27 -> ACTIVE,
+# retired-only rule); Brendan Gaunce (214 GP -> neither prereg bucket);
 # Lias Andersson, Nic Petan (league search returned no unique match; not
 # needed — 24 fringe already verified).
