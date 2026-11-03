@@ -66,6 +66,13 @@ career); records are seasons.
 
 ## 4. Cohort selection rule  *(supervisor signs this section)*
 
+**Retired players only** (added 2026-11-03, before sign-off): an active
+player's in-progress season changes nightly, so a frozen truth table goes
+stale within days — the value grading and the SUM/COUNT checksums would be
+scored against a moving target. Eligibility: last NHL season completed
+before the truth-build date (checked from resolution_report.csv's
+last_season column, never from memory).
+
 Target ~25–30 players, drawn BEFORE any live run from the frozen
 `cohort_report.csv` (official career-games numbers):
 

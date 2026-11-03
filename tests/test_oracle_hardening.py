@@ -161,3 +161,19 @@ def test_resolver_name_matching_and_result_parsing():
                            "lastName": {"default": "B"}}) == (1, "A B")
     assert _result_fields({"weird": 1}) is None
     assert _result_fields({"playerId": "abc", "name": "X"}) is None
+
+
+def test_resolver_prefers_unique_exact_match_over_fold():
+    """'Marian Hossa' and 'Marcel Hossa' both fold-match 'M... Hossa';
+    a unique EXACT match must win before the fold is consulted."""
+    import sys
+    from pathlib import Path
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
+    from resolve_candidates import names_match
+    from webaggs.canon import normalize_name
+    results = [(1, "Marian Hossa"), (2, "Marcel Hossa")]
+    exact = sorted({i for i, n in results
+                    if normalize_name(n) == normalize_name("Marian Hossa")})
+    folded = sorted({i for i, n in results if names_match("Marian Hossa", n)})
+    assert folded == [1, 2]            # the fold alone is ambiguous
+    assert exact == [1]                # the exact preference resolves it

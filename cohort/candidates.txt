@@ -3,13 +3,16 @@
 # and writes resolution_report.csv with GP for the PREREGISTRATION §4 rule.
 # Lines: 'Name' (to resolve) or 'Name | PLAYER_ID' (to verify).
 #
-# Anchor stars (>= 500 GP expected). McDavid and Kane ids were already
-# live-verified by CI runs; Matthews corroborated by search; all re-verified.
-Connor McDavid | 8478402
-Patrick Kane | 8474141
-Auston Matthews | 8479318
-Sidney Crosby | 8471675
-Alex Ovechkin | 8471214
+# Anchor stars (>= 500 GP, RETIRED ONLY — prereg §4): active players carry
+# a live in-progress season whose totals move nightly, so a frozen truth
+# table goes stale within days and poisons value grading and SUM/COUNT
+# checksums. Retired careers are permanently settled. Thornton (2005-06)
+# and Iginla (2012-13) carry mid-season trades.
+Joe Thornton
+Jarome Iginla
+Patrick Marleau
+Marian Hossa
+Henrik Sedin
 #
 # Fringe candidates (<= 150 GP expected — resolution_report.csv decides).
 # Mix: famous short-career first-rounders (well covered by draft/bust

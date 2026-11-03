@@ -94,9 +94,11 @@ def main() -> int:
 
         if pid is None:                               # factor 1: name -> id
             time.sleep(0.5)
-            matches = [(i, n) for i, n in search_player(label)
-                       if names_match(label, n)]
-            ids = sorted({i for i, _ in matches})
+            results = search_player(label)
+            exact = sorted({i for i, n in results
+                            if normalize_name(n) == normalize_name(label)})
+            matches = [(i, n) for i, n in results if names_match(label, n)]
+            ids = exact if len(exact) == 1 else sorted({i for i, _ in matches})
             if len(ids) != 1:
                 failures.append(f"{label}: {'AMBIGUOUS ' + str(matches[:6]) if ids else 'NOT FOUND in league search'}")
                 out_lines.append(ln)                  # leave line untouched
@@ -117,14 +119,16 @@ def main() -> int:
 
         gp = sum(r["gp"] for r in seasons)
         pts = sum(r["pts"] for r in seasons)
+        last = max(r["season"] for r in seasons)
         bucket = ("star" if gp >= 500 else
                   "fringe" if gp <= 150 else "NEITHER (prereg §4)")
         rows.append({"player": official, "player_id": pid,
                      "n_seasons": len(seasons), "career_gp": gp,
-                     "career_pts": pts, "bucket": bucket})
+                     "career_pts": pts, "last_season": last,
+                     "bucket": bucket})
         out_lines.append(f"{official} | {pid}")
         print(f"  OK  {official:<24} {pid}  {len(seasons):2d} seasons "
-              f"{gp:4d} GP {pts:4d} pts  [{bucket}]")
+              f"{gp:4d} GP {pts:4d} pts  last {last}  [{bucket}]")
 
     CANDIDATES.write_text("\n".join(out_lines) + "\n", encoding="utf-8")
     if rows:
