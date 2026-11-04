@@ -109,12 +109,17 @@ def canonical_doi(text) -> str | None:
 
 
 def normalize_title(title: str) -> str:
-    """Normalized paper title for keying: ASCII-folded, lowercase,
-    alphanumerics and single spaces only, truncated to 160 chars. The SAME
-    function keys truth and assertions, so variants join when the words do."""
+    """Normalized paper title for keying: accent-folded (NFKD, combining
+    marks stripped — so é joins e), casefolded, Unicode punctuation removed
+    but NON-LATIN SCRIPTS PRESERVED (the citation graph is full of CJK and
+    Cyrillic titles; ASCII-folding erased them — found live by the driver's
+    unkeyable-citer refusal on W37211910). Same function on both sides, so
+    truth and assertions join whenever the characters do."""
     s = unicodedata.normalize("NFKD", str(title or ""))
     s = "".join(ch for ch in s if not unicodedata.combining(ch))
-    s = re.sub(r"[^a-z0-9 ]", " ", s.lower())
+    s = s.casefold()
+    s = re.sub(r"[^\w\s]", " ", s)          # \w is Unicode-aware in py3
+    s = re.sub(r"_", " ", s)
     s = re.sub(r"\s+", " ", s).strip()
     return s[:160].strip()
 
@@ -127,6 +132,8 @@ def cite_key_from_parts(doi, title) -> str | None:
     if d:
         return f"doi:{d}"
     t = normalize_title(title)
-    if t and len(t.split()) >= 3:
+    # keyable: >= 3 tokens (spaced scripts) OR >= 6 characters ignoring
+    # spaces (CJK and other unspaced scripts carry whole words per glyph)
+    if t and (len(t.split()) >= 3 or len(t.replace(" ", "")) >= 6):
         return f"t:{t}"
     return None

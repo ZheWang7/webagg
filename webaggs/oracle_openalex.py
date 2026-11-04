@@ -20,6 +20,7 @@ Scope rules it encodes (PREREGISTRATION_EXP2C.md):
 """
 from __future__ import annotations
 
+import os
 import time
 
 import requests
@@ -48,6 +49,12 @@ class OpenAlexDriver:
         self._last = 0.0
 
     def _get(self, params: dict) -> dict:
+        # OpenAlex meters anonymous access (shared $0.10/day per IP, per its
+        # own meta notice); a free account key gets its own budget. Read it
+        # from OPENALEX_API_KEY (via .env) when present.
+        key = os.environ.get("OPENALEX_API_KEY")
+        if key:
+            params = {**params, "api_key": key}
         wait = self.pace - (time.time() - self._last)
         if wait > 0:
             time.sleep(wait)

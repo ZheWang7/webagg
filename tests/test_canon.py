@@ -49,3 +49,17 @@ def test_canonical_doi_and_cite_key():
     # the SAME normalized form keys arXiv-vs-journal title variants together
     assert normalize_title("BERT: Pre-training of Deep  Bidirectional—Transformers") == \
         normalize_title("bert pre training of deep bidirectional transformers")
+
+
+def test_nonlatin_titles_key_instead_of_vanishing():
+    """Live-data regression (W37211910): CJK titles must survive
+    normalization and form keys; ASCII-folding erased them."""
+    from webaggs.canon import cite_key_from_parts, normalize_title
+    jp = "連載 メディアを人権から読む--「新民世界」"
+    assert len(normalize_title(jp).replace(" ", "")) >= 6
+    key = cite_key_from_parts("", jp)
+    assert key and key.startswith("t:")
+    assert cite_key_from_parts("", jp) == cite_key_from_parts("", jp + " 。")
+    # accent folding still joins Latin variants
+    assert normalize_title("Évaluation de méthodes") == \
+        normalize_title("evaluation de methodes")

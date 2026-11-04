@@ -105,3 +105,16 @@ def test_timeout_retried_once_then_succeeds_and_hard_404():
     with pytest.raises(OracleError, match="404"):
         d.work_meta("W0")
     assert d.client.calls == 1                    # 404 never retried
+
+
+def test_api_key_env_reaches_requests(monkeypatch):
+    client = _Client([_page([_work(1)], 1, None)])
+    d = OpenAlexDriver(pace_seconds=0, retry_cooldown=0, client=client)
+    monkeypatch.setenv("OPENALEX_API_KEY", "k-test")
+    d.citers("W1", "2026-06-30")
+    assert client.seen_params[0]["api_key"] == "k-test"
+    monkeypatch.delenv("OPENALEX_API_KEY")
+    client2 = _Client([_page([_work(1)], 1, None)])
+    d2 = OpenAlexDriver(pace_seconds=0, retry_cooldown=0, client=client2)
+    d2.citers("W1", "2026-06-30")
+    assert "api_key" not in client2.seen_params[0]
