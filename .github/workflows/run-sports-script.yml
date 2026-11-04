@@ -1,0 +1,39 @@
+# Generic dispatch-only runner for SPORTS-branch dev scripts (feasibility
+# probes, candidate resolvers). Runs the given script on the sports branch
+# and commits anything it wrote under data/ci/ or cohort/ back to sports.
+# Touches no finance code. Safe to delete.
+name: run-sports-script
+on:
+  workflow_dispatch:
+    inputs:
+      script:
+        description: "script path on the sports branch"
+        required: true
+        default: "scripts/probe_phase2.py"
+
+permissions:
+  contents: write
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: sports
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install requests
+      - name: run script
+        run: python "${{ inputs.script }}"
+      - name: commit outputs back to sports
+        if: always()
+        run: |
+          git config user.name "Zhe Wang"
+          git config user.email "jameswangzhe1110@gmail.com"
+          git add data/ci cohort 2>/dev/null || true
+          if git diff --cached --quiet; then echo "nothing to commit"; exit 0; fi
+          git commit -m "CI output: ${{ inputs.script }}" -m "Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>" -m "Claude-Session: https://claude.ai/code/session_01QRRix2uLG54HPuUbB2BLeQ"
+          git push origin HEAD:sports
