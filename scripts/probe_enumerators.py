@@ -25,9 +25,17 @@ from __future__ import annotations
 
 import argparse
 import os
+import sys
 import time
+from pathlib import Path
 
 import requests
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from webaggs import config  # noqa: E402  (importing it loads .env -> S2_API_KEY)
+
+ENV_LOADED = config.DATA_DIR is not None   # touch config: the import is for its side effect
 
 # AlphaFold 2 (Jumper et al. 2021): same paper known to both indexes
 DEFAULT_PMID = "34265844"
@@ -39,13 +47,21 @@ PAUSE = 1.5          # polite pacing: both APIs are free/anonymous
 
 
 def get(url, params):
-    """One GET with loud, informative failure (probe = diagnosis tool)."""
-    time.sleep(PAUSE)
-    r = requests.get(url, params=params, timeout=30)
-    if r.status_code != 200:
-        # the error BODY is the finding (e.g. S2 names its offset cap)
-        return {"__status": r.status_code, "__body": r.text[:300]}
-    return r.json()
+    """One GET with loud, informative failure (probe = diagnosis tool).
+    429 = rate limit, NOT an API cap: back off and retry a few times so a
+    saturated anonymous pool is not misread as a pagination limit."""
+    headers = {}
+    if url.startswith(S2) and os.environ.get("S2_API_KEY"):
+        headers["x-api-key"] = os.environ["S2_API_KEY"]   # 1 req/s with key
+    for attempt in range(4):
+        time.sleep(PAUSE if attempt == 0 else 8 * attempt)
+        r = requests.get(url, params=params, headers=headers, timeout=30)
+        if r.status_code == 429 and attempt < 3:
+            continue
+        if r.status_code != 200:
+            # the error BODY is the finding (e.g. S2 names its offset cap)
+            return {"__status": r.status_code, "__body": r.text[:300]}
+        return r.json()
 
 
 def s2_doi(entry):
@@ -77,11 +93,16 @@ def probe_s2(doi):
         if "data" in j:
             print(f"  offset={off:5d} -> ok ({len(j['data'])} entries, "
                   f"next={j.get('next')})")
+        elif j["__status"] == 429:
+            print(f"  offset={off:5d} -> 429 rate-limited (NOT a cap; "
+                  "set S2_API_KEY and re-run)")
+            cap = "unmeasured (429)"
+            break
         else:
             print(f"  offset={off:5d} -> HTTP {j['__status']}: {j['__body']}")
             cap = off
             break
-    print(f"  DEPTH CAP: {'~'+str(cap) if cap else 'none found <= 12000'}")
+    print(f"  DEPTH CAP: {cap if cap else 'none found <= 12000'}")
 
     # Q3: DOI keyability on a sample page
     j = get(url, {"fields": "externalIds,title", "limit": 100, "offset": 0})
@@ -123,11 +144,28 @@ def probe_epmc(pmid):
             break                                  # walked past the end: fine
     print(f"  DEPTH CAP: {'~'+str(cap) if cap else 'none hit'}")
 
-    # Q3: DOI keyability
+    # Q3: DOI keyability. The /citations endpoint returns LIGHT entries
+    # (pmid, title, no DOI). The SEARCH endpoint with a CITES: query
+    # returns full records WITH doi and cursor-based deep paging — that
+    # is the enumerator the plug-in would actually walk, so probe it.
     jj = get(url, {"page": 1, "pageSize": 100, "format": "json"})
     rows = (jj.get("citationList") or {}).get("citation", [])
     dois = [d for d in (epmc_doi(e) for e in rows) if d]
-    print(f"  keyability: {len(dois)}/{len(rows)} entries carry a DOI")
+    print(f"  /citations keyability: {len(dois)}/{len(rows)} carry a DOI "
+          f"(fields: {sorted(rows[0].keys()) if rows else '-'})")
+    surl = f"{EPMC}/search"
+    sj = get(surl, {"query": f"CITES:{pmid}_MED", "format": "json",
+                    "resultType": "lite", "pageSize": 100, "cursorMark": "*"})
+    if "__status" in sj:
+        print(f"  /search CITES: FAILED HTTP {sj['__status']}: {sj['__body']}")
+    else:
+        hits = (sj.get("resultList") or {}).get("result", [])
+        sd = [d for d in (epmc_doi(h) for h in hits) if d]
+        print(f"  /search CITES: hitCount={sj.get('hitCount')}, page={len(hits)}, "
+              f"DOI keyability {len(sd)}/{len(hits)}, "
+              f"nextCursorMark={'yes' if sj.get('nextCursorMark') else 'no'}")
+        if sd:
+            dois = sd                              # the walkable, keyable set
     return total, set(dois), cap
 
 
