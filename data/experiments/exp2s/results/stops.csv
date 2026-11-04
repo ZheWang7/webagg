@@ -1,0 +1,117 @@
+player,eps,stop_step,stop_kind,censored,spend_at_stop,recall_at_stop,promised,violated
+akim aliu,0.05,,censored,1,0.48,1.0,0.95,0
+akim aliu,0.1,,censored,1,0.48,1.0,0.9,0
+akim aliu,0.2,,censored,1,0.48,1.0,0.8,0
+akim aliu,0.3,,censored,1,0.48,1.0,0.7,0
+christian hanson,0.05,5,checksum,0,0.1,1.0,0.95,0
+christian hanson,0.1,5,checksum,0,0.1,1.0,0.9,0
+christian hanson,0.2,5,checksum,0,0.1,1.0,0.8,0
+christian hanson,0.3,5,checksum,0,0.1,1.0,0.7,0
+duncan siemens,0.05,3,checksum,0,0.06,1.0,0.95,0
+duncan siemens,0.1,3,checksum,0,0.06,1.0,0.9,0
+duncan siemens,0.2,3,checksum,0,0.06,1.0,0.8,0
+duncan siemens,0.3,3,checksum,0,0.06,1.0,0.7,0
+fabian brunnstrom,0.05,2,checksum,0,0.04,1.0,0.95,0
+fabian brunnstrom,0.1,2,checksum,0,0.04,1.0,0.9,0
+fabian brunnstrom,0.2,2,checksum,0,0.04,1.0,0.8,0
+fabian brunnstrom,0.3,2,checksum,0,0.04,1.0,0.7,0
+griffin reinhart,0.05,1,checksum,0,0.02,1.0,0.95,0
+griffin reinhart,0.1,1,checksum,0,0.02,1.0,0.9,0
+griffin reinhart,0.2,1,checksum,0,0.02,1.0,0.8,0
+griffin reinhart,0.3,1,checksum,0,0.02,1.0,0.7,0
+henrik sedin,0.05,2,checksum,0,0.04,1.0,0.95,0
+henrik sedin,0.1,2,checksum,0,0.04,1.0,0.9,0
+henrik sedin,0.2,2,checksum,0,0.04,1.0,0.8,0
+henrik sedin,0.3,2,checksum,0,0.04,1.0,0.7,0
+hugh jessiman,0.05,1,checksum,0,0.02,1.0,0.95,0
+hugh jessiman,0.1,1,checksum,0,0.02,1.0,0.9,0
+hugh jessiman,0.2,1,checksum,0,0.02,1.0,0.8,0
+hugh jessiman,0.3,1,checksum,0,0.02,1.0,0.7,0
+hunter shinkaruk,0.05,1,checksum,0,0.02,1.0,0.95,0
+hunter shinkaruk,0.1,1,checksum,0,0.02,1.0,0.9,0
+hunter shinkaruk,0.2,1,checksum,0,0.02,1.0,0.8,0
+hunter shinkaruk,0.3,1,checksum,0,0.02,1.0,0.7,0
+jarome iginla,0.05,1,checksum,0,0.02,1.0,0.95,0
+jarome iginla,0.1,1,checksum,0,0.02,1.0,0.9,0
+jarome iginla,0.2,1,checksum,0,0.02,1.0,0.8,0
+jarome iginla,0.3,1,checksum,0,0.02,1.0,0.7,0
+jerry d amigo,0.05,3,checksum,0,0.06,1.0,0.95,0
+jerry d amigo,0.1,3,checksum,0,0.06,1.0,0.9,0
+jerry d amigo,0.2,3,checksum,0,0.06,1.0,0.8,0
+jerry d amigo,0.3,3,checksum,0,0.06,1.0,0.7,0
+joe thornton,0.05,7,checksum,0,0.14,1.0,0.95,0
+joe thornton,0.1,7,checksum,0,0.14,1.0,0.9,0
+joe thornton,0.2,7,checksum,0,0.14,1.0,0.8,0
+joe thornton,0.3,7,checksum,0,0.14,1.0,0.7,0
+joshua ho sang,0.05,6,checksum,0,0.12,1.0,0.95,0
+joshua ho sang,0.1,6,checksum,0,0.12,1.0,0.9,0
+joshua ho sang,0.2,6,checksum,0,0.12,1.0,0.8,0
+joshua ho sang,0.3,6,checksum,0,0.12,1.0,0.7,0
+kerby rychel,0.05,2,checksum,0,0.04,1.0,0.95,0
+kerby rychel,0.1,2,checksum,0,0.04,1.0,0.9,0
+kerby rychel,0.2,2,checksum,0,0.04,1.0,0.8,0
+kerby rychel,0.3,2,checksum,0,0.04,1.0,0.7,0
+linus omark,0.05,2,checksum,0,0.04,1.0,0.95,0
+linus omark,0.1,2,checksum,0,0.04,1.0,0.9,0
+linus omark,0.2,2,checksum,0,0.04,1.0,0.8,0
+linus omark,0.3,2,checksum,0,0.04,1.0,0.7,0
+logan brown,0.05,3,checksum,0,0.06,1.0,0.95,0
+logan brown,0.1,3,checksum,0,0.06,1.0,0.9,0
+logan brown,0.2,3,checksum,0,0.06,1.0,0.8,0
+logan brown,0.3,3,checksum,0,0.06,1.0,0.7,0
+marian hossa,0.05,4,checksum,0,0.08,1.0,0.95,0
+marian hossa,0.1,4,checksum,0,0.08,1.0,0.9,0
+marian hossa,0.2,4,checksum,0,0.08,1.0,0.8,0
+marian hossa,0.3,4,checksum,0,0.08,1.0,0.7,0
+mark arcobello,0.05,3,checksum,0,0.06,1.0,0.95,0
+mark arcobello,0.1,3,checksum,0,0.06,1.0,0.9,0
+mark arcobello,0.2,3,checksum,0,0.06,1.0,0.8,0
+mark arcobello,0.3,3,checksum,0,0.06,1.0,0.7,0
+mark mcneill,0.05,1,checksum,0,0.02,1.0,0.95,0
+mark mcneill,0.1,1,checksum,0,0.02,1.0,0.9,0
+mark mcneill,0.2,1,checksum,0,0.02,1.0,0.8,0
+mark mcneill,0.3,1,checksum,0,0.02,1.0,0.7,0
+matt frattin,0.05,1,checksum,0,0.02,1.0,0.95,0
+matt frattin,0.1,1,checksum,0,0.02,1.0,0.9,0
+matt frattin,0.2,1,checksum,0,0.02,1.0,0.8,0
+matt frattin,0.3,1,checksum,0,0.02,1.0,0.7,0
+matt puempel,0.05,1,checksum,0,0.02,1.0,0.95,0
+matt puempel,0.1,1,checksum,0,0.02,1.0,0.9,0
+matt puempel,0.2,1,checksum,0,0.02,1.0,0.8,0
+matt puempel,0.3,1,checksum,0,0.02,1.0,0.7,0
+michael bournival,0.05,1,checksum,0,0.02,1.0,0.95,0
+michael bournival,0.1,1,checksum,0,0.02,1.0,0.9,0
+michael bournival,0.2,1,checksum,0,0.02,1.0,0.8,0
+michael bournival,0.3,1,checksum,0,0.02,1.0,0.7,0
+michael dal colle,0.05,1,checksum,0,0.02,1.0,0.95,0
+michael dal colle,0.1,1,checksum,0,0.02,1.0,0.9,0
+michael dal colle,0.2,1,checksum,0,0.02,1.0,0.8,0
+michael dal colle,0.3,1,checksum,0,0.02,1.0,0.7,0
+nikita filatov,0.05,4,checksum,0,0.08,1.0,0.95,0
+nikita filatov,0.1,4,checksum,0,0.08,1.0,0.9,0
+nikita filatov,0.2,4,checksum,0,0.08,1.0,0.8,0
+nikita filatov,0.3,4,checksum,0,0.08,1.0,0.7,0
+patrick marleau,0.05,3,checksum,0,0.06,1.0,0.95,0
+patrick marleau,0.1,3,checksum,0,0.06,1.0,0.9,0
+patrick marleau,0.2,3,checksum,0,0.06,1.0,0.8,0
+patrick marleau,0.3,3,checksum,0,0.06,1.0,0.7,0
+rob schremp,0.05,1,checksum,0,0.02,1.0,0.95,0
+rob schremp,0.1,1,checksum,0,0.02,1.0,0.9,0
+rob schremp,0.2,1,checksum,0,0.02,1.0,0.8,0
+rob schremp,0.3,1,checksum,0,0.02,1.0,0.7,0
+scott glennie,0.05,2,checksum,0,0.04,1.0,0.95,0
+scott glennie,0.1,2,checksum,0,0.04,1.0,0.9,0
+scott glennie,0.2,2,checksum,0,0.04,1.0,0.8,0
+scott glennie,0.3,2,checksum,0,0.04,1.0,0.7,0
+stuart percy,0.05,2,checksum,0,0.04,1.0,0.95,0
+stuart percy,0.1,2,checksum,0,0.04,1.0,0.9,0
+stuart percy,0.2,2,checksum,0,0.04,1.0,0.8,0
+stuart percy,0.3,2,checksum,0,0.04,1.0,0.7,0
+teemu hartikainen,0.05,1,checksum,0,0.02,1.0,0.95,0
+teemu hartikainen,0.1,1,checksum,0,0.02,1.0,0.9,0
+teemu hartikainen,0.2,1,checksum,0,0.02,1.0,0.8,0
+teemu hartikainen,0.3,1,checksum,0,0.02,1.0,0.7,0
+zach boychuk,0.05,4,checksum,0,0.08,1.0,0.95,0
+zach boychuk,0.1,4,checksum,0,0.08,1.0,0.9,0
+zach boychuk,0.2,4,checksum,0,0.08,1.0,0.8,0
+zach boychuk,0.3,4,checksum,0,0.08,1.0,0.7,0

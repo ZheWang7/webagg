@@ -1,0 +1,30 @@
+player,certificate,stop_reason,n_truth,n_asserted,record_recall,exact_recall,n_spurious,true_total,asserted_total,rel_agg_error
+akim aliu,abandoned,frontier_exhausted,2,3,1.0,1.0,1,3,6,1.0
+christian hanson,checksum,certified,3,3,1.0,1.0,0,9,9,0.0
+duncan siemens,checksum,certified,3,3,1.0,1.0,0,2,2,0.0
+fabian brunnstrom,checksum,certified,3,3,1.0,1.0,0,41,41,0.0
+griffin reinhart,checksum,certified,2,2,1.0,1.0,0,2,2,0.0
+henrik sedin,checksum,certified,17,17,1.0,1.0,0,1070,1070,0.0
+hugh jessiman,checksum,certified,1,1,1.0,1.0,0,0,0,0.0
+hunter shinkaruk,checksum,certified,2,2,1.0,1.0,0,4,4,0.0
+jarome iginla,checksum,certified,20,21,1.0,1.0,1,1300,1302,0.0015
+jerry d amigo,checksum,certified,2,2,1.0,1.0,0,3,3,0.0
+joe thornton,checksum,certified,24,24,1.0,1.0,0,1539,1539,0.0
+joshua ho sang,checksum,certified,3,3,1.0,1.0,0,24,24,0.0
+kerby rychel,checksum,certified,4,4,1.0,1.0,0,14,14,0.0
+linus omark,checksum,certified,3,3,1.0,1.0,0,32,32,0.0
+logan brown,checksum,certified,6,6,1.0,1.0,0,26,26,0.0
+marian hossa,checksum,certified,19,19,1.0,0.9474,0,1134,1078,0.0494
+mark arcobello,checksum,certified,4,4,1.0,1.0,0,53,53,0.0
+mark mcneill,checksum,certified,2,2,1.0,1.0,0,0,0,0.0
+matt frattin,checksum,certified,5,5,1.0,1.0,0,35,35,0.0
+matt puempel,checksum,certified,4,4,1.0,1.0,0,16,16,0.0
+michael bournival,checksum,certified,4,4,1.0,1.0,0,22,22,0.0
+michael dal colle,checksum,certified,5,5,1.0,1.0,0,21,21,0.0
+nikita filatov,checksum,certified,4,4,1.0,1.0,0,14,14,0.0
+patrick marleau,checksum,certified,23,23,1.0,1.0,0,1197,1197,0.0
+rob schremp,checksum,certified,5,5,1.0,1.0,0,54,54,0.0
+scott glennie,checksum,certified,1,1,1.0,1.0,0,0,0,0.0
+stuart percy,checksum,certified,2,2,1.0,1.0,0,3,3,0.0
+teemu hartikainen,checksum,certified,3,3,1.0,1.0,0,13,13,0.0
+zach boychuk,checksum,certified,7,7,1.0,1.0,0,30,30,0.0

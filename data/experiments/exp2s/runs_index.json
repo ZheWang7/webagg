@@ -1,0 +1,234 @@
+{
+  "akim aliu": {
+    "done": true,
+    "run_id": "exp2s_nhl_v1_akim_aliu",
+    "stop_reason": "frontier_exhausted",
+    "certificate": "abandoned",
+    "total": 6,
+    "n_records": 3
+  },
+  "christian hanson": {
+    "done": true,
+    "run_id": "exp2s_nhl_v1_christian_hanson",
+    "stop_reason": "certified",
+    "certificate": "checksum",
+    "total": 9,
+    "n_records": 3
+  },
+  "duncan siemens": {
+    "done": true,
+    "run_id": "exp2s_nhl_v1_duncan_siemens",
+    "stop_reason": "certified",
+    "certificate": "checksum",
+    "total": 2,
+    "n_records": 3
+  },
+  "fabian brunnstrom": {
+    "done": true,
+    "run_id": "exp2s_nhl_v1_fabian_brunnstrom",
+    "stop_reason": "certified",
+    "certificate": "checksum",
+    "total": 41,
+    "n_records": 3
+  },
+  "griffin reinhart": {
+    "done": true,
+    "run_id": "exp2s_nhl_v1_griffin_reinhart",
+    "stop_reason": "certified",
+    "certificate": "checksum",
+    "total": 2,
+    "n_records": 2
+  },
+  "henrik sedin": {
+    "done": true,
+    "run_id": "exp2s_nhl_v1_henrik_sedin",
+    "stop_reason": "certified",
+    "certificate": "checksum",
+    "total": 1070,
+    "n_records": 17
+  },
+  "hugh jessiman": {
+    "done": true,
+    "run_id": "exp2s_nhl_v1_hugh_jessiman",
+    "stop_reason": "certified",
+    "certificate": "checksum",
+    "total": 0,
+    "n_records": 1
+  },
+  "hunter shinkaruk": {
+    "done": true,
+    "run_id": "exp2s_nhl_v1_hunter_shinkaruk",
+    "stop_reason": "certified",
+    "certificate": "checksum",
+    "total": 4,
+    "n_records": 2
+  },
+  "jarome iginla": {
+    "done": true,
+    "run_id": "exp2s_nhl_v1_jarome_iginla",
+    "stop_reason": "certified",
+    "certificate": "checksum",
+    "total": 1302,
+    "n_records": 21
+  },
+  "jerry d amigo": {
+    "done": true,
+    "run_id": "exp2s_nhl_v1_jerry_d_amigo",
+    "stop_reason": "certified",
+    "certificate": "checksum",
+    "total": 3,
+    "n_records": 2
+  },
+  "joe thornton": {
+    "done": true,
+    "run_id": "exp2s_nhl_v1_joe_thornton",
+    "stop_reason": "certified",
+    "certificate": "checksum",
+    "total": 1539,
+    "n_records": 24
+  },
+  "joshua ho sang": {
+    "done": true,
+    "run_id": "exp2s_nhl_v1_joshua_ho_sang",
+    "stop_reason": "certified",
+    "certificate": "checksum",
+    "total": 24,
+    "n_records": 3
+  },
+  "kerby rychel": {
+    "done": true,
+    "run_id": "exp2s_nhl_v1_kerby_rychel",
+    "stop_reason": "certified",
+    "certificate": "checksum",
+    "total": 14,
+    "n_records": 4
+  },
+  "linus omark": {
+    "done": true,
+    "run_id": "exp2s_nhl_v1_linus_omark",
+    "stop_reason": "certified",
+    "certificate": "checksum",
+    "total": 32,
+    "n_records": 3
+  },
+  "logan brown": {
+    "done": true,
+    "run_id": "exp2s_nhl_v1_logan_brown",
+    "stop_reason": "certified",
+    "certificate": "checksum",
+    "total": 26,
+    "n_records": 6
+  },
+  "marian hossa": {
+    "done": true,
+    "run_id": "exp2s_nhl_v1_marian_hossa",
+    "stop_reason": "certified",
+    "certificate": "checksum",
+    "total": 1078,
+    "n_records": 19
+  },
+  "mark arcobello": {
+    "done": true,
+    "run_id": "exp2s_nhl_v1_mark_arcobello",
+    "stop_reason": "certified",
+    "certificate": "checksum",
+    "total": 53,
+    "n_records": 4
+  },
+  "mark mcneill": {
+    "done": true,
+    "run_id": "exp2s_nhl_v1_mark_mcneill",
+    "stop_reason": "certified",
+    "certificate": "checksum",
+    "total": 0,
+    "n_records": 2
+  },
+  "matt frattin": {
+    "done": true,
+    "run_id": "exp2s_nhl_v1_matt_frattin",
+    "stop_reason": "certified",
+    "certificate": "checksum",
+    "total": 35,
+    "n_records": 5
+  },
+  "matt puempel": {
+    "done": true,
+    "run_id": "exp2s_nhl_v1_matt_puempel",
+    "stop_reason": "certified",
+    "certificate": "checksum",
+    "total": 16,
+    "n_records": 4
+  },
+  "michael bournival": {
+    "done": true,
+    "run_id": "exp2s_nhl_v1_michael_bournival",
+    "stop_reason": "certified",
+    "certificate": "checksum",
+    "total": 22,
+    "n_records": 4
+  },
+  "michael dal colle": {
+    "done": true,
+    "run_id": "exp2s_nhl_v1_michael_dal_colle",
+    "stop_reason": "certified",
+    "certificate": "checksum",
+    "total": 21,
+    "n_records": 5
+  },
+  "nikita filatov": {
+    "done": true,
+    "run_id": "exp2s_nhl_v1_nikita_filatov",
+    "stop_reason": "certified",
+    "certificate": "checksum",
+    "total": 14,
+    "n_records": 4
+  },
+  "patrick marleau": {
+    "done": true,
+    "run_id": "exp2s_nhl_v1_patrick_marleau",
+    "stop_reason": "certified",
+    "certificate": "checksum",
+    "total": 1197,
+    "n_records": 23
+  },
+  "rob schremp": {
+    "done": true,
+    "run_id": "exp2s_nhl_v1_rob_schremp",
+    "stop_reason": "certified",
+    "certificate": "checksum",
+    "total": 54,
+    "n_records": 5
+  },
+  "scott glennie": {
+    "done": true,
+    "run_id": "exp2s_nhl_v1_scott_glennie",
+    "stop_reason": "certified",
+    "certificate": "checksum",
+    "total": 0,
+    "n_records": 1
+  },
+  "stuart percy": {
+    "done": true,
+    "run_id": "exp2s_nhl_v1_stuart_percy",
+    "stop_reason": "certified",
+    "certificate": "checksum",
+    "total": 3,
+    "n_records": 2
+  },
+  "teemu hartikainen": {
+    "done": true,
+    "run_id": "exp2s_nhl_v1_teemu_hartikainen",
+    "stop_reason": "certified",
+    "certificate": "checksum",
+    "total": 13,
+    "n_records": 3
+  },
+  "zach boychuk": {
+    "done": true,
+    "run_id": "exp2s_nhl_v1_zach_boychuk",
+    "stop_reason": "certified",
+    "certificate": "checksum",
+    "total": 30,
+    "n_records": 7
+  }
+}
