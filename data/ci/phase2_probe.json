@@ -1,0 +1,170 @@
+{
+ "clinicaltrials": [
+  {
+   "query": "intervention: pembrolizumab",
+   "total": 3001
+  },
+  {
+   "query": "intervention: metformin",
+   "total": 3137
+  },
+  {
+   "query": "intervention: semaglutide",
+   "total": 796
+  },
+  {
+   "query": "condition: breast cancer",
+   "total": 16983
+  },
+  {
+   "query": "cond breast cancer, phase 3 only",
+   "total": 1564
+  }
+ ],
+ "openalex": [
+  {
+   "paper": "BERT: Pre-training of Deep Bidirectional Transformers",
+   "matched": "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding",
+   "id": "https://openalex.org/W2896457183",
+   "cited_by_count": 47071,
+   "year": 2018
+  },
+  {
+   "paper": "Attention Is All You Need",
+   "matched": "Attention Is All You Need",
+   "id": "https://openalex.org/W2626778328",
+   "cited_by_count": 122093,
+   "year": 2017
+  },
+  {
+   "paper": "Deep Residual Learning for Image Recognition",
+   "matched": "Deep Residual Learning for Image Recognition",
+   "id": "https://openalex.org/W2194775991",
+   "cited_by_count": 237350,
+   "year": 2016
+  }
+ ],
+ "ct_schema_sections": {
+  "identificationModule": [
+   "acronym",
+   "briefTitle",
+   "nctId",
+   "officialTitle",
+   "orgStudyIdInfo",
+   "organization",
+   "secondaryIdInfos"
+  ],
+  "statusModule": [
+   "completionDateStruct",
+   "expandedAccessInfo",
+   "lastUpdatePostDateStruct",
+   "lastUpdateSubmitDate",
+   "overallStatus",
+   "primaryCompletionDateStruct",
+   "resultsFirstPostDateStruct",
+   "resultsFirstSubmitDate",
+   "resultsFirstSubmitQcDate",
+   "startDateStruct",
+   "statusVerifiedDate",
+   "studyFirstPostDateStruct",
+   "studyFirstSubmitDate",
+   "studyFirstSubmitQcDate"
+  ],
+  "sponsorCollaboratorsModule": [
+   "leadSponsor",
+   "responsibleParty"
+  ],
+  "oversightModule": [
+   "oversightHasDmc"
+  ],
+  "descriptionModule": [
+   "briefSummary"
+  ],
+  "conditionsModule": [
+   "conditions",
+   "keywords"
+  ],
+  "designModule": [
+   "designInfo",
+   "enrollmentInfo",
+   "phases",
+   "studyType"
+  ],
+  "armsInterventionsModule": [
+   "armGroups",
+   "interventions"
+  ],
+  "outcomesModule": [
+   "primaryOutcomes",
+   "secondaryOutcomes"
+  ],
+  "eligibilityModule": [
+   "eligibilityCriteria",
+   "healthyVolunteers",
+   "minimumAge",
+   "sex",
+   "stdAges"
+  ],
+  "contactsLocationsModule": [
+   "locations",
+   "overallOfficials"
+  ],
+  "referencesModule": [
+   "references"
+  ]
+ },
+ "oa_work_fields": [
+  "abstract_inverted_index",
+  "apc_list",
+  "apc_paid",
+  "authorships",
+  "awards",
+  "best_oa_location",
+  "biblio",
+  "citation_normalized_percentile",
+  "cited_by_count",
+  "cited_by_percentile_year",
+  "concepts",
+  "content_urls",
+  "corresponding_author_ids",
+  "corresponding_institution_ids",
+  "countries_distinct_count",
+  "counts_by_year",
+  "created_date",
+  "display_name",
+  "doi",
+  "funders",
+  "fwci",
+  "has_content",
+  "has_fulltext",
+  "id",
+  "ids",
+  "indexed_in",
+  "institutions",
+  "institutions_distinct_count",
+  "is_paratext",
+  "is_retracted",
+  "is_xpac",
+  "keywords",
+  "language",
+  "locations",
+  "locations_count",
+  "mesh",
+  "open_access",
+  "primary_location",
+  "primary_topic",
+  "publication_date",
+  "publication_year",
+  "referenced_works",
+  "referenced_works_count",
+  "related_works",
+  "relevance_score",
+  "study_designs",
+  "sustainable_development_goals",
+  "title",
+  "topics",
+  "type",
+  "updated_date",
+  "volume"
+ ]
+}
