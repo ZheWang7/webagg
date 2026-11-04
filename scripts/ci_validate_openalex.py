@@ -40,5 +40,38 @@ def main() -> int:
     return 0
 
 
+def _diagnose():
+    """CI logs are unreachable from the dev sandbox, so the run carries
+    its own diagnostics: on ANY failure the traceback plus raw API
+    probes are committed back in the report before the nonzero exit."""
+    import json
+    import traceback
+
+    import requests
+    try:
+        return main()
+    except BaseException:
+        OUT.mkdir(parents=True, exist_ok=True)
+        probe = {}
+        for label, params in (
+            ("work_meta", {"filter": f"ids.openalex:{WID}",
+                           "per-page": 1}),
+            ("citers_page1", {"filter": f"cites:{WID},"
+                                        "to_publication_date:2017-09-01",
+                              "per-page": 3, "cursor": "*"})):
+            try:
+                r = requests.get("https://api.openalex.org/works",
+                                 params=params, timeout=30)
+                probe[label] = f"HTTP {r.status_code}: {r.text[:900]}"
+            except Exception as e:  # noqa: BLE001
+                probe[label] = f"EXC {type(e).__name__}: {e}"
+        report = ("# Exp 2-C oracle validation FAILED\n\n```\n"
+                  + traceback.format_exc()
+                  + "\n```\n\nRaw probes:\n```json\n"
+                  + json.dumps(probe, indent=1) + "\n```\n")
+        (OUT / "exp2c_oracle_check_ERROR.md").write_text(report)
+        raise
+
+
 if __name__ == "__main__":
-    raise SystemExit(main())
+    raise SystemExit(_diagnose())
