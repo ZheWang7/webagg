@@ -1,24 +1,14 @@
 """ONLINE sanity preflight — the only tests that touch the real network.
-
-Opt-in by design: skipped unless RUN_ONLINE=1, so `pytest` stays fully
-offline. Run once from the machine that will do the live runs, BEFORE any
-spend:
-
-    $env:RUN_ONLINE="1"; pytest -m online -v        (PowerShell)
-
-The two key-dependent checks cost ~$0.001 (Serper) and <$0.01 (OpenAI) and
-additionally skip when their key is absent. Nothing asserts numbers that
-can go stale — only structural invariants plus one immutable fact
-(McDavid's rookie season), and the driver ALREADY self-validates every
-career against the API's own careerTotals before returning.
-"""
+Opt-in: RUN_ONLINE=1. The oracle checks exercise the REAL driver against
+OpenAlex, including a full cursor walk with self-validation on a small
+early-cutoff slice (papers citing 'Attention Is All You Need' published
+before 2017-09-01 — a stable, finished set)."""
 import os
 
 import pytest
 
 from webaggs import config
 from webaggs.fetch import fetch_url
-from webaggs.truth import season_key
 
 pytestmark = [
     pytest.mark.online,
@@ -26,66 +16,41 @@ pytestmark = [
                        reason="online sanity is opt-in: set RUN_ONLINE=1"),
 ]
 
-
-MCDAVID_ID = 8478402        # from nhl.com/player/connor-mcdavid-8478402
-KANE_ID = 8474141           # Patrick Kane — traded mid-season 2022-23
-#                             (CHI -> NYR): exercises per-team row summing
+ATTENTION_WID = "W2626778328"       # openalex.org/W2626778328
 
 
-def test_oracle_reachable_and_self_validates():
-    """The landing endpoint — the only one the truth build uses — answers,
-    the driver's league/game-type filter reproduces the API's own career
-    totals (its built-in self-validation), and the rows have the shape the
-    truth builder expects."""
-    from webaggs.oracle_nhl import NHLDriver
-    name, rows = NHLDriver().career_regular_season(MCDAVID_ID)
-    assert name == "Connor McDavid"
-    seasons = [r["season"] for r in rows]
-    assert "2015-16" in seasons                 # rookie year: immutable fact
-    assert seasons == sorted(seasons) and len(seasons) == len(set(seasons))
-    for r in rows:
-        season_key(r["season"])                 # parses, or raises loudly
-        assert isinstance(r["pts"], int) and 0 <= r["pts"] <= config.POINTS_MAX
-        assert r["gp"] >= 0
+def test_oracle_work_meta_reachable_and_sane():
+    from webaggs.oracle_openalex import OpenAlexDriver
+    m = OpenAlexDriver().work_meta(ATTENTION_WID)
+    assert "attention is all you need" in m["title"].lower()
+    assert m["year"] == 2017
+    assert m["cited_by_count"] > 50000            # grows; floor is stable
 
 
-def test_oracle_traded_season_sums_to_one_record():
-    """McDavid has never been traded, so his career cannot exercise the
-    one remaining schema assumption: a traded season arrives as SEVERAL
-    per-team rows that the driver sums into ONE (player, season) record.
-    Kane's 2022-23 (CHI -> NYR) is the real-world instance. If the API
-    also carried a combined row, the sum would double-count and the
-    driver's self-validation against careerTotals would raise — so a
-    green run here certifies the traded-season rule on live data."""
-    from webaggs.oracle_nhl import NHLDriver
-    name, rows = NHLDriver().career_regular_season(KANE_ID)
-    assert name == "Patrick Kane"
-    by_season = {r["season"]: r for r in rows}
-    assert "2022-23" in by_season
-    assert "/" in by_season["2022-23"]["team"]   # two teams, one record
-    assert len(rows) == len({r["season"] for r in rows})
+def test_oracle_citers_walk_self_validates_on_early_slice():
+    from webaggs.oracle_openalex import OpenAlexDriver
+    rows = OpenAlexDriver().citers(ATTENTION_WID, "2017-09-01")
+    # a finished historical slice: non-empty, modest, fully keyed
+    assert 0 < len(rows) < 2000
+    assert all(r["key"].startswith(("doi:", "t:")) for r in rows)
+    assert len({r["key"] for r in rows}) == len(rows)
 
 
 def test_open_web_fetch_classifies_ok():
-    """A stable public page comes back status='ok' with real text — the
-    fetcher, UA and outbound network all work from this machine."""
     src = fetch_url("https://www.wikipedia.org", "sanity")
     assert src.status == "ok" and len(src.main_text) > 500
 
 
 def test_deny_list_blocks_the_real_oracle():
-    """The contrast line: oracle URLs are refused BEFORE any request."""
-    for url in ("https://api-web.nhle.com/v1/player/8478402/landing",
-                "https://www.nhl.com/player/connor-mcdavid-8478402"):
-        src = fetch_url(url, "sanity")
-        assert src.status == "denied" and src.main_text == ""
+    src = fetch_url("https://api.openalex.org/works", "sanity")
+    assert src.status == "denied" and src.main_text == ""
 
 
 @pytest.mark.skipif(not os.environ.get(config.SERPER_API_KEY_ENV),
                     reason="SERPER_API_KEY not set")
 def test_serper_key_works():
     from webaggs.search import SerperBackend
-    results = SerperBackend().search("NHL", k=3)
+    results = SerperBackend().search("citations", k=3)
     assert results and all(r["url"].startswith("http") for r in results)
 
 

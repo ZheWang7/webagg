@@ -1,41 +1,28 @@
-"""Entity resolution for the NHL domain (webaggr.pdf §6) — deterministic.
+"""Entity resolution for the citation domain (webaggr.pdf §6) — deterministic.
 
-Why no fitted matcher here (a PRE-REGISTERED simplification, disclosed in
-PREREGISTRATION_EXP2S.md): the finance domain lacked a join key, so ER was a
-learned probabilistic matcher with bounded error. Here the record key is
-(player, season) and the season IS a join key once canonicalized; the only
-ER work left is folding name VARIANTS of the one queried player onto one
-canonical entity ('C. McDavid', 'Connor McDavid' -> 'connor mcdavid').
-
-Cross-player contamination (another player sharing the surname on the same
-page) is handled by the guard below, not by merging.
+The stratum is the TARGET paper (one per run), and the "entity" a mention
+asserts is which paper the page says is being cited. The guard: a mention
+counts only when the page's cited-paper surface matches the target title —
+exact normalized match, or one normalized title containing the other
+(subtitle variants: 'Attention Is All You Need' vs the same plus venue
+suffixes). Anything else is contamination (a citers-of-some-OTHER-paper
+list) and is rejected, never merged. Citing-paper IDENTITY (the record
+key) is handled by canon.cite_key_from_parts, not here.
 """
 from __future__ import annotations
 
-from . import canon
+from .canon import normalize_title
 
 
-def resolve_entity(entity_surface: str, target_player: str) -> str | None:
-    """Map a mention's surface name onto the run's target player, or None
-    if it is a different player (contamination guard, webaggr.pdf §6/§10).
-
-    Merge rule (deterministic, pre-registered):
-      full normalized match            -> merge
-      last name + first initial match  -> merge ('C. McDavid')
-      anything else                    -> reject (never silently merge)
-    """
-    target = canon.normalize_name(target_player)
-    surf = canon.normalize_name(entity_surface)
-    if not surf:
+def resolve_entity(entity_surface: str, target_paper: str) -> str | None:
+    target = normalize_title(target_paper)
+    surf = normalize_title(entity_surface)
+    if not surf or not target:
         return None
     if surf == target:
         return target
-    t_parts, s_parts = target.split(), surf.split()
-    if len(t_parts) >= 2 and len(s_parts) >= 2:
-        same_last = s_parts[-1] == t_parts[-1]
-        initial_ok = s_parts[0][0] == t_parts[0][0]
-        if same_last and initial_ok:
-            return target                      # 'c mcdavid' -> 'connor mcdavid'
-    if len(s_parts) == 1 and s_parts[0] == t_parts[-1]:
-        return target                          # bare surname on a profile page
-    return None                                # different player: contamination
+    # subtitle/venue-suffix variants: containment with enough overlap
+    shorter, longer = sorted((surf, target), key=len)
+    if len(shorter.split()) >= 3 and shorter in longer:
+        return target
+    return None                                # different paper: contamination

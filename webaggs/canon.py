@@ -1,7 +1,10 @@
 """Canonicalization: typed validators for the reader (webaggr.pdf §7.1).
 
-NHL domain: names, seasons ("2015-16") and integer point totals
-(points = goals + assists; per-game averages are look-alikes to reject).
+Citation domain (Exp 2-C): the record key is a citing paper's identity —
+DOI when present, else a normalized title — produced identically on the
+truth side (oracle_openalex) and the extraction side, so grading joins
+exactly. The NHL-era validators below it are kept: they are generic string
+functions and the sports branch's tests still cover them.
 
 Look-alike numbers are the reader's main hazard; here the types are
 player names, NHL seasons and integer point totals. Everything that
@@ -87,3 +90,43 @@ def canonical_points(value) -> int | None:
     if n < 0 or n > config.POINTS_MAX:
         return None
     return n
+
+
+# --- citation-domain validators (Exp 2-C) --------------------------------
+_DOI = re.compile(r"\b(10\.\d{4,9}/[^\s\"'<>]+)", re.IGNORECASE)
+
+
+def canonical_doi(text) -> str | None:
+    """A DOI anywhere in the text -> lowercase bare DOI ('10.x/y'), with
+    URL prefixes and trailing punctuation stripped; None if absent."""
+    if not text:
+        return None
+    m = _DOI.search(str(text))
+    if not m:
+        return None
+    doi = m.group(1).lower().rstrip(".,;:)]}>\"'")
+    return doi if "/" in doi and len(doi) >= 8 else None
+
+
+def normalize_title(title: str) -> str:
+    """Normalized paper title for keying: ASCII-folded, lowercase,
+    alphanumerics and single spaces only, truncated to 160 chars. The SAME
+    function keys truth and assertions, so variants join when the words do."""
+    s = unicodedata.normalize("NFKD", str(title or ""))
+    s = "".join(ch for ch in s if not unicodedata.combining(ch))
+    s = re.sub(r"[^a-z0-9 ]", " ", s.lower())
+    s = re.sub(r"\s+", " ", s).strip()
+    return s[:160].strip()
+
+
+def cite_key_from_parts(doi, title) -> str | None:
+    """The grading/record key: 'doi:<doi>' when a DOI exists, else
+    't:<normalized title>' when the title has at least 3 words (shorter is
+    too collision-prone to key on); None when neither works."""
+    d = canonical_doi(doi)
+    if d:
+        return f"doi:{d}"
+    t = normalize_title(title)
+    if t and len(t.split()) >= 3:
+        return f"t:{t}"
+    return None

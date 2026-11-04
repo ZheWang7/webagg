@@ -1,12 +1,12 @@
 """Grade finished Exp 2-S runs against the frozen truth table (exact grading).
 
 Offline; reads resolved records from the ledgers. Output:
-data/experiments/exp2s/results/grades.csv — one row per player with record
+data/experiments/exp2c/results/grades.csv — one row per player with record
 recall, exact recall, spurious count and relative aggregation error, plus
 the certificate path (statistical / checksum / abandoned) for the headline
 split.
 
-Usage: python scripts/grade_exp2s.py --cohort nhl_v1
+Usage: python scripts/grade_exp2c.py --cohort nhl_v1
 """
 from __future__ import annotations
 
@@ -22,7 +22,7 @@ from webaggs import config                   # noqa: E402
 from webaggs.storage import Ledger           # noqa: E402
 from webaggs.truth import grade, load_truth  # noqa: E402
 
-EXP_DIR = config.DATA_DIR / "experiments" / "exp2s"
+EXP_DIR = config.DATA_DIR / "experiments" / "exp2c"
 
 
 def main() -> None:

@@ -140,11 +140,12 @@ def test_claims_corroboration_is_ingestion_order_invariant():
 
 
 def test_er_is_invariant_to_case_diacritics_spacing():
-    target = "Luka Dončić"
-    for surf in ("luka doncic", "LUKA  DONČIĆ", " Luka Dončić ", "L. Doncic",
-                 "Doncic"):
-        assert resolve_entity(surf, target) == "luka doncic", surf
-    assert resolve_entity("Mario Doncic", target) is None
+    target = "Évaluation of Sample Methods in Dépth"
+    for surf in ("evaluation of sample methods in depth",
+                 "ÉVALUATION OF SAMPLE METHODS IN DÉPTH",
+                 "  Évaluation of Sample Methods in Dépth (v2) "):
+        assert resolve_entity(surf, target), surf
+    assert resolve_entity("A Completely Different Study", target) is None
 
 
 @pytest.mark.parametrize("seed", [23, 29, 31])

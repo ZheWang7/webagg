@@ -1,4 +1,4 @@
-"""Central configuration for webagg-sports (Exp 2-S, NHL domain).
+"""Central configuration for webagg-citations (Exp 2-C, citation domain).
 
 Parameter names and defaults follow webaggr.pdf and the implementation
 guide's parameter table (Table 4). Values changed for Exp 2-S are noted.
@@ -68,11 +68,20 @@ CLASS_PRIORS = {
 # value above this is a look-alike number, never a real points figure.
 POINTS_MAX = 4000
 
-# --- Oracle deny list (PREREGISTRATION_EXP2S.md) -------------------------
-# Official NHL data defines truth and is DENIED at run time: the
-# withheld-registry design (webaggr.pdf §9). nhle.com covers the API host
-# (api-web.nhle.com); everything else is "the web".
-DENY_DOMAINS = ("nhl.com", "nhle.com")
+# --- Oracle deny list (PREREGISTRATION_EXP2C.md) -------------------------
+# OpenAlex defines truth and is DENIED at run time (withheld-registry
+# design, webaggr.pdf §9). Semantic Scholar, Google Scholar, publisher
+# pages and the rest of the web stay fair game (the hockey-reference
+# role) unless the pre-registration says otherwise.
+DENY_DOMAINS = ("openalex.org",)
+
+# Citation records carry value 1 (f_Q = COUNT via the unchanged SUM path).
+CITE_VALUE = 1
+# Aggregate claims are DISABLED in this domain (pre-registered): cited-by
+# counts differ across indexing universes (Scholar > S2 > OpenAlex), so a
+# corroborated-but-wrong COUNT would poison the cardinality brake. Exp 2-C
+# tests the STATISTICAL path pure; the checksum path was Exp 2-S's story.
+CLAIMS_ENABLED = False
 
 # --- LLM (single-provider design: one API, one model) --------------------
 LLM_MODEL = os.environ.get("WEBAGG_LLM_MODEL", "gpt-5-mini")

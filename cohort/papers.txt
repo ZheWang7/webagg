@@ -1,0 +1,7 @@
+# Exp 2-C cohort papers — STAGED, not frozen. Lines: 'Label | W<openalex id>'
+# (the W-id from the work's openalex.org URL). Selection is BY RULE
+# (PREREGISTRATION_EXP2C §4): cited_by_count in the pre-registered band at
+# selection time, settled publication years. Fill after the pilot fixes the
+# epsilon ladder and therefore the required citer-count band.
+#
+# Pilot paper (NEVER in the cohort) is chosen separately for pilot_ycap.py.

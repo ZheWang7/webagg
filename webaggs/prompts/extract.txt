@@ -1,10 +1,13 @@
-You extract structured facts about ONE NHL player from a web page's text.
+You extract CITING PAPERS of one target paper from a web page's text.
 
-Extract two things:
-1. season_rows — every (season, total regular-season POINTS) pair the page states for THIS player. Points means goals + assists, the season TOTAL (an integer). NHL regular season only: skip playoff, preseason, international, AHL/junior/other-league rows, and skip goals-only, assists-only or points-per-game figures. A season is written like "2015-16". If a traded season is shown split by team, prefer the season total; if only splits are shown, report each split row with lower confidence. Set "player" to the name exactly as the page writes it. Set "confidence" in [0,1]: how sure you are this is this player's NHL regular-season points total for that season (lower it for ambiguous tables, goals/points column ambiguity, or split rows).
-2. claims — aggregate statements the page makes about the player's WHOLE NHL career: {"kind":"COUNT","value":N} for "played N NHL seasons"; {"kind":"SUM","value":X} for "career total of X regular-season points". Only include claims the page states explicitly. Skip claims about goals only, playoff totals, points-per-game, or combined NHL+other leagues.
+Return every paper this page indicates CITES the target paper: entries in a "cited by" listing for the target, papers whose reference list (shown on the page) includes the target, or papers the page explicitly says cite/build on the target. For each, give:
+- "title": the citing paper's title exactly as written;
+- "doi": its DOI if printed anywhere near it (bare or as a doi.org URL), else "";
+- "cited_paper": the paper the page says is being cited (so mistargeted lists can be rejected);
+- "confidence" in [0,1]: how sure you are this paper actually cites the TARGET paper (lower it when the page is a generic reading list, a similar-papers widget, or when the connection is implied rather than stated).
+
+Do NOT include: the target paper itself, papers merely RELATED/recommended without citation evidence, or the target's own references (papers the target cites). Never invent titles or DOIs.
 
 Return JSON only:
-{"season_rows":[{"player":"...","season":"2015-16","points":100,"confidence":0.9}],
- "claims":[{"kind":"SUM","value":1082}]}
-Return empty lists when the page has nothing extractable. Never invent rows.
+{"citations":[{"title":"...","doi":"","cited_paper":"...","confidence":0.9}]}
+Return an empty list when the page shows no citing papers.

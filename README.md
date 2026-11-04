@@ -1,4 +1,10 @@
-# webagg-sports — WebAggr in the NHL domain (Experiment 2-S)
+# webagg-citations — WebAggr in the citation domain (Experiment 2-C)
+
+**This branch** instantiates the pipeline for the query *"which papers
+cite [target paper]?"* (f_Q = COUNT of citing papers) with OpenAlex as
+the withheld oracle — the experiment that tests the STATISTICAL
+stopping guarantee at reachable n. The NHL instantiation (Exp 2-S,
+complete) lives on the `sports` branch.
 
 A from-scratch instantiation of the WebAggr pipeline (webaggr.pdf) for the
 query **"What is [player]'s total career regular-season points in the NHL?"**

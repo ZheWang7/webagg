@@ -1,10 +1,9 @@
-"""NHL oracle driver: schema traps, self-validation, transport hardening,
-and the strict candidate-line parser. All clients are fakes — offline."""
+"""OpenAlex oracle driver: pagination self-validation, schema traps,
+transport hardening. All clients are fakes — offline."""
 import pytest
 from requests.exceptions import Timeout as ReqTimeout
 
-from webaggs.oracle_nhl import NHLDriver, OracleError
-from webaggs.truth import parse_candidate_line
+from webaggs.oracle_openalex import OpenAlexDriver, OracleError
 
 
 class _Resp:
@@ -20,160 +19,89 @@ class _Client:
     def __init__(self, payloads):
         self.payloads = list(payloads)
         self.calls = 0
+        self.seen_params = []
 
-    def get(self, url, headers=None, timeout=None):
+    def get(self, url, params=None, headers=None, timeout=None):
         self.calls += 1
+        self.seen_params.append(params)
         item = self.payloads.pop(0)
         if isinstance(item, Exception):
             raise item
         return item
 
 
-def _landing(season_totals, career_pts, career_gp, first="Benchy",
-             last="Marks"):
-    return {"firstName": {"default": first}, "lastName": {"default": last},
-            "careerTotals": {"regularSeason": {"points": career_pts,
-                                               "gamesPlayed": career_gp}},
-            "seasonTotals": season_totals}
+def _page(results, count, next_cursor):
+    return _Resp({"meta": {"count": count, "next_cursor": next_cursor},
+                  "results": results})
 
 
-def _row(season, pts, gp, league="NHL", game_type=2, team="Oilers"):
-    e = {"season": season, "leagueAbbrev": league, "gamesPlayed": gp,
-         "points": pts, "teamName": {"default": team}}
-    if game_type is not None:
-        e["gameTypeId"] = game_type
-    return e
+def _work(i, doi=True, title=None):
+    return {"id": f"https://openalex.org/W{i}",
+            "doi": f"https://doi.org/10.5555/x.{i}" if doi else None,
+            "display_name": title if title is not None
+            else f"Follow-up Study Number {i}",
+            "publication_year": 2020}
 
 
-def _drv(payload):
-    return NHLDriver(pace_seconds=0, retry_cooldown=0,
-                     client=_Client([_Resp(payload)]))
+def _drv(payloads):
+    return OpenAlexDriver(pace_seconds=0, retry_cooldown=0,
+                          client=_Client(payloads))
 
 
-# --- schema traps ------------------------------------------------------------
-def test_filters_leagues_and_playoffs_and_sums_traded_season():
-    rows = [
-        _row(20152016, 48, 45),                         # NHL regular: in
-        _row(20152016, 10, 12, game_type=3),            # NHL playoffs: OUT
-        _row(20152016, 30, 20, league="AHL"),           # AHL: OUT
-        _row(20142015, 120, 60, league="OHL"),          # junior: OUT
-        _row(20162017, 40, 50, team="Oilers"),          # traded season,
-        _row(20162017, 25, 30, team="Canucks"),         # two NHL rows: SUMMED
-        # v2 leagueAbbrev shape must also be accepted:
-        {"season": 20172018, "leagueAbbrev": {"default": "NHL"},
-         "gameTypeId": 2, "gamesPlayed": 10, "points": 7,
-         "teamName": {"default": "Canucks"}},
-    ]
-    name, out = _drv(_landing(rows, career_pts=48 + 65 + 7,
-                              career_gp=45 + 80 + 10)).career_regular_season(1)
-    assert name == "Benchy Marks"
-    assert [(r["season"], r["pts"], r["gp"]) for r in out] == [
-        ("2015-16", 48, 45), ("2016-17", 65, 80), ("2017-18", 7, 10)]
-    assert out[1]["team"] == "Oilers/Canucks"           # traded: both teams
+def test_cursor_walk_collects_all_pages_and_keys_doi_first():
+    d = _drv([_page([_work(1), _work(2)], 3, "cur2"),
+              _page([_work(3, doi=False)], 3, None)])
+    rows = d.citers("W1", "2026-06-30")
+    assert [r["key"] for r in rows] == [
+        "doi:10.5555/x.1", "doi:10.5555/x.2", "t:follow up study number 3"]
+    # the cutoff is part of the filter sent to the API
+    assert "to_publication_date:2026-06-30" in \
+        d.client.seen_params[0]["filter"]
 
 
-def test_missing_game_type_on_nhl_row_raises_never_guesses():
-    rows = [_row(20152016, 48, 45, game_type=None)]
-    with pytest.raises(OracleError, match="gameTypeId"):
-        _drv(_landing(rows, 48, 45)).career_regular_season(1)
-
-
-def test_unknown_league_shape_raises():
-    rows = [{"season": 20152016, "leagueAbbrev": 7, "gameTypeId": 2,
-             "gamesPlayed": 1, "points": 1, "teamName": {"default": "X"}}]
-    with pytest.raises(OracleError, match="leagueAbbrev"):
-        _drv(_landing(rows, 1, 1)).career_regular_season(1)
-
-
-def test_self_validation_against_career_totals():
-    """THE anti-delusion guard: filtered rows must reproduce the API's own
-    careerTotals, or no truth is emitted."""
-    rows = [_row(20152016, 48, 45)]
+def test_self_validation_refuses_partial_walk():
+    d = _drv([_page([_work(1)], 5, None)])        # says 5, delivers 1
     with pytest.raises(OracleError, match="SELF-VALIDATION"):
-        _drv(_landing(rows, career_pts=50, career_gp=45)).career_regular_season(1)
-    with pytest.raises(OracleError, match="self-validate"):
-        payload = _landing(rows, 48, 45)
-        del payload["careerTotals"]                     # totals absent: refuse
-        _drv(payload).career_regular_season(1)
+        d.citers("W1", "2026-06-30")
 
 
-def test_zero_nhl_rows_and_bad_season_raise():
-    with pytest.raises(OracleError, match="zero NHL"):
-        _drv(_landing([_row(20152016, 9, 9, league="AHL")],
-                      0, 0)).career_regular_season(1)
-    with pytest.raises(OracleError, match="season identifier"):
-        _drv(_landing([_row(20152017, 9, 9)], 9, 9)).career_regular_season(1)
+def test_duplicate_keys_collapse_to_one_record():
+    d = _drv([_page([_work(1), _work(1)], 2, None)])
+    rows = d.citers("W1", "2026-06-30")
+    assert len(rows) == 1
 
 
-# --- transport ----------------------------------------------------------------
-def test_timeout_is_retried_once_then_succeeds():
-    ok = _Resp(_landing([_row(20152016, 48, 45)], 48, 45))
+def test_unkeyable_citer_raises_never_shrinks_truth():
+    bad = _work(9, doi=False, title="Hi")         # <3 words, no DOI
+    d = _drv([_page([bad], 1, None)])
+    with pytest.raises(OracleError, match="grading key"):
+        d.citers("W1", "2026-06-30")
+
+
+def test_missing_meta_count_raises():
+    d = _drv([_Resp({"meta": {}, "results": []})])
+    with pytest.raises(OracleError, match="meta.count"):
+        d.citers("W1", "2026-06-30")
+
+
+def test_work_meta_and_not_found():
+    d = _drv([_Resp({"results": [{"id": "https://openalex.org/W7",
+                                  "display_name": "T", "publication_year": 2017,
+                                  "cited_by_count": 42}]})])
+    m = d.work_meta("W7")
+    assert m["cited_by_count"] == 42
+    d = _drv([_Resp({"results": []})])
+    with pytest.raises(OracleError, match="not found"):
+        d.work_meta("W404")
+
+
+def test_timeout_retried_once_then_succeeds_and_hard_404():
+    ok = _page([_work(1)], 1, None)
     client = _Client([ReqTimeout("hang"), ok])
-    d = NHLDriver(pace_seconds=0, retry_cooldown=0, client=client)
-    name, rows = d.career_regular_season(1)
-    assert client.calls == 2 and rows[0]["pts"] == 48
-
-
-def test_timeout_twice_raises_loudly():
-    client = _Client([ReqTimeout("hang"), ReqTimeout("hang")])
-    d = NHLDriver(pace_seconds=0, retry_cooldown=0, client=client)
-    with pytest.raises(OracleError, match="Timeout"):
-        d.career_regular_season(1)
-
-
-def test_404_is_not_retried_and_names_the_remedy():
-    client = _Client([_Resp({}, status=404)])
-    d = NHLDriver(pace_seconds=0, retry_cooldown=0, client=client)
-    with pytest.raises(OracleError, match="nhl.com page URL"):
-        d.career_regular_season(999)
-    assert client.calls == 1                            # retrying 404: pointless
-
-
-# --- candidate parser ----------------------------------------------------------
-def test_parse_candidate_line():
-    assert parse_candidate_line("Connor McDavid | 8478402") == \
-        ("Connor McDavid", 8478402)
-    assert parse_candidate_line("Connor McDavid") == ("Connor McDavid", None)
-    for bad in ("| 123", "Name |", "Name | 12x3"):
-        with pytest.raises(ValueError):
-            parse_candidate_line(bad)
-
-
-# --- candidate resolver helpers (dev tooling, but its matching must be right)
-def test_resolver_name_matching_and_result_parsing():
-    import sys
-    from pathlib import Path
-    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
-    from resolve_candidates import _result_fields, names_match
-
-    assert names_match("Josh Ho-Sang", "Joshua Ho-Sang")      # nickname fold
-    assert names_match("Fabian Brunnstrom", "Fabian Brunnström")
-    assert names_match("JERRY D'AMIGO", "Jerry D'Amigo")
-    assert not names_match("Sebastian Aho", "Connor McDavid")
-    # same surname + initial IS folded by the ER rule — the reason the
-    # resolver demands a UNIQUE id among matches, never picks a best one
-    assert names_match("Jack Smith", "John Smith")
-
-    assert _result_fields({"playerId": "8478402",
-                           "name": "Connor McDavid"}) == (8478402,
-                                                          "Connor McDavid")
-    assert _result_fields({"id": 1, "firstName": {"default": "A"},
-                           "lastName": {"default": "B"}}) == (1, "A B")
-    assert _result_fields({"weird": 1}) is None
-    assert _result_fields({"playerId": "abc", "name": "X"}) is None
-
-
-def test_resolver_prefers_unique_exact_match_over_fold():
-    """'Marian Hossa' and 'Marcel Hossa' both fold-match 'M... Hossa';
-    a unique EXACT match must win before the fold is consulted."""
-    import sys
-    from pathlib import Path
-    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
-    from resolve_candidates import names_match
-    from webaggs.canon import normalize_name
-    results = [(1, "Marian Hossa"), (2, "Marcel Hossa")]
-    exact = sorted({i for i, n in results
-                    if normalize_name(n) == normalize_name("Marian Hossa")})
-    folded = sorted({i for i, n in results if names_match("Marian Hossa", n)})
-    assert folded == [1, 2]            # the fold alone is ambiguous
-    assert exact == [1]                # the exact preference resolves it
+    d = OpenAlexDriver(pace_seconds=0, retry_cooldown=0, client=client)
+    assert len(d.citers("W1", "2026-06-30")) == 1
+    assert client.calls == 2
+    d = _drv([_Resp({}, status=404)])
+    with pytest.raises(OracleError, match="404"):
+        d.work_meta("W0")
+    assert d.client.calls == 1                    # 404 never retried

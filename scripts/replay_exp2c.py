@@ -6,7 +6,7 @@ Self-tests (run before any table is written; a failure aborts loudly):
       for every run that stopped 'certified';
   S2  replayed stop steps are monotone non-increasing as epsilon loosens.
 
-Outputs (data/experiments/exp2s/results/):
+Outputs (data/experiments/exp2c/results/):
   stops.csv        one row per (player, eps): stop step, stop kind
                    (statistical/checksum/censored), spend at stop,
                    realized record recall at stop   -> C2 / Plot 2
@@ -40,15 +40,22 @@ from webaggs.replay import (recall_at_step, recall_trajectory,  # noqa: E402
 from webaggs.storage import Ledger              # noqa: E402
 from webaggs.truth import load_truth            # noqa: E402
 
-EXP_DIR = config.DATA_DIR / "experiments" / "exp2s"
-EPS_ARMS = (0.30, 0.20, 0.10, 0.05)     # 0.05 = the live arm
-LIVE_EPS = 0.05
+EXP_DIR = config.DATA_DIR / "experiments" / "exp2c"
+# Defaults form a ladder around the pilot-chosen live eps; override with
+# --arms/--live-eps once PREREGISTRATION_EXP2C fixes them.
+EPS_ARMS = (0.50, 0.40, 0.30, 0.20)
+LIVE_EPS = 0.30
 
 
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--cohort", required=True)
+    ap.add_argument("--arms", default=",".join(str(e) for e in EPS_ARMS))
+    ap.add_argument("--live-eps", type=float, default=LIVE_EPS)
     args = ap.parse_args()
+    eps_arms = tuple(sorted((float(x) for x in args.arms.split(",")),
+                            reverse=True))
+    live_eps = args.live_eps
 
     truth = load_truth(config.DATA_DIR, args.cohort)
     idx = json.loads((EXP_DIR / "runs_index.json").read_text(encoding="utf-8"))
@@ -71,16 +78,16 @@ def main() -> None:
 
         # ---- self-test S1: replay at live eps reproduces the live stop ----
         if live_stop and live_stop[1] == "certified":
-            rr = replay_stop(ms, LIVE_EPS)
+            rr = replay_stop(ms, live_eps)
             assert rr.stop_step == live_stop[0], (
                 f"S1 FAILED for {player}: live certified stop at step "
-                f"{live_stop[0]}, replay at eps={LIVE_EPS} says {rr.stop_step}. "
+                f"{live_stop[0]}, replay at eps={live_eps} says {rr.stop_step}. "
                 "The ledger does not reproduce the live decision — do not "
                 "report any replayed arm until this is diagnosed.")
 
         # ---- replay every arm + self-test S2 (monotonicity) ---------------
         prev_step = None
-        for eps in sorted(EPS_ARMS):            # strictest first: 0.05 ... 0.30
+        for eps in sorted(eps_arms):            # strictest first: 0.05 ... 0.30
             rr = replay_stop(ms, eps)
             if prev_step is not None:
                 # a stricter eps stopped -> every looser eps must stop, no later
@@ -108,7 +115,7 @@ def main() -> None:
                                "recall_at_stop": round(recall, 4),
                                "promised": 1 - eps,
                                "violated": int(recall < 1 - eps)})
-            if eps == LIVE_EPS and kind == "statistical":
+            if eps == live_eps and kind == "statistical":
                 stat_stops += 1
                 stat_violations += int(recall < 1 - eps)
 
@@ -141,7 +148,7 @@ def main() -> None:
     print(f"Self-tests S1/S2 passed over {len(idx)} runs.")
     print(f"C1: {above}/{len(cal_rows)} certificate points above the diagonal "
           "(claimed < realized) — any such point falsifies Assumption 1(a).")
-    print(f"C2 (statistical path only, eps={LIVE_EPS}): {stat_stops} certified "
+    print(f"C2 (statistical path only, eps={live_eps}): {stat_stops} certified "
           f"stops, {stat_violations} recall violations "
           f"(delta_M budget = {0.05}).")
     print(f"Tables written to {results_dir}")

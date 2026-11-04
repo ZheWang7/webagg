@@ -7,7 +7,7 @@ import pytest
 
 import webaggs.llm as llm_mod
 import webaggs.search as search_mod
-from tests.conftest import PAGES, PLAYER, RoutedSearch, make_fake_llm, \
+from tests.conftest import PAGES, TARGET, RoutedSearch, make_fake_llm, \
     make_fetch
 from webaggs.conformal import ConformalError, ConformalGate
 from webaggs.fetch import fetch_url
@@ -137,7 +137,7 @@ def test_crash_resume_policy_yields_one_clean_trajectory(tmp_path, gate):
     """A run crashing mid-player leaves a partial ledger; fresh_ledger moves
     it aside and the rerun produces ONE clean trajectory that replays."""
     calls = {"n": 0}
-    good = make_fake_llm(PAGES, PLAYER)
+    good = make_fake_llm(PAGES, TARGET)
 
     def crashing_llm(system, user, **kw):
         if kw.get("purpose") == "extract":
@@ -150,23 +150,23 @@ def test_crash_resume_policy_yields_one_clean_trajectory(tmp_path, gate):
     rid = "crashy"
     ledger = Ledger(runs_dir / f"{rid}.sqlite")
     with pytest.raises(LLMError):
-        end_to_end(PLAYER, rid, ledger, search=RoutedSearch(default=list(PAGES)),
-                   gate=gate, llm=crashing_llm, fetch=make_fetch(PLAYER, PAGES),
+        end_to_end(TARGET, rid, ledger, search=RoutedSearch(default=list(PAGES)),
+                   gate=gate, llm=crashing_llm, fetch=make_fetch(TARGET, PAGES),
                    eps_g=0.05, delta_m=0.05, budget_usd=5.0, max_steps=30)
     ledger.close()
 
     ledger2 = fresh_ledger(runs_dir, rid)            # moves the partial aside
     assert (runs_dir / f"{rid}.crashed-1.sqlite").exists()
-    ans = end_to_end(PLAYER, rid, ledger2, search=RoutedSearch(default=list(PAGES)),
-                     gate=gate, llm=good, fetch=make_fetch(PLAYER, PAGES),
+    ans = end_to_end(TARGET, rid, ledger2, search=RoutedSearch(default=list(PAGES)),
+                     gate=gate, llm=good, fetch=make_fetch(TARGET, PAGES),
                      eps_g=0.05, delta_m=0.05, budget_usd=5.0, max_steps=30)
     ms = ledger2.measurements(rid, metric="U_hat")
     steps = [s for s, *_ in ms]
     assert steps == sorted(set(steps)), "duplicate/interleaved steps"
     live = ledger2.stop(rid)
-    assert live[1] == "certified"
-    assert replay_stop(ms, 0.05).stop_step == live[0]
-    assert ans.total == 1450
+    assert live[1] in ("economic", "frontier_exhausted", "max_steps")
+    assert replay_stop(ms, 0.05).censored   # tiny n: never certifies
+    assert ans.total == 3
     ledger2.close()
 
 

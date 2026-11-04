@@ -42,8 +42,8 @@ def seed_formulations(player: str, *, llm=call_llm, ledger=None, run_id="",
             formulation_id=sha16(f"seed|{q}")[:8], query=q,
             p_success=min(max(float(f.get("p_success", 0.5)), 0.05), 1.0),
             yield_if_success=max(float(f.get("yield_if_success", 2.0)), 0.1)))
-    for q in (f"{player} career stats season by season",
-              f"{player} total career points NHL"):
+    for q in (f'"{player}" cited by',
+              f'"{player}" citing papers'):
         fms.append(Formulation(formulation_id=sha16(f"seed|{q}")[:8], query=q,
                                p_success=0.9, yield_if_success=5.0))
     # dedup by query text

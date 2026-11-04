@@ -1,22 +1,15 @@
-"""Randomized stress campaign: generated worlds through the REAL end_to_end
-(fakes only for search/fetch/llm — tests only). Two arms:
-
-  A. benign worlds (truthful claims, partial coverage, paywalls, name
-     variants, contamination)
-  B. adversarial worlds (a WRONG, corroborated COUNT claim above the truth)
-
-Invariants checked on every run:
-  I1  no exception; a stop is always recorded with a known reason
-  I2  reported total == sum of resolved records
-  I3  value correctness: every adopted season value equals truth (sources
-      agree in these worlds, so corroboration must recover the truth)
-  I4  'certified' live stop reproduces under replay at the live eps (S1)
-  I5  replayed stops monotone in eps (S2); certified => no looser arm censored
-  I6  measurement rows carry full replay context; 'certified' is a string
-  I7  grading math sane
-  I8  coverage events == N distinct records; spend <= budget + one search
-  I9  (arm B) a wrong COUNT above the discoverable records NEVER yields a
-      checksum certificate — the brake holds and the run ends uncertified
+"""Randomized stress, citation domain: generated citer sets scattered over
+random pages with duplicate DOI forms and contamination, run through the
+REAL end_to_end. Claims are off (pre-registered), so endings are honest
+(abandoned) except where a dense, fully re-covered world certifies
+STATISTICALLY. Invariants per run:
+  I1 stop recorded with a known reason
+  I2 total == n_records (COUNT domain: every value is 1)
+  I3 no contaminated key ever becomes a record
+  I4 a certified live stop reproduces under replay at the live eps (S1)
+  I5 replayed stops monotone in eps (S2)
+  I6 measurement rows carry full replay context; certified is a string
+  I7 grading sane; found keys are a subset of truth + known spurious forms
 """
 import random
 
@@ -27,121 +20,84 @@ from webaggs.replay import replay_stop
 from webaggs.storage import Ledger
 from webaggs.truth import grade
 
-EPS_ARMS = (0.05, 0.10, 0.20, 0.30)
-BUDGET = 5.0
+EPS_ARMS = (0.20, 0.30, 0.40, 0.50)
 
 
-def _random_world(rng, player, adversarial=False):
-    n_seasons = rng.randint(1, 8)
-    start = rng.randint(1996, 2018)
-    # hockey-plausible season totals (record 215): career sums stay under
-    # POINTS_MAX, so TRUTHFUL SUM claims survive the typed validator and the
-    # SUM-checksum path is actually exercised (with the old 5..2500 range,
-    # sums reached ~20k > POINTS_MAX and every SUM claim was silently dropped)
-    truth = {f"{y}-{(y + 1) % 100:02d}": rng.randint(5, 160)
-             for y in range(start, start + n_seasons)}
-    seasons = list(truth)
-    pages, n_pages = {}, rng.randint(1, 5)
-    wrong_count = n_seasons + rng.randint(1, 3)
-    for i in range(n_pages):
-        covered = rng.sample(seasons, rng.randint(0, len(seasons)))
-        rows = [(player if rng.random() < 0.8 else f"{player.split()[0][0]}. "
-                 + player.split()[-1], s, truth[s], rng.uniform(0.82, 0.99))
-                for s in covered]
-        if rng.random() < 0.2:
-            rows.append((f"Zork {player.split()[-1]}", rng.choice(seasons),
-                         777, 0.95))   # <= POINTS_MAX so the ER guard, not
-                                        # the typed validator, must reject it
-        claims = []
-        if adversarial:
-            claims.append({"kind": "COUNT", "value": wrong_count})  # every page
+def _world(rng, target):
+    n = rng.randint(3, 60)
+    truth = {}
+    for i in range(n):
+        if rng.random() < 0.7:
+            truth[f"doi:10.9999/w.{i}"] = dict(
+                title=f"Citing Work Number {i} Analysis",
+                doi=f"10.9999/w.{i}")
         else:
-            if rng.random() < 0.5:
-                claims.append({"kind": "COUNT", "value": n_seasons})
-            if rng.random() < 0.3:
-                claims.append({"kind": "SUM", "value": sum(truth.values())})
+            truth[f"t:citing work number {i} analysis"] = dict(
+                title=f"Citing Work Number {i} Analysis", doi="")
+    keys = list(truth)
+    pages = {}
+    for pg in range(rng.randint(1, 5)):
+        subset = rng.sample(keys, rng.randint(0, len(keys)))
+        cites = []
+        for k in subset:
+            v = truth[k]
+            doi = v["doi"]
+            if doi and rng.random() < 0.5:
+                doi = f"https://doi.org/{doi.upper()}"   # URL/case variant
+            cites.append(dict(title=v["title"], doi=doi,
+                              cited_paper=target,
+                              confidence=rng.uniform(0.82, 0.99)))
+        if rng.random() < 0.25:                           # contamination
+            cites.append(dict(title="Imposter Study On Something Else",
+                              doi="10.4242/bad.1",
+                              cited_paper="A Different Target Paper",
+                              confidence=0.95))
         status = "paywall" if rng.random() < 0.15 else "ok"
-        pages[f"https://w{i}.test/{player.split()[-1].lower()}"] = {
-            "rows": rows, "claims": claims, "status": status}
+        pages[f"https://w{pg}.test/{rng.randint(0, 10**6)}"] = {
+            "citations": cites, "status": status}
     return truth, pages
 
 
-def _check_run(trial, tmp_path, gate, player, truth, pages, adversarial):
-    ledger = Ledger(tmp_path / f"r{trial}.sqlite")
-    rid = f"r{trial}"
-    ans = end_to_end(player, rid, ledger,
-                     search=RoutedSearch(default=list(pages)), gate=gate,
-                     llm=make_fake_llm(pages, player),
-                     fetch=make_fetch(player, pages),
-                     eps_g=0.05, delta_m=0.05, budget_usd=BUDGET, max_steps=25)
-
-    stop = ledger.stop(rid)                                       # I1
-    assert stop is not None and stop[1] in (
-        "certified", "economic", "frontier_exhausted", "budget", "max_steps")
-
-    assert ans.total == sum(r.value for r in ans.records)         # I2
-    assert all("zork" not in r.record_key for r in ans.records)
-
-    for r in ans.records:                                         # I3
-        assert r.value == truth[r.season], (trial, r)
-
-    ms = ledger.measurements(rid, metric="U_hat")
-    for _s, _g, _m, _u, extra in ms:                              # I6
-        assert isinstance(extra["certified"], str)
-        for key in ("psi", "hot", "N", "claimed_count", "spent"):
-            assert key in extra
-    if ms:                                                        # I8
-        last = ms[-1][4]
-        assert last["N"] == len(ledger.coverage(rid)) == ans.n_records
-        assert last["spent"] <= BUDGET + 0.02 + 1e-9
-
-    if stop[1] == "certified":                                    # I4, I5
-        rr = replay_stop(ms, 0.05)
-        assert rr.stop_step == stop[0]
-        for eps in EPS_ARMS:
-            assert not replay_stop(ms, eps).censored
-    prev = None
-    for eps in EPS_ARMS:                                          # I5
-        rr = replay_stop(ms, eps)
-        if prev is not None:
-            assert rr.stop_step is not None and rr.stop_step <= prev
-        prev = rr.stop_step if rr.stop_step is not None else prev
-
-    if adversarial:                                               # I9
-        assert ans.certificate != "checksum", (trial, ans)
-        assert stop[1] != "certified" or ans.certificate == "statistical"
-
-    asserted = {r.season: r.value for r in ans.records}           # I7
-    g = grade(normalize_name(player), truth, asserted)
-    assert 0.0 <= g.record_recall <= 1.0 and g.n_spurious >= 0
-    ledger.close()
-    return ans
-
-
-def test_invariants_over_benign_random_worlds(tmp_path, gate):
+def test_invariants_over_random_citation_worlds(tmp_path, gate):
     rng = random.Random(7)
-    certs = set()
-    for trial in range(40):
-        player = f"Rando Trialson{trial}"
-        truth, pages = _random_world(rng, player)
-        ans = _check_run(trial, tmp_path, gate, player, truth, pages,
-                         adversarial=False)
-        certs.add(ans.certificate)
-    # the campaign must exercise BOTH endings (fixed seed: deterministic);
-    # checksum certs disappearing would mean claims are being dropped again
-    assert "checksum" in certs and "abandoned" in certs
-
-
-def test_wrong_count_claims_never_certify(tmp_path, gate):
-    """Arm B: every page corroborates a COUNT above the discoverable records.
-    The cardinality brake must hold — no checksum certificate, ever."""
-    rng = random.Random(41)
-    outcomes = set()
-    for trial in range(20):
-        player = f"Adver Sarial{trial}"
-        truth, pages = _random_world(rng, player, adversarial=True)
-        ans = _check_run(1000 + trial, tmp_path, gate, player, truth, pages,
-                         adversarial=True)
-        outcomes.add(ans.certificate)
-    assert "checksum" not in outcomes
-    assert "abandoned" in outcomes               # the honest ending dominates
+    endings = set()
+    for trial in range(30):
+        target = f"Sample Landmark Paper Number {trial} Study"
+        truth, pages = _world(rng, target)
+        ledger = Ledger(tmp_path / f"r{trial}.sqlite")
+        rid = f"r{trial}"
+        ans = end_to_end(target, rid, ledger,
+                         search=RoutedSearch(default=list(pages)), gate=gate,
+                         llm=make_fake_llm(pages, target),
+                         fetch=make_fetch(target, pages),
+                         eps_g=0.30, delta_m=0.05, budget_usd=5.0,
+                         max_steps=25)
+        stop = ledger.stop(rid)
+        assert stop and stop[1] in ("certified", "economic",
+                                    "frontier_exhausted", "budget",
+                                    "max_steps")                       # I1
+        endings.add(ans.certificate)
+        assert ans.total == ans.n_records == len(ans.records)         # I2
+        assert all("bad.1" not in r.record_key for r in ans.records)  # I3
+        ms = ledger.measurements(rid, metric="U_hat")
+        for _s, _g, _m, _u, extra in ms:                              # I6
+            assert isinstance(extra["certified"], str)
+            for key in ("psi", "hot", "N", "claimed_count", "spent"):
+                assert key in extra
+        if stop[1] == "certified":                                    # I4
+            assert replay_stop(ms, 0.30).stop_step == stop[0]
+            assert ans.certificate == "statistical"
+        prev = None                        # I5: ascending eps -> stop never
+        for eps in sorted(EPS_ARMS):       # later, and once stopped, stays
+            rr = replay_stop(ms, eps)
+            if prev is not None:
+                assert rr.stop_step is not None and rr.stop_step <= prev, \
+                    (trial, eps)
+            prev = rr.stop_step if rr.stop_step is not None else prev
+        found = {r.record_key.split("|", 1)[1] for r in ans.records}
+        assert found <= set(truth)                                    # I7
+        g = grade(normalize_name(target), {k: 1 for k in truth},
+                  {k: 1 for k in found})
+        assert 0.0 <= g.record_recall <= 1.0 and g.n_spurious == 0
+        ledger.close()
+    assert "abandoned" in endings          # honest ending must occur

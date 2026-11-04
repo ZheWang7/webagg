@@ -83,7 +83,10 @@ def load_truth(data_dir: Path, cohort: str, *, verify: bool = True):
         for row in csv.DictReader(f):
             n_rows += 1
             p = normalize_name(row["player"])
-            truth.setdefault(p, {})[season_key(row["season"])] = int(row["pts"])
+            # citation domain: the key column carries canonical cite keys
+            # (doi:... / t:...), written canonical at build time and frozen
+            # under the manifest hash — no re-canonicalization on load
+            truth.setdefault(p, {})[row["season"]] = int(row["pts"])
     if n_rows != sum(len(s) for s in truth.values()):
         raise RuntimeError(f"Truth table {csv_path} has duplicate "
                            "(player, season) rows — a corrupt answer key; "

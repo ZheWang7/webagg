@@ -11,7 +11,7 @@ from nbclient import NotebookClient
 from tests.conftest import seed_selftest_cohort
 
 REPO = Path(__file__).resolve().parents[1]
-NB_PATH = REPO / "notebooks" / "exp2s_stopping_calibration.ipynb"
+NB_PATH = REPO / "notebooks" / "exp2c_stopping_guarantee.ipynb"
 
 
 @pytest.mark.slow
@@ -35,6 +35,6 @@ def test_notebook_executes_offline_end_to_end(tmp_path, monkeypatch):
     assert "live phase skipped" in text          # the gate held
     assert "Self-tests S1/S2 passed" in text     # replay reproduces the stops
     assert "HEADLINE (statistical path" in text  # C2 table printed
-    res = tmp_path / "experiments" / "exp2s" / "results"
+    res = tmp_path / "experiments" / "exp2c" / "results"
     for f in ("stops.csv", "calibration.csv", "shortfall.csv", "grades.csv"):
         assert (res / f).exists(), f"notebook did not write {f}"

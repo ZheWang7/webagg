@@ -1,5 +1,10 @@
 # TESTING.md — test architecture and verification report
 
+> CITATION BRANCH: the suite below was ported to the citation domain
+> (Exp 2-C); counts differ from the sports branch. The headline
+> addition: the statistical certificate now fires END TO END in
+> test_pipeline_e2e and in the script-level roundtrip.
+
 Suite: **101 tests (95 offline + 6 opt-in online), 10 layers, ~98% line
 coverage of `webaggs/`**, pyflakes clean. Run with `pytest` from the repo root. The suite is the gate: it must
 be green before any live spend (`run_exp2s.py` and the notebook both say so).

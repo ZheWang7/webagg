@@ -1,3 +1,4 @@
+from tests.conftest import TARGET
 from webaggs.extract import extract_certified, is_relevant
 from webaggs.types import Source
 
@@ -9,27 +10,27 @@ def _src(text):
 
 
 def test_relevance_gate(gate):
-    ok, _ = is_relevant(_src("Testo Sampleson scored a lot"), "Testo Sampleson")
+    ok, _ = is_relevant(_src(f"papers citing {TARGET} are listed"), TARGET)
     assert ok
-    ok, score = is_relevant(_src("unrelated page about soup"), "Testo Sampleson")
-    assert not ok and score == 0.0
+    ok, score = is_relevant(_src("a page about soup recipes"), TARGET)
+    assert not ok and score < 0.5
 
 
-def test_extraction_applies_typed_validators_and_gate(gate):
+def test_extraction_keys_doi_first_applies_gate_and_disables_claims(gate):
     def llm(system, user, **kw):
-        return {"season_rows": [
-            {"player": "Testo Sampleson", "season": "2019-20",
-             "points": 450, "confidence": 0.95},            # accepted
-            {"player": "Testo Sampleson", "season": "2018-2020",
-             "points": 500, "confidence": 0.95},            # span: typed reject
-            {"player": "Testo Sampleson", "season": "2020-21",
-             "points": 612, "confidence": 0.10},            # low conf: gate reject
-        ], "claims": [
-            {"kind": "SUM", "value": 1450},                 # kept
-            {"kind": "COUNT", "value": 99},                 # typed bound: dropped
-        ]}
-    ms, claims, n_rej = extract_certified(_src("Testo Sampleson page"),
-                                          "Testo Sampleson", gate, llm=llm)
-    assert [(m.season, m.value) for m in ms] == [("2019-20", 450)]
+        return {"citations": [
+            {"title": "Good Paper With Doi", "doi": "DOI: 10.1234/ab.1",
+             "cited_paper": TARGET, "confidence": 0.95},     # accepted, doi key
+            {"title": "Title Only Citing Paper", "doi": "",
+             "cited_paper": TARGET, "confidence": 0.92},     # accepted, t: key
+            {"title": "Hi", "doi": "",
+             "cited_paper": TARGET, "confidence": 0.95},     # unkeyable: reject
+            {"title": "Low Confidence Citing Paper", "doi": "",
+             "cited_paper": TARGET, "confidence": 0.10},     # gate reject
+        ], "claims": [{"kind": "COUNT", "value": 999}]}      # must be IGNORED
+    ms, claims, n_rej = extract_certified(_src("x"), TARGET, gate, llm=llm)
+    assert [m.season for m in ms] == ["doi:10.1234/ab.1",
+                                      "t:title only citing paper"]
+    assert all(m.value == 1 for m in ms)          # COUNT domain: value 1
     assert n_rej == 2
-    assert [(c.kind, c.value) for c in claims] == [("SUM", 1450.0)]
+    assert claims == []                           # claims OFF (pre-registered)

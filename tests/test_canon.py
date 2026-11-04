@@ -33,3 +33,19 @@ def test_canonical_points_typed_bounds():
     assert canonical_points("4,500") is None         # above POINTS_MAX: reject
     assert canonical_points("999999") is None        # absurd: reject
     assert canonical_points("n/a") is None
+
+
+def test_canonical_doi_and_cite_key():
+    from webaggs.canon import canonical_doi, cite_key_from_parts, \
+        normalize_title
+    assert canonical_doi("https://doi.org/10.1234/ABC.5,") == "10.1234/abc.5"
+    assert canonical_doi("doi: 10.48550/arXiv.1706.03762") == \
+        "10.48550/arxiv.1706.03762"
+    assert canonical_doi("no doi here 10.1/x") is None    # registrant too short
+    assert cite_key_from_parts("10.1234/a.1", "ignored") == "doi:10.1234/a.1"
+    assert cite_key_from_parts("", "Attention Is All You Need") == \
+        "t:attention is all you need"
+    assert cite_key_from_parts("", "Hi") is None          # too short to key
+    # the SAME normalized form keys arXiv-vs-journal title variants together
+    assert normalize_title("BERT: Pre-training of Deep  Bidirectional—Transformers") == \
+        normalize_title("bert pre training of deep bidirectional transformers")
