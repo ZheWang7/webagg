@@ -47,6 +47,9 @@ DEFAULT_PMID = "34265844"
 OUT = config.DATA_DIR / "ci" / "exp2c_probe.md"
 
 
+ALIASED: list[str] = []    # OpenAlex answers under a different primary DOI
+
+
 def page_dois(page) -> list[str]:
     return [d for d in (canonical_doi(r.get("doi")) for r in page.rows) if d]
 
@@ -62,8 +65,14 @@ def in_openalex(oa, handle, dois) -> set:
             "select": "doi", "per-page": 100, **oa._key()})
         for w in (data or {}).get("results") or []:
             d = canonical_doi(w.get("doi"))
-            if d:
+            # count a hit only when OpenAlex lists the work under the SAME
+            # DOI we asked for: if it answers with a different primary DOI
+            # (preprint vs published version) the agent's key will not join
+            # the truth key, so it is NOT reachable for grading
+            if d and d in chunk:
                 found.add(d)
+            elif d:
+                ALIASED.append(d)
     return found
 
 
@@ -174,6 +183,9 @@ def main() -> None:
             f"in Europe PMC {len(t_ep)/n:.0%}, in BOTH {len(both)/n:.0%}, "
             f"in NEITHER {1 - len(either)/n:.0%}")
         ceiling = len(either) / n
+        say(f"- DOI aliasing: for {len(ALIASED)} of the {n} sampled truth "
+            "DOIs OpenAlex lists the citing work under a DIFFERENT primary "
+            "DOI (counted as not reachable: the keys would not join)")
         say(f"- **recall ceiling ~ {ceiling:.0%}** (truth records reachable "
             "through at least one enumerator)")
 
