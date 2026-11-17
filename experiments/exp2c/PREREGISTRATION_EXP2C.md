@@ -168,6 +168,34 @@ freeze. If no ε ≤ 0.7 is feasible at the measured u, THAT is the finding
 and the cohort run does not proceed with two indexes (the pre-registered
 fallback is to name Semantic Scholar as a third enumerator and re-probe).
 
+### 6.3.1 Probe result (2026-11-17, CI run, AlphaFold 2, cutoff 2023-12-31)
+
+Full report: data/ci/exp2c_probe.md. All three APIs behaved as coded.
+
+- **Oracle**: 40,830 raw rows, list length = /citation-count
+  (self-validated); 1,291 without DOI, 1,161 undated, 23,741 after the
+  cutoff → **truth 14,637** DOI-registered citers.
+- **Enumerators**: OpenAlex lists 14,853, Europe PMC 12,325; both honored
+  the requested page size (50/50 rows) and returned a DOI on every row.
+- **Reach** (120 random truth records): OpenAlex 82%, Europe PMC 79%,
+  both 70%, neither 8% → **recall ceiling ≈ 92%**. For 19 of the 120,
+  OpenAlex lists the citing work under a different primary DOI than the
+  oracle (preprint vs published version); those keys do not join and are
+  counted as unreachable through OpenAlex.
+- **Overlap**: 84% of OpenAlex's sampled citers are in Europe PMC, 83% the
+  other way → N ≈ 15,800 distinct, **singleton share u ≈ 0.28** (samples
+  of 120 from the head of each list: a rough estimate, ± ~0.08).
+- **Band at u = 0.28**: ε 0.5 → τ 2,340, N 54k–67k · ε 0.6 → τ 1,130,
+  N 26k–32k · ε 0.7 → τ 670, N 15k–19k.
+
+**To be decided and written here before the freeze (supervisor):** the
+live ε. Candidates: ε = 0.7 with τ_max ≈ 700 and a cohort band of
+15k–19k truth-sized papers (cheapest; this pilot paper itself would
+fit), or ε = 0.6 with τ_max ≈ 1,150 and 26k–32k. Part of u is DOI
+aliasing between the indexes, not missing coverage; resolving aliases in
+ER, or naming a third enumerator, would lower u and tighten ε — either is
+a design change that must be made and re-probed BEFORE the freeze.
+
 ### 6.4 PILOT 2 (scripts/pilot_walk.py, after the probe)
 
 One short live walk (default 40 occasions) on a non-cohort paper:
