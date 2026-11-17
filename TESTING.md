@@ -1,13 +1,19 @@
 # TESTING.md — test architecture and verification report
 
-> CITATION BRANCH: the suite below was ported to the citation domain
-> (Exp 2-C); counts differ from the sports branch. The headline
-> addition: the statistical certificate now fires END TO END in
-> test_pipeline_e2e and in the script-level roundtrip.
+> CITATION BRANCH (prereg rev 3): OpenCitations is the oracle; the agent
+> walks two paginated citation indexes one page per capture occasion.
+> New test layers for this design: `test_indexes.py` (index plug-in and
+> design arithmetic), `test_oracle_opencitations.py` (oracle universe,
+> cutoff, self-validation), and the index-walk cases in
+> `test_pipeline_e2e.py` — the statistical certificate fires end to end
+> through a two-index walk; a partial-overlap world must REFUSE to
+> certify; a failed page is retried; the oracle cannot be walked.
 
-Suite: **101 tests (95 offline + 6 opt-in online), 10 layers, ~98% line
-coverage of `webaggs/`**, pyflakes clean. Run with `pytest` from the repo root. The suite is the gate: it must
-be green before any live spend (`run_exp2s.py` and the notebook both say so).
+Suite: **112 tests (105 offline + 7 opt-in online)**, pyflakes clean. Run
+with `pytest` from the repo root. The suite is the gate: it must be green
+before any live spend. (The layer table below predates rev 3; file names
+ending `exp2s` are now `exp2c`, and the oracle rows describe the sports
+branch's NHL driver, which is kept for its tests.)
 
 ## Layers
 

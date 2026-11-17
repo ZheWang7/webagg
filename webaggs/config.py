@@ -61,6 +61,7 @@ CLASS_PRIORS = {
     "stats_vendor": 0.80,   # hockey-reference, espn, quanthockey, hockeydb, ...
     "news": 0.60,           # press / sports media
     "other": 0.40,          # blogs, forums, everything else
+    "citation_index": 0.80, # a paginated citation index (OpenAlex, Europe PMC)
 }
 
 # Typed bound for the points validator (canon.canonical_points): the NHL
@@ -68,12 +69,30 @@ CLASS_PRIORS = {
 # value above this is a look-alike number, never a real points figure.
 POINTS_MAX = 4000
 
-# --- Oracle deny list (PREREGISTRATION_EXP2C.md) -------------------------
-# OpenAlex defines truth and is DENIED at run time (withheld-registry
-# design, webaggr.pdf §9). Semantic Scholar, Google Scholar, publisher
-# pages and the rest of the web stay fair game (the hockey-reference
-# role) unless the pre-registration says otherwise.
-DENY_DOMAINS = ("openalex.org",)
+# --- Oracle deny list (PREREGISTRATION_EXP2C.md rev 3) -------------------
+# OpenCitations defines truth and is DENIED at run time (withheld-registry
+# design, webaggr.pdf §9). OpenAlex and Europe PMC are the agent's two
+# paginated enumerators; publisher pages, blogs and the rest of the web
+# stay fair game.
+DENY_DOMAINS = ("opencitations.net",)
+
+# --- Index pagination plug-in (prereg §6.2; webaggr.pdf Def. 5) -----------
+# One index page = one capture occasion. The page size we REQUEST is the
+# per-occasion novelty bound by construction, so the experiment runs with
+# Y_CAP = INDEX_PAGE_SIZE (Assumption 1b holds as written).
+INDEX_PAGE_SIZE = 50
+# Intake truncation (impl guide's sanctioned tightening): an occasion may
+# credit at most Y_CAP NEW records; the excess stays unseen mass.
+TRUNCATE_INTAKE = True
+# How an index page is read: "structured" parses the API's own rows
+# (no transcription error on DOIs); "llm" sends the rendered page through
+# the certified LLM reader + conformal gate (slower; kept as an arm).
+INDEX_READER = "structured"
+INDEX_PAGE_COST = 0.001    # $ per index-page occasion (API usage, approx.)
+INDEX_PAGE_RETRIES = 2     # re-enqueue a failed page this many times
+# The record universe is DOI-registered citing works (the oracle's
+# universe): rows without a DOI are rejected by the typed validator.
+CITE_REQUIRE_DOI = True
 
 # Citation records carry value 1 (f_Q = COUNT via the unchanged SUM path).
 CITE_VALUE = 1

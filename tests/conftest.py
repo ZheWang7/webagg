@@ -1,15 +1,17 @@
 """Shared TEST-ONLY fakes, citation domain. Experiment scripts never import
 from here — no fakes in any experiment path; tests inject via the
-`llm`, `fetch`, `search` parameters.
+`llm`, `fetch`, `search`, `indexes` parameters.
 
 Two synthetic worlds:
-  * TARGET (small): 3 citing papers across 3 domains — exercises dedup,
-    DOI-vs-title keying, contamination; ends ABANDONED (claims are off in
-    this domain and psi is huge at tiny n).
-  * BIGPAPER (large): 400 citing papers fully covered by two index pages —
-    with max_steps=4 and eps=0.30, U_hat hits 0 (every record doubly
-    covered), psi = (24/400)*sqrt(2*4*ln(1/0.05)) ~= 0.147 < 0.30, and the
-    STATISTICAL certificate fires end to end: the path Exp 2-C exists for.
+  * TARGET (small): 3 DOI-registered citing papers across 3 domains —
+    exercises dedup, the DOI-universe validator, contamination; ends
+    ABANDONED (claims are off in this domain and psi is huge at tiny n).
+  * BIGPAPER (large): 408 citing papers enumerated by TWO fake paginated
+    indexes, 2 per page (y_cap = page size = 2). With tau_max = 420 and
+    eps = 0.5 the design arithmetic (webaggs/design.py) gives a feasible
+    band of N in (401, 414): both walks finish, every record is doubly
+    covered, psi ~= 0.49 < 0.5, and the STATISTICAL certificate fires end
+    to end: the path Exp 2-C exists for.
 """
 from __future__ import annotations
 
@@ -21,6 +23,7 @@ import pytest
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from webaggs.conformal import ConformalGate            # noqa: E402
+from webaggs.indexes import CitationIndex, IndexPage, Target  # noqa: E402
 from webaggs.types import Source, sha16                # noqa: E402
 
 TARGET = "Testo Attention Nets: A Sample Paper"
@@ -30,8 +33,8 @@ TRUTH = {
                               doi="10.1234/aaa.1"),
     "doi:10.1234/bbb.2": dict(title="A Survey of Sample Methods",
                               doi="https://doi.org/10.1234/BBB.2"),
-    "t:testo nets considered helpful": dict(
-        title="Testo Nets Considered Helpful", doi=""),
+    "doi:10.1234/ccc.3": dict(title="Testo Nets Considered Helpful",
+                              doi="10.1234/ccc.3"),
 }
 
 PAGES = {
@@ -45,7 +48,10 @@ PAGES = {
         ]},
     "https://reviews.test/testo-survey": {
         "citations": [
-            dict(title="Testo Nets Considered Helpful", doi="",
+            dict(title="Testo Nets Considered Helpful", doi="10.1234/ccc.3",
+                 cited_paper=TARGET, confidence=0.9),
+            # NO DOI: outside the pre-registered DOI universe -> rejected
+            dict(title="An Unregistered Workshop Note On Testo", doi="",
                  cited_paper=TARGET, confidence=0.9),
             # DUPLICATE of aaa.1 via doi URL form: must dedup to one record
             dict(title="Downstream Applications of Testo Nets (preprint)",
@@ -55,26 +61,85 @@ PAGES = {
     "https://blog.test/reading-list": {
         "citations": [
             # CONTAMINATION: cites a different paper — ER guard rejects
-            dict(title="Unrelated Gradient Tricks", doi="10.9/zz.9",
+            dict(title="Unrelated Gradient Tricks", doi="10.9999/zz.9",
                  cited_paper="Some Other Famous Paper", confidence=0.95),
         ]},
 }
 
 # --- the large world: statistical certification end to end ---------------
 BIGPAPER = "Big Sample Transformers: A Landmark Paper"
+BIG_N, BIG_PAGE, BIG_TAU, BIG_EPS = 408, 2, 420, 0.5
 BIG_TRUTH = {f"doi:10.5555/big.{i}": dict(title=f"Follow-up Study {i}",
                                           doi=f"10.5555/big.{i}")
-             for i in range(400)}
+             for i in range(BIG_N)}
+BIG_CUTOFF = "2023-12-31"
+# one prose page that re-mentions two already-indexed citers
 BIG_PAGES = {
-    "https://scholar-mirror.test/big-1": {
-        "citations": [dict(title=v["title"], doi=v["doi"],
-                           cited_paper=BIGPAPER, confidence=0.95)
-                      for v in BIG_TRUTH.values()]},
-    "https://index.test/big-2": {
-        "citations": [dict(title=v["title"], doi=v["doi"],
-                           cited_paper=BIGPAPER, confidence=0.94)
-                      for v in BIG_TRUTH.values()]},
+    "https://blog.test/big-notes": {
+        "citations": [dict(title="Follow-up Study 0", doi="10.5555/big.0",
+                           cited_paper=BIGPAPER, confidence=0.95),
+                      dict(title="Follow-up Study 1", doi="10.5555/big.1",
+                           cited_paper=BIGPAPER, confidence=0.95)]},
 }
+
+
+class FakeIndex(CitationIndex):
+    """An in-memory paginated citation index. Only the transport (_get)
+    is faked: URL building, the deny check, page-size enforcement,
+    rendering and the Source all run through the REAL CitationIndex."""
+
+    first_cursor = "0"
+
+    def __init__(self, name, dois, domain=None, fail_once=()):
+        super().__init__(pace_seconds=0, retries=1, cooldown=0)
+        self.name = name
+        self.dois = list(dois)
+        self.base = f"https://{domain or name + '.test'}/cites"
+        self.fail_once = set(fail_once)        # cursor offsets that 503 once
+        self.calls = 0
+
+    def resolve(self, target):
+        return "H1"
+
+    def request(self, handle, cursor, size, cutoff):
+        return self.base, {"h": handle, "cursor": cursor, "size": size,
+                           "to": cutoff}, {}
+
+    def _get(self, url, params):
+        self.calls += 1
+        off, size = int(params["cursor"]), int(params["size"])
+        if off in self.fail_once:
+            self.fail_once.discard(off)
+            return 503, None
+        nxt = off + size if off + size < len(self.dois) else None
+        return 200, {"rows": self.dois[off:off + size], "next": nxt,
+                     "total": len(self.dois)}
+
+    def parse(self, data, cursor, cutoff):
+        rows = [{"title": f"Follow-up Study {d.rsplit('.', 1)[-1]}", "doi": d}
+                for d in data["rows"]]
+        nxt = None if data["next"] is None else str(data["next"])
+        return IndexPage(rows=rows, next_cursor=nxt, total=data["total"])
+
+
+def big_indexes(overlap: float = 1.0):
+    """Two fake indexes over the BIG world. `overlap` < 1 drops the tail of
+    index B, leaving those records as singletons (f1 stays up)."""
+    dois = [v["doi"] for v in BIG_TRUTH.values()]
+    keep = int(round(len(dois) * overlap))
+    return [FakeIndex("idx-a", dois), FakeIndex("idx-b", dois[:keep])]
+
+
+BIG_TARGET = Target(title=BIGPAPER, doi="10.5555/bigpaper", pmid="1")
+
+
+def big_kwargs(overlap: float = 1.0, **over):
+    """The run_query kwargs that put the BIG world on the index path."""
+    kw = dict(target=BIG_TARGET, indexes=big_indexes(overlap),
+              cutoff=BIG_CUTOFF, page_size=BIG_PAGE, y_cap=BIG_PAGE,
+              eps_g=BIG_EPS, max_steps=BIG_TAU)
+    kw.update(over)
+    return kw
 
 
 class RoutedSearch:
@@ -155,7 +220,8 @@ def seed_selftest_cohort(data_dir) -> str:
     """OFFLINE self-test cohort under `data_dir`: frozen truth, fitted
     calibration file, and one finished ledger per paper via the real
     end_to_end over the synthetic worlds. BIGPAPER certifies
-    STATISTICALLY (max_steps=4, eps=0.30); TARGET ends abandoned."""
+    STATISTICALLY via the two-index walk (eps=0.5); TARGET ends
+    abandoned."""
     import json
 
     from webaggs.canon import normalize_name
@@ -182,15 +248,16 @@ def seed_selftest_cohort(data_dir) -> str:
     gate = ConformalGate.fit(_calibration_pairs())
     runs_dir = data_dir / "experiments" / "exp2c" / "runs"
     idx = {}
-    for paper, pages, steps in ((TARGET, PAGES, 30), (BIGPAPER, BIG_PAGES, 4)):
+    for paper, pages, kw in (
+            (TARGET, PAGES, dict(eps_g=BIG_EPS, max_steps=30)),
+            (BIGPAPER, BIG_PAGES, big_kwargs())):
         rid = f"exp2c_{cohort}_{normalize_name(paper).replace(' ', '_')[:30]}"
         ledger = Ledger(runs_dir / f"{rid}.sqlite")
         ans = end_to_end(paper, rid, ledger,
                          search=RoutedSearch(default=list(pages)), gate=gate,
                          llm=make_fake_llm(pages, paper),
                          fetch=make_fetch(paper, pages),
-                         eps_g=0.30, delta_m=0.05, budget_usd=5.0,
-                         max_steps=steps)
+                         delta_m=0.05, budget_usd=50.0, **kw)
         ledger.close()
         idx[normalize_name(paper)] = {
             "done": True, "run_id": rid, "stop_reason": ans.stop_reason,

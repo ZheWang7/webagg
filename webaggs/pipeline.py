@@ -86,14 +86,37 @@ def run_query(player: str, run_id: str, ledger, *, search, gate,
               eps_g: float = config.EPS_G, delta_m: float = config.DELTA_M,
               eta: float = config.ETA, budget_usd: float = config.BUDGET_USD,
               max_steps: int = config.MAX_STEPS,
-              llm=call_llm, fetch=real_fetch):
+              llm=call_llm, fetch=real_fetch,
+              target=None, indexes=(), cutoff: str | None = None,
+              page_size: int = config.INDEX_PAGE_SIZE,
+              y_cap: int | None = None,
+              truncate_intake: bool | None = None,
+              index_reader: str | None = None):
     """FrontierDiscovery (webaggr.pdf Alg. 1). Returns (state, artifacts).
 
     `search`, `gate` are required collaborators; `llm` and `fetch` are
     injectable for TESTS ONLY — experiment scripts pass the real ones.
+
+    Index plug-in (prereg §6.2): `indexes` are paginated citation indexes
+    walked one page per capture occasion for `target` (an indexes.Target),
+    listing citers published <= `cutoff`. `y_cap` overrides the novelty
+    bound (the experiment passes y_cap = page_size).
     """
+    if truncate_intake is None:
+        truncate_intake = config.TRUNCATE_INTAKE
+    if index_reader is None:
+        index_reader = config.INDEX_READER
+    if indexes and (target is None or not cutoff):
+        raise ValueError("index walking needs a target and a cutoff date")
+    if indexes and page_size > (y_cap or config.Y_CAP):
+        raise ValueError(
+            f"page_size {page_size} exceeds Y_CAP {y_cap or config.Y_CAP}: "
+            "an index page could then exceed the per-occasion novelty bound "
+            "(Assumption 1b) — pass y_cap >= page_size")
     stratum = canon.normalize_name(player)
     state = FrontierState()
+    if y_cap is not None:
+        state.Y_CAP = y_cap
     state.strata[stratum] = StratumState(name=stratum)
     ce = ClaimsEngine()
     mentions_by_record: dict[str, list] = defaultdict(list)
@@ -106,6 +129,39 @@ def run_query(player: str, run_id: str, ledger, *, search, gate,
 
     for fm in seed_formulations(player, llm=llm, ledger=ledger, run_id=run_id):
         add_if_novel(state, fm)
+
+    # Index entry points: deterministic seed formulations proposed by CODE
+    # (Def. 5 admits non-LLM proposers, like the §5 constraint engine).
+    # index_plan maps a formulation id to its page: the frontier module
+    # itself is untouched — a page is just another formulation to it.
+    index_plan: dict[str, dict] = {}
+
+    def add_page(ix, handle, cursor, page_no, attempt=0, total=None):
+        # y-hat = what this page can still deliver (index total is used as
+        # a YIELD ESTIMATE only, never as a claim — prereg §5)
+        est = page_size
+        if total is not None:
+            est = max(min(page_size, total - (page_no - 1) * page_size), 1)
+        fid = sha16(f"idx|{ix.name}|{cursor}|{attempt}")[:8]
+        state.formulations[fid] = Formulation(
+            formulation_id=fid,
+            query=f"[index:{ix.name}] citing papers, page {page_no}"
+                  + (f" (retry {attempt})" if attempt else ""),
+            p_success=1.0, yield_if_success=float(est),
+            cost=config.INDEX_PAGE_COST)
+        index_plan[fid] = dict(ix=ix, handle=handle, cursor=cursor,
+                               page_no=page_no, attempt=attempt)
+
+    for ix in indexes:
+        try:
+            handle = ix.resolve(target)
+        except Exception as e:            # index cannot serve this target:
+            ledger.log_measurement(       # logged loudly, run continues on
+                run_id, 0, stratum,       # the remaining sources
+                "index_unavailable", 1.0,
+                extra={"index": ix.name, "why": str(e)[:300]})
+            continue
+        add_page(ix, handle, ix.first_cursor, 1)
 
     for step in range(1, max_steps + 1):
         stop_step = step
@@ -129,19 +185,36 @@ def run_query(player: str, run_id: str, ledger, *, search, gate,
                  if not state.strata[g].certified}
         state.T += 1
         new = 0
+        truncated = 0                     # new records refused by the cap
         new_keys_this_step: list[str] = []
-        for r in search.search(fm.query, k=10):
-            url = r["url"]
-            if url in url_cache:
+        plan = index_plan.get(fm.formulation_id)
+        page = None
+        if plan is not None:
+            # an index page: ONE url, fetched through the index (Def. 5)
+            ix = plan["ix"]
+            hits = [ix.page_url(plan["handle"], plan["cursor"], page_size,
+                                cutoff)]
+        else:
+            hits = [r["url"] for r in search.search(fm.query, k=10)]
+        for url in hits:
+            if plan is None and url in url_cache:
                 # same page under a new formulation: a legitimate second
                 # capture occasion for its records — credit, don't refetch
                 for rk in url_cache[url]:
                     was_new = rk not in state.covered
+                    if was_new and truncate_intake and new >= state.Y_CAP:
+                        truncated += 1    # over the cap: stays unseen mass
+                        continue
                     state.covered[rk].add(fm.formulation_id)
                     if was_new and new < state.Y_CAP:
                         new += 1
                 continue
-            src = fetch(url, fm.formulation_id)
+            if plan is not None:
+                src, page = ix.fetch_page(target, plan["handle"],
+                                          plan["cursor"], page_size, cutoff,
+                                          fm.formulation_id)
+            else:
+                src = fetch(url, fm.formulation_id)
             ledger.log_fetch_outcome(run_id, step, url, src.domain, src.status,
                                      len(src.main_text))
             ledger.add_source(src)
@@ -154,9 +227,15 @@ def run_query(player: str, run_id: str, ledger, *, search, gate,
                                     src.main_text[:2000])
                 url_cache[url] = []
                 continue
-            from .extract import extract_certified   # local import avoids cycle
-            ms, claims, n_rej = extract_certified(
-                src, player, gate, ledger=ledger, run_id=run_id, llm=llm)
+            from .extract import (extract_certified,   # local import
+                                  extract_structured)  # avoids a cycle
+            if plan is not None and index_reader == "structured":
+                # typed API rows read directly: no LLM transcription of DOIs
+                ms, claims, n_rej = extract_structured(src, player,
+                                                       page.rows, gate)
+            else:
+                ms, claims, n_rej = extract_certified(
+                    src, player, gate, ledger=ledger, run_id=run_id, llm=llm)
             if n_rej:                         # delta_E audit trail (§7.1):
                 ledger.log_measurement(       # gate/validator rejections per
                     run_id, step, stratum,    # source, persisted not discarded
@@ -171,11 +250,18 @@ def run_query(player: str, run_id: str, ledger, *, search, gate,
                 if ent is None:
                     ledger.add_mention(m, accepted=False)  # contamination guard
                     continue
-                ledger.add_mention(m, accepted=True)
                 rk = m.record_key(ent)
+                was_new = rk not in state.covered
+                if was_new and truncate_intake and new >= state.Y_CAP:
+                    # intake truncation (guide's sanctioned tightening, A1b):
+                    # the occasion already credited Y_CAP new records, so
+                    # this one is NOT covered and remains unseen mass
+                    ledger.add_mention(m, accepted=False)
+                    truncated += 1
+                    continue
+                ledger.add_mention(m, accepted=True)
                 state.record_stratum[rk] = stratum
                 mentions_by_record[rk].append(m)
-                was_new = rk not in state.covered
                 state.covered[rk].add(fm.formulation_id)   # OCCASIONS, not sources
                 covered_keys.append(rk)
                 if was_new:
@@ -188,8 +274,30 @@ def run_query(player: str, run_id: str, ledger, *, search, gate,
         spent += fm.cost
         for g, c_t in pre_c.items():            # realized V_t += c_t^2
             state.strata[g].V += c_t * c_t
+        if truncated:
+            ledger.log_measurement(run_id, step, stratum, "intake_truncated",
+                                   truncated, extra={"y_cap": state.Y_CAP})
 
-        if new_keys_this_step:
+        if plan is not None:
+            # CURSOR-STYLE emission (prereg §10.3): the next page becomes a
+            # formulation only now, so frontier credit moves by at most one
+            # page per step. A failed page is re-enqueued a bounded number
+            # of times — a dead walk must not look like a finished one.
+            if page is not None and page.next_cursor:
+                add_page(ix, plan["handle"], page.next_cursor,
+                         plan["page_no"] + 1, total=page.total)
+            elif page is None and plan["attempt"] < config.INDEX_PAGE_RETRIES:
+                add_page(ix, plan["handle"], plan["cursor"], plan["page_no"],
+                         attempt=plan["attempt"] + 1)
+            elif page is None:
+                ledger.log_measurement(run_id, step, stratum,
+                                       "index_walk_aborted", 1.0,
+                                       extra={"index": ix.name,
+                                              "page_no": plan["page_no"]})
+
+        if new_keys_this_step and plan is None:
+            # LLM follow-ups come from SEARCH occasions only: an index page
+            # already has its deterministic successor (the next page)
             unissued = [f.query for f in state.formulations.values() if not f.issued]
             for nf in propose_followups(player, [k.split("|")[1] for k in
                                                  state.covered], unissued,

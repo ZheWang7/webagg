@@ -26,12 +26,22 @@ def _run(tmp_path, gate, pages, rid="b", **kw):
     return ledger, ans
 
 
-def test_novelty_counter_capped_but_all_records_enter(tmp_path, gate):
+def test_intake_is_truncated_to_y_cap_per_occasion(tmp_path, gate):
+    """Assumption 1(b) ENFORCED: one occasion credits at most Y_CAP new
+    records; the excess is not covered (it stays unseen mass) and the
+    truncation is logged. The same 20-record page read with truncation off
+    shows the legacy counter-only behavior."""
     ledger, ans = _run(tmp_path, gate, _world(20), budget_usd=5.0,
                        max_steps=10)
-    assert ans.n_records == 20
+    assert ans.n_records == 12                   # config.Y_CAP
     news = [e["new"] for _s, _g, _m, _u, e in ledger.measurements("b", "U_hat")]
-    assert max(news) == 12                       # Y_CAP caps the counter only
+    assert max(news) == 12
+    tr = ledger.measurements("b", metric="intake_truncated")
+    assert tr and tr[0][3] == 8                  # 20 offered - 12 credited
+    ledger.close()
+    ledger, ans = _run(tmp_path, gate, _world(20), rid="legacy",
+                       budget_usd=5.0, max_steps=10, truncate_intake=False)
+    assert ans.n_records == 20
     ledger.close()
 
 

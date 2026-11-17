@@ -1,56 +1,69 @@
 # webagg-citations — WebAggr in the citation domain (Experiment 2-C)
 
-**This branch** instantiates the pipeline for the query *"which papers
-cite [target paper]?"* (f_Q = COUNT of citing papers) with OpenAlex as
-the withheld oracle — the experiment that tests the STATISTICAL
-stopping guarantee at reachable n. The NHL instantiation (Exp 2-S,
-complete) lives on the `sports` branch.
+**This branch** runs the WebAggr pipeline (webaggr.pdf) on the query
+*"which DOI-registered papers cite [target paper], up to a cutoff
+year?"* (f_Q = COUNT). It is the experiment that tests the
+**statistical stopping guarantee** (Theorem 1) at a size where the
+certificate can actually fire. The NHL instantiation (Exp 2-S, complete)
+lives on the `sports` branch.
 
-A from-scratch instantiation of the WebAggr pipeline (webaggr.pdf) for the
-query **"What is [player]'s total career regular-season points in the NHL?"**
-(points = goals + assists) — f_Q = SUM over (player, season) records — with
-**the NHL's official public API as the withheld oracle** (the EDGAR role: defines truth, denied at run time).
-
-Purpose: Exp 2-S, a control experiment for the finance Exp 2 failure. See
-`experiments/exp2s/PREREGISTRATION_EXP2S.md` — read it first; it is the
+Read `experiments/exp2c/PREREGISTRATION_EXP2C.md` first — it is the
 contract for every run.
+
+## The design in one screen
+
+| Role | Source | Notes |
+|---|---|---|
+| **Oracle** (defines truth, DENIED to the agent) | OpenCitations | free, no key; returns the whole citing list at once |
+| **Enumerator 1** | OpenAlex | cursor paging; free key (`OPENALEX_API_KEY`) |
+| **Enumerator 2** | Europe PMC | `CITES:` search, cursor paging; no key; biomedicine only |
+| Optional enumerator 3 | Semantic Scholar | needs `S2_API_KEY`; off unless pre-registered |
+| Everything else | the open web via Serper | prose pages; read by the LLM reader + conformal gate |
+
+How a run works:
+
+1. The agent walks each enumerator **one page per capture occasion**
+   (Def. 5). The page size it requests (50) is the per-occasion novelty
+   bound **Y_CAP** by construction (Assumption 1b).
+2. Pages are emitted **cursor-style**: page k+1 becomes a formulation only
+   after page k is read, so the frontier stays "hot" until a walk ends.
+3. A record seen by only one enumerator is a **singleton** (f₁). After
+   both walks, Û ≈ the singleton share u.
+4. The unchanged stop test fires when **Û + ψ < ε** and the frontier is
+   cold. ψ shrinks like 1/N, so the paper needs enough citers — and the
+   walks must fit inside τ_max. `webaggs/design.py` computes that band.
+5. Recall at the stop is graded against the frozen OpenCitations truth.
 
 ## Layout
 
 ```
 webaggs/                 the pipeline package
   config.py              parameters (impl-guide Table 4 names)
-  canon.py               typed validators: names, seasons, points (§7.1)
+  canon.py               typed validators: DOIs, titles (§7.1)
   frontier.py            Û, ψ, the two-conjunct stop test (§3.2–3.3)
-  claims.py              COUNT/SUM checksums, gap direction, brake (§5.2)
+  indexes.py             paginated citation indexes as capture occasions
+  design.py              feasibility arithmetic for the statistical stop
   pipeline.py            FrontierDiscovery loop + end_to_end wiring (§14.1)
-  replay.py              offline stop replay from frozen ledgers (Exp 2)
-  extract.py, conformal.py   certified reading + δ_E gate (§7.1)
-  er.py, corroborate.py  deterministic ER + echo-collapse corroboration
-  aggregate.py           SUM with the honest (ε_C + ε_F) interval (§7.3)
-  oracle_nhl.py, truth.py   the withheld oracle, freeze, exact grading
+  replay.py              offline stop replay from frozen ledgers
+  extract.py, conformal.py   LLM reader + δ_E gate; structured index reader
+  er.py, corroborate.py  ER guard + echo-collapse corroboration
+  aggregate.py           COUNT with the honest ε_C interval (§7.3)
+  oracle_opencitations.py, truth.py   the withheld oracle, freeze, grading
   storage.py             per-run SQLite ledger (the replay substrate)
-  fetch.py               deny list + fetch-outcome classifier (paywall instrument)
+  fetch.py               deny list + fetch-outcome classifier
   llm.py, search.py      single-provider LLM, Serper
 notebooks/
-  exp2s_stopping_calibration.ipynb   Exp 2-S, end to end: gated live cell,
-                         S1/S2 self-tests, C1 calibration plot, C2 coverage
-                         table, shortfall decomposition, grading
+  exp2c_stopping_guarantee.ipynb   the experiment end to end
 scripts/
-  build_cohort.py        freeze the truth table + cohort report
-  run_exp2s.py           LIVE phase (gated by RUN_LIVE=1)
-  replay_exp2s.py        OFFLINE arms + self-tests S1/S2 + C1/C2 tables
-  grade_exp2s.py         exact grading vs the frozen key
-tests/                   87-test suite, 9 layers (see TESTING.md) — the gate;
-                         it also EXECUTES the notebook headlessly against a
-                         synthetic cohort, so the notebook itself is gated
+  probe_enumerators.py   $0: oracle size, reach, overlap u, feasible band
+  pilot_walk.py          short live walk + automatic gate calibration
+  build_citation_truth.py   freeze truth + targets from the oracle
+  run_exp2c.py           LIVE phase (gated by RUN_LIVE=1)
+  replay_exp2c.py        OFFLINE arms + self-tests S1/S2 + C1/C2 tables
+  grade_exp2c.py         exact grading vs the frozen key
+  pilot_diagnose.py      explain a run's discovery rate from its ledger
+tests/                   112 tests (see TESTING.md) — the gate
 ```
-
-The notebook and the scripts are two entry points over the SAME ledgers and
-run index (identical run_id scheme), so you can run live from either and
-replay from either. Knobs: `WEBAGG_DATA_DIR` relocates all experiment data
-(used by the tests for isolation); `WEBAGG_COHORT` overrides the notebook's
-cohort for pilots without editing the pre-registered constant.
 
 ## Setup (PyCharm / Windows)
 
@@ -58,54 +71,34 @@ cohort for pilots without editing the pre-registered constant.
 python -m venv .venv
 .venv\Scripts\activate
 pip install -r requirements.txt
-copy .env.example .env     # fill in OPENAI_API_KEY, SERPER_API_KEY
+copy .env.example .env     # OPENAI_API_KEY, SERPER_API_KEY, OPENALEX_API_KEY
 pytest                     # the gate: green before any live spend
 ```
 
-`.env` is auto-loaded by `webaggs.config` (shell values win), same as the
-finance repo — with one exception: `RUN_LIVE` and `RUN_ONLINE` are never
-read from it, so arming live spend or the network preflight is always a
+`.env` is auto-loaded by `webaggs.config` (shell values win). `RUN_LIVE`
+and `RUN_ONLINE` are never read from it: arming spend or the network is a
 deliberate per-session `$env:` in the shell.
 
-## Calibration (before the first live run)
-
-1. **Conformal gate** (`data/conformal/calibration.csv`, columns
-   `confidence,correct`): run the extractor on a pilot player **not in the
-   cohort**, label ≥ 20 correct rows by hand against the oracle, save. The
-   gate refuses to run unfitted — by design.
-2. **ε_F is NOT calibrated** in this domain. Reports carry
-   `eps_f = None` and print no two-term interval. Do not invent a number.
-
-## Online sanity preflight (once, from the machine that will run live)
+## Running Exp 2-C (order is part of the pre-registration)
 
 ```powershell
-$env:RUN_ONLINE="1"; pytest -m online -v
-```
-
-Six checks, skipped on normal `pytest` runs: the oracle answers and the
-driver self-validates McDavid's career against the API's own totals (a dry
-run of the truth builder); a traded season (Kane 2022-23) sums into one
-record; a public page fetches as `ok`; the deny list blocks the real
-oracle; and — when the keys are set — one tiny Serper search (~$0.001) and
-one tiny LLM call (<$0.01). Run it before `build_cohort.py` and again
-before `RUN_LIVE=1`; a red here means a network/key problem, caught before
-any spend.
-
-## Running Exp 2-S (order is part of the pre-registration)
-
-```powershell
-pytest                                                   # 1. gate
-python scripts/build_cohort.py --cohort nhl_v1 --candidates cohort/candidates.txt
-#   -> apply the pre-registered selection rule to cohort_report.csv,
-#      finalize candidates, rebuild under the final cohort name, FREEZE
-# 2. supervisor signs PREREGISTRATION_EXP2S.md §4; commit it
+pytest                                             # 1. gate
+$env:RUN_ONLINE="1"; pytest -m online -v           # 2. preflight ($0)
+python scripts/probe_enumerators.py                # 3. probe ($0): u, band
+#    -> write eps, tau_max and the cohort band into the prereg (section 6.3)
 $env:RUN_LIVE="1"
-python scripts/run_exp2s.py    --cohort nhl_v1           # 3. live (ε = 0.05)
-python scripts/replay_exp2s.py --cohort nhl_v1           # 4. offline arms + C1/C2
-python scripts/grade_exp2s.py  --cohort nhl_v1           # 5. exact grading
+python scripts/pilot_walk.py --title "..." --doi ... --pmid ... --cutoff 2023-12-31
+#    -> 4. pilot: plumbing check + conformal gate fitted automatically
+#    5. choose cohort papers by the prereg rule; cohort/papers.txt lines:
+#       Title | DOI | PMID
+python scripts/build_citation_truth.py --cohort cite_v1 --papers cohort/papers.txt --cutoff 2023-12-31
+#    6. supervisor signs the prereg; commit it
+python scripts/run_exp2c.py    --cohort cite_v1 --eps <eps> --max-steps <tau_max>
+python scripts/replay_exp2c.py --cohort cite_v1 --live-eps <eps> --arms 0.9,0.8,0.7,0.6,0.5
+python scripts/grade_exp2c.py  --cohort cite_v1
 ```
 
-Idempotent: `run_exp2s.py` skips finished players (`runs_index.json`); no
+Idempotent: `run_exp2c.py` skips finished papers (`runs_index.json`); no
 re-rolling after seeing results.
 
 ## Design notes carried over from the finance build (why the code looks like this)

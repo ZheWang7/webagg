@@ -30,30 +30,68 @@ def is_relevant(src, target_paper: str) -> tuple[bool, float]:
     return score > 0.8, round(score, 2)
 
 
+def _row_to_mention(src, target_paper, row, gate, require_doi):
+    """One reader row -> Mention, or None when a validator or the gate
+    rejects it. Shared by the LLM reader and the structured index reader so
+    both apply exactly the same typed validators and conformal gate."""
+    if require_doi and not canon.canonical_doi(row.get("doi")):
+        return None                              # outside the DOI universe
+    key = canon.cite_key_from_parts(row.get("doi"), row.get("title"))
+    conf = float(row.get("confidence", 0.0))
+    if key is None:
+        return None                              # typed validator rejection
+    if not gate.accepts(conf):
+        return None                              # conformal rejection (delta_E)
+    return Mention(
+        mention_id=f"{src.source_id}:cite:{sha16(key)[:8]}",
+        source_id=src.source_id,
+        entity_surface=row.get("cited_paper", target_paper),
+        season=key, attribute="citation",
+        value=config.CITE_VALUE, confidence=conf)
+
+
+def _collect(src, target_paper, rows, gate, require_doi):
+    """rows -> (mentions, n_rejected), one mention per distinct record key
+    (a page listing the same DOI twice asserts it once)."""
+    mentions, rejected, seen = [], 0, set()
+    for row in rows:
+        m = _row_to_mention(src, target_paper, row, gate, require_doi)
+        if m is None:
+            rejected += 1
+        elif m.season not in seen:
+            seen.add(m.season)
+            mentions.append(m)
+    return mentions, rejected
+
+
 def extract_certified(src, target_paper: str, gate, *, ledger=None, run_id="",
-                      llm=call_llm):
+                      llm=call_llm, require_doi=None):
     """-> (accepted mentions, claims=[], n_rejected). Each accepted mention
     is one CITING paper: record key in the `season` slot (core modules and
     ledger schema unchanged — the slot is the record sub-key), value
     CITE_VALUE=1 so the unchanged SUM aggregate is the COUNT."""
+    if require_doi is None:
+        require_doi = config.CITE_REQUIRE_DOI
     system = load_prompt("extract.txt")
-    user = f"Target paper: {target_paper}\nPage text:\n{src.main_text[:12000]}"
+    user = f"Target paper: {target_paper}\nPage text:\n{src.main_text[:20000]}"
     out = llm(system, user, ledger=ledger, run_id=run_id, purpose="extract")
-
-    mentions, rejected = [], 0
-    for row in out.get("citations", []):
-        key = canon.cite_key_from_parts(row.get("doi"), row.get("title"))
-        conf = float(row.get("confidence", 0.0))
-        if key is None:
-            rejected += 1                        # typed validator rejection
-            continue
-        if not gate.accepts(conf):
-            rejected += 1                        # conformal rejection (delta_E)
-            continue
-        mentions.append(Mention(
-            mention_id=f"{src.source_id}:cite:{sha16(key)[:8]}",
-            source_id=src.source_id,
-            entity_surface=row.get("cited_paper", target_paper),
-            season=key, attribute="citation",
-            value=config.CITE_VALUE, confidence=conf))
+    mentions, rejected = _collect(src, target_paper, out.get("citations", []),
+                                  gate, require_doi)
     return mentions, [], rejected                # claims OFF (pre-registered)
+
+
+def extract_structured(src, target_paper: str, rows, gate, *,
+                       require_doi=None):
+    """Structured reader for INDEX pages (config.INDEX_READER="structured"):
+    the API already returns typed rows, so they are read directly instead of
+    being transcribed by an LLM — a mistyped DOI would create a false
+    singleton and corrupt f1 (webaggr.pdf §3.2 eq. 1). Same validators,
+    same gate; confidence 1.0 because nothing was transcribed. The row's
+    cited paper is the target by construction (the index was queried for
+    exactly that paper)."""
+    if require_doi is None:
+        require_doi = config.CITE_REQUIRE_DOI
+    typed = [{"title": r.get("title"), "doi": r.get("doi"),
+              "cited_paper": target_paper, "confidence": 1.0} for r in rows]
+    mentions, rejected = _collect(src, target_paper, typed, gate, require_doi)
+    return mentions, [], rejected

@@ -1,200 +1,222 @@
-"""Exp 2-C enumerator PROBE ($0, no keys): measure the two candidate
-citation indexes BEFORE the pagination plug-in is built (prereg §6.2/§9).
+"""Exp 2-C PROBE ($0): measure the oracle and the two enumerators on one
+paper BEFORE any live spend (PREREGISTRATION_EXP2C rev 3 §6.3).
 
-Four questions, each of which sets a prereg parameter:
-  1. page size     — is the `limit`/`pageSize` we request honored?
-                     (it becomes Y_CAP, so it must be a real bound)
-  2. depth cap     — how deep can pagination actually walk? Semantic
-                     Scholar's citations endpoint is believed to cap
-                     offset around 10,000 — if true, Y_CAP and the
-                     cohort band must shrink to fit under it.
-  3. keyability    — what fraction of entries carry a DOI (the primary
-                     record key)?
-  4. overlap       — do the two indexes cover the same DOIs (double
-                     coverage needs real overlap)?
+It answers, with numbers, the questions the design cannot assume:
+  1. ORACLE     — does OpenCitations return the full citing list, does it
+                  self-validate against its own count, and how big is the
+                  DOI-registered truth at the cutoff?
+  2. ENUMERATORS— do OpenAlex and Europe PMC resolve the paper, honor the
+                  page size we request (it becomes Y_CAP), and return DOIs?
+  3. REACH      — of a random sample of TRUTH records, what share can the
+                  agent reach at all (in at least one enumerator)? That is
+                  the recall ceiling.
+  4. OVERLAP    — what share of what the agent finds will be in only ONE
+                  enumerator (singletons, u)? This decides whether the
+                  certificate can fire: it needs  u + psi < eps.
+  5. THE BAND   — given the measured u: the smallest tau_max and the range
+                  of N for which the certificate is reachable, per eps.
 
-Probes BOTH indexes on the SAME paper (default: AlphaFold, the kind of
-biomedical giant the cohort band targets) so overlap is meaningful.
+Default paper: AlphaFold 2 (a biomedical giant, the cohort's kind).
 
 Usage:
     $env:RUN_ONLINE="1"
     python scripts/probe_enumerators.py
-    python scripts/probe_enumerators.py --pmid 32015508 --doi 10.1038/s41586-020-2008-3
+    python scripts/probe_enumerators.py --doi 10.1038/s41586-020-2649-2 --pmid 32939066
 """
 from __future__ import annotations
 
 import argparse
 import os
+import random
 import sys
 import time
 from pathlib import Path
 
-import requests
-
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from webaggs import config  # noqa: E402  (importing it loads .env -> S2_API_KEY)
+from webaggs import config, design              # noqa: E402
+from webaggs.canon import canonical_doi         # noqa: E402
+from webaggs.indexes import (EuropePMCIndex, OpenAlexIndex,  # noqa: E402
+                             Target)
+from webaggs.oracle_opencitations import (OpenCitationsDriver,  # noqa: E402
+                                          OracleError)
 
-ENV_LOADED = config.DATA_DIR is not None   # touch config: the import is for its side effect
-
-# AlphaFold 2 (Jumper et al. 2021): same paper known to both indexes
-DEFAULT_PMID = "34265844"
+DEFAULT_TITLE = "Highly accurate protein structure prediction with AlphaFold"
 DEFAULT_DOI = "10.1038/s41586-021-03819-2"
-
-S2 = "https://api.semanticscholar.org/graph/v1/paper"
-EPMC = "https://www.ebi.ac.uk/europepmc/webservices/rest"
-PAUSE = 1.5          # polite pacing: both APIs are free/anonymous
+DEFAULT_PMID = "34265844"
+OUT = config.DATA_DIR / "ci" / "exp2c_probe.md"
 
 
-def get(url, params):
-    """One GET with loud, informative failure (probe = diagnosis tool).
-    429 = rate limit, NOT an API cap: back off and retry a few times so a
-    saturated anonymous pool is not misread as a pagination limit."""
-    headers = {}
-    if url.startswith(S2) and os.environ.get("S2_API_KEY"):
-        headers["x-api-key"] = os.environ["S2_API_KEY"]   # 1 req/s with key
-    for attempt in range(4):
-        time.sleep(PAUSE if attempt == 0 else 8 * attempt)
-        r = requests.get(url, params=params, headers=headers, timeout=30)
-        if r.status_code == 429 and attempt < 3:
-            continue
-        if r.status_code != 200:
-            # the error BODY is the finding (e.g. S2 names its offset cap)
-            return {"__status": r.status_code, "__body": r.text[:300]}
-        return r.json()
+def page_dois(page) -> list[str]:
+    return [d for d in (canonical_doi(r.get("doi")) for r in page.rows) if d]
 
 
-def s2_doi(entry):
-    ids = (entry.get("citingPaper") or {}).get("externalIds") or {}
-    return (ids.get("DOI") or "").lower() or None
+def in_openalex(oa, handle, dois) -> set:
+    """Which of `dois` cite the target according to OpenAlex (batched OR)."""
+    found = set()
+    for i in range(0, len(dois), 40):
+        chunk = dois[i:i + 40]
+        status, data = oa._get(oa.BASE, {
+            "filter": f"cites:{handle},doi:" + "|".join(
+                f"https://doi.org/{d}" for d in chunk),
+            "select": "doi", "per-page": 100, **oa._key()})
+        for w in (data or {}).get("results") or []:
+            d = canonical_doi(w.get("doi"))
+            if d:
+                found.add(d)
+    return found
 
 
-def epmc_doi(entry):
-    return (entry.get("doi") or "").lower() or None
-
-
-def probe_s2(doi):
-    print(f"\n=== Semantic Scholar: {S2}/DOI:{doi}/citations ===")
-    url = f"{S2}/DOI:{doi}/citations"
-    meta = get(f"{S2}/DOI:{doi}", {"fields": "citationCount,title"})
-    total = meta.get("citationCount")
-    print(f"paper: {meta.get('title')!r}, citationCount={total}")
-
-    # Q1: are requested page sizes honored? (each becomes a candidate Y_CAP)
-    for lim in (25, 100, 500):
-        j = get(url, {"fields": "externalIds,title", "limit": lim, "offset": 0})
-        got = len(j.get("data", [])) if "data" in j else j
-        print(f"  limit={lim:4d} -> entries on page: {got}")
-
-    # Q2: the depth cap — walk the offset up until the API says no
-    cap = None
-    for off in (1000, 5000, 9000, 9900, 9975, 10000, 12000):
-        j = get(url, {"fields": "externalIds", "limit": 25, "offset": off})
-        if "data" in j:
-            print(f"  offset={off:5d} -> ok ({len(j['data'])} entries, "
-                  f"next={j.get('next')})")
-        elif j["__status"] == 429:
-            print(f"  offset={off:5d} -> 429 rate-limited (NOT a cap; "
-                  "set S2_API_KEY and re-run)")
-            cap = "unmeasured (429)"
-            break
-        else:
-            print(f"  offset={off:5d} -> HTTP {j['__status']}: {j['__body']}")
-            cap = off
-            break
-    print(f"  DEPTH CAP: {cap if cap else 'none found <= 12000'}")
-
-    # Q3: DOI keyability on a sample page
-    j = get(url, {"fields": "externalIds,title", "limit": 100, "offset": 0})
-    rows = j.get("data", [])
-    dois = [d for d in (s2_doi(e) for e in rows) if d]
-    print(f"  keyability: {len(dois)}/{len(rows)} entries carry a DOI")
-    return total, set(dois), cap
-
-
-def probe_epmc(pmid):
-    print(f"\n=== Europe PMC: {EPMC}/MED/{pmid}/citations ===")
-    url = f"{EPMC}/MED/{pmid}/citations"
-    j = get(url, {"page": 1, "pageSize": 100, "format": "json"})
-    if "__status" in j:
-        print(f"  FAILED: HTTP {j['__status']}: {j['__body']}")
-        return None, set(), None
-    total = j.get("hitCount")
-    print(f"  hitCount={total}")
-
-    # Q1: page sizes honored?
-    for ps in (25, 100, 1000):
-        jj = get(url, {"page": 1, "pageSize": ps, "format": "json"})
-        rows = (jj.get("citationList") or {}).get("citation", [])
-        print(f"  pageSize={ps:4d} -> entries on page: {len(rows)}")
-
-    # Q2: depth — can page*pageSize walk past 10k? past the full count?
-    cap = None
-    for page in (10, 50, 101, 150, 250):          # x100 = position 1k..25k
-        jj = get(url, {"page": page, "pageSize": 100, "format": "json"})
-        rows = (jj.get("citationList") or {}).get("citation", []) \
-            if "__status" not in jj else None
-        if rows is None:
-            print(f"  page={page:4d} (pos {page*100}) -> "
-                  f"HTTP {jj['__status']}: {jj['__body']}")
-            cap = page * 100
-            break
-        print(f"  page={page:4d} (pos {page*100}) -> {len(rows)} entries")
-        if not rows:
-            break                                  # walked past the end: fine
-    print(f"  DEPTH CAP: {'~'+str(cap) if cap else 'none hit'}")
-
-    # Q3: DOI keyability. The /citations endpoint returns LIGHT entries
-    # (pmid, title, no DOI). The SEARCH endpoint with a CITES: query
-    # returns full records WITH doi and cursor-based deep paging — that
-    # is the enumerator the plug-in would actually walk, so probe it.
-    jj = get(url, {"page": 1, "pageSize": 100, "format": "json"})
-    rows = (jj.get("citationList") or {}).get("citation", [])
-    dois = [d for d in (epmc_doi(e) for e in rows) if d]
-    print(f"  /citations keyability: {len(dois)}/{len(rows)} carry a DOI "
-          f"(fields: {sorted(rows[0].keys()) if rows else '-'})")
-    surl = f"{EPMC}/search"
-    sj = get(surl, {"query": f"CITES:{pmid}_MED", "format": "json",
-                    "resultType": "lite", "pageSize": 100, "cursorMark": "*"})
-    if "__status" in sj:
-        print(f"  /search CITES: FAILED HTTP {sj['__status']}: {sj['__body']}")
-    else:
-        hits = (sj.get("resultList") or {}).get("result", [])
-        sd = [d for d in (epmc_doi(h) for h in hits) if d]
-        print(f"  /search CITES: hitCount={sj.get('hitCount')}, page={len(hits)}, "
-              f"DOI keyability {len(sd)}/{len(hits)}, "
-              f"nextCursorMark={'yes' if sj.get('nextCursorMark') else 'no'}")
-        if sd:
-            dois = sd                              # the walkable, keyable set
-    return total, set(dois), cap
+def in_europepmc(ep, handle, dois) -> set:
+    """Which of `dois` cite the target according to Europe PMC (one small
+    query per DOI — the search syntax has no reliable batch OR on DOI)."""
+    found = set()
+    for d in dois:
+        status, data = ep._get(ep.BASE, {
+            "query": f'CITES:{handle}_MED AND DOI:"{d}"',
+            "resultType": "idlist", "pageSize": 1, "format": "json"})
+        if (data or {}).get("hitCount"):
+            found.add(d)
+    return found
 
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--pmid", default=DEFAULT_PMID)
+    ap.add_argument("--title", default=DEFAULT_TITLE)
     ap.add_argument("--doi", default=DEFAULT_DOI)
+    ap.add_argument("--pmid", default=DEFAULT_PMID)
+    ap.add_argument("--cutoff", default="2023-12-31")
+    ap.add_argument("--sample", type=int, default=120)
+    ap.add_argument("--page-size", type=int, default=config.INDEX_PAGE_SIZE)
     args = ap.parse_args()
     # same opt-in gate as the online sanity tests (shell-only, never .env)
     if os.environ.get("RUN_ONLINE") != "1":
         raise SystemExit("RUN_ONLINE != 1 — network probes are a deliberate "
                          "per-session decision ($0 here, but the rule is the rule).")
 
-    s2_total, s2_dois, s2_cap = probe_s2(args.doi)
-    ep_total, ep_dois, ep_cap = probe_epmc(args.pmid)
+    lines: list[str] = []
 
-    # Q4: overlap on the sampled first pages (same paper, both indexes)
-    print("\n=== Verdict inputs ===")
-    print(f"totals: S2={s2_total}  EPMC={ep_total}  "
-          f"(vs OpenAlex truth at grading time)")
-    if s2_dois and ep_dois:
-        inter = len(s2_dois & ep_dois)
-        print(f"first-page DOI overlap: {inter}/{min(len(s2_dois), len(ep_dois))} "
-              "(pages are differently ordered — any overlap > 0 confirms "
-              "the indexes key-join; the real overlap is measured in PILOT 2)")
-    print("depth caps: S2", s2_cap, "| EPMC", ep_cap)
-    print("\n-> paste this whole output into the chat; Y_CAP (page size), "
-          "the live eps and the cohort citer band are chosen from it "
-          "(prereg section 6.2/6.3).")
+    def say(text=""):
+        print(text)
+        lines.append(text)
+
+    target = Target(title=args.title, doi=args.doi, pmid=args.pmid)
+    rng = random.Random(20261117)                 # fixed seed: reproducible
+    say(f"# Exp 2-C probe — {args.title}")
+    say(f"DOI {args.doi} · PMID {args.pmid} · cutoff {args.cutoff} · "
+        f"page size {args.page_size}")
+
+    # --- 1. the oracle ----------------------------------------------------
+    say("\n## 1. Oracle: OpenCitations")
+    truth = []
+    try:
+        t0 = time.time()
+        rows, rep = OpenCitationsDriver().citers(args.doi, args.cutoff)
+        truth = [r["doi"] for r in rows]
+        say(f"- full list fetched and SELF-VALIDATED against /citation-count "
+            f"in {time.time() - t0:.0f}s")
+        say(f"- raw rows {rep['raw_rows']}: no DOI {rep['no_doi']}, undated "
+            f"{rep['no_date']}, after cutoff {rep['after_cutoff']}, "
+            f"duplicates {rep['duplicate']}")
+        say(f"- **truth size at cutoff: {len(truth)} DOI-registered citers**")
+    except OracleError as e:
+        say(f"- ORACLE FAILED: {e}")
+
+    # --- 2. the enumerators ----------------------------------------------
+    say("\n## 2. Enumerators")
+    oa, ep = OpenAlexIndex(), EuropePMCIndex()
+    info = {}
+    for ix in (oa, ep):
+        try:
+            handle = ix.resolve(target)
+        except Exception as e:
+            say(f"- {ix.name}: CANNOT RESOLVE — {e}")
+            continue
+        src, page = ix.fetch_page(target, handle, ix.first_cursor,
+                                  args.page_size, args.cutoff, "probe")
+        if page is None:
+            say(f"- {ix.name}: first page FAILED (status {src.status})")
+            continue
+        dois = page_dois(page)
+        say(f"- {ix.name}: handle {handle}, index total {page.total}, first "
+            f"page {len(page.rows)} rows (asked {args.page_size}), "
+            f"{len(dois)} with DOI, next cursor "
+            f"{'yes' if page.next_cursor else 'NO'}")
+        # walk two more pages to sample beyond the head of the list
+        sample, cur, p = list(dois), page.next_cursor, page
+        for _ in range(2):
+            if not cur:
+                break
+            _s, p = ix.fetch_page(target, handle, cur, args.page_size,
+                                  args.cutoff, "probe")
+            if p is None:
+                break
+            sample += page_dois(p)
+            cur = p.next_cursor
+        info[ix.name] = dict(handle=handle, total=page.total or 0,
+                             sample=sample)
+    if os.environ.get("OPENALEX_API_KEY") is None:
+        say("- NOTE: OPENALEX_API_KEY not set — OpenAlex anonymous access is "
+            "metered per IP; set the free key before a full walk")
+
+    if len(info) < 2 or not truth:
+        say("\n**Probe incomplete — fix the failures above before going on.**")
+    else:
+        H_oa, H_ep = info["openalex"]["handle"], info["europepmc"]["handle"]
+        # --- 3. reach: a random sample of TRUTH, looked up in both -------
+        say("\n## 3. Reach (recall ceiling against the oracle)")
+        samp = rng.sample(truth, min(args.sample, len(truth)))
+        t_oa = in_openalex(oa, H_oa, samp)
+        t_ep = in_europepmc(ep, H_ep, samp)
+        either, both = t_oa | t_ep, t_oa & t_ep
+        n = len(samp)
+        say(f"- sample of {n} truth records: in OpenAlex {len(t_oa)/n:.0%}, "
+            f"in Europe PMC {len(t_ep)/n:.0%}, in BOTH {len(both)/n:.0%}, "
+            f"in NEITHER {1 - len(either)/n:.0%}")
+        ceiling = len(either) / n
+        say(f"- **recall ceiling ~ {ceiling:.0%}** (truth records reachable "
+            "through at least one enumerator)")
+
+        # --- 4. overlap: what the AGENT will see --------------------------
+        say("\n## 4. Overlap between the enumerators (singleton share u)")
+        s_oa = info["openalex"]["sample"][:args.sample]
+        s_ep = info["europepmc"]["sample"][:args.sample]
+        a = len(in_europepmc(ep, H_ep, s_oa)) / max(len(s_oa), 1)
+        b = len(in_openalex(oa, H_oa, s_ep)) / max(len(s_ep), 1)
+        n_oa, n_ep = info["openalex"]["total"], info["europepmc"]["total"]
+        inter = (a * n_oa + b * n_ep) / 2          # two estimates, averaged
+        union = n_oa + n_ep - inter
+        u = (union - inter) / union if union else 1.0
+        say(f"- of OpenAlex's citers, {a:.0%} are also in Europe PMC; of "
+            f"Europe PMC's, {b:.0%} are also in OpenAlex")
+        say(f"- estimated distinct records N ~ {union:,.0f}; "
+            f"**singleton share u ~ {u:.2f}**")
+        in_truth = len(set(s_oa) & set(truth)) / max(len(s_oa), 1)
+        say(f"- of OpenAlex's sampled citers, {in_truth:.0%} are in the "
+            "oracle's truth (the rest are spurious for grading, not harmful "
+            "to recall)")
+
+        # --- 5. the feasibility band --------------------------------------
+        say("\n## 5. Can the certificate fire? (needs u + psi < eps)")
+        say("| eps | min tau_max | N must be between | this paper's N | verdict |")
+        say("|---|---|---|---|---|")
+        for eps in (0.5, 0.6, 0.7, 0.8, 0.9):
+            if u >= eps:
+                say(f"| {eps} | — | — | {union:,.0f} | impossible: u >= eps |")
+                continue
+            tau = design.min_tau(eps, config.BETA, config.DELTA_M, u)
+            lo, hi = design.feasible_band(eps, args.page_size, tau,
+                                          config.BETA, config.DELTA_M, u)
+            fits = "fits" if lo <= union <= hi else (
+                "too few citers" if union < lo else "too many for this tau")
+            say(f"| {eps} | {tau} | {lo:,.0f} – {hi:,.0f} | {union:,.0f} | "
+                f"{fits} |")
+        say("\n(min tau_max is the smallest budget with a 25%-wide band; a "
+            "larger tau_max widens the band and moves it up.)")
+
+    OUT.parent.mkdir(parents=True, exist_ok=True)
+    OUT.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    print(f"\nreport written to {OUT} — paste it into the chat.")
 
 
 if __name__ == "__main__":

@@ -5,7 +5,7 @@ from webaggs.pipeline import end_to_end
 from webaggs.storage import Ledger
 
 PAGES = {
-    "https://api.openalex.org/works?filter=cites:W1": {"citations": []},
+    "https://api.opencitations.net/index/v2/citations/doi:10.1/x": {"citations": []},
     "https://paywall.test/citers": {"citations": [], "status": "paywall"},
     "https://a.test/citers": {
         "citations": [
@@ -20,7 +20,7 @@ PAGES = {
         "citations": [
             dict(title="True Citing Paper One", doi="doi.org/10.1234/C.1",
                  cited_paper=TARGET, confidence=0.9),    # same record, 2nd domain
-            dict(title="True Citing Paper Two Here", doi="",
+            dict(title="True Citing Paper Two Here", doi="10.1234/c.2",
                  cited_paper=TARGET, confidence=0.9),
         ]},
 }

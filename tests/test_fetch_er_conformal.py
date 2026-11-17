@@ -7,8 +7,8 @@ from webaggs.fetch import classify_source, domain_of, fetch_url, html_to_text
 
 # --- deny list: the withheld oracle ---------------------------------------
 def test_oracle_domains_are_denied_without_any_network_call():
-    for url in ("https://api.openalex.org/works?filter=cites:W2626778328",
-                "https://openalex.org/W2626778328"):
+    for url in ("https://api.opencitations.net/index/v2/citations/doi:10.1/x",
+                "https://opencitations.net/index/search?text=10.1/x"):
         src = fetch_url(url, "fm1")       # would raise if it tried the network
         assert src.status == "denied" and src.main_text == ""
 
@@ -18,6 +18,9 @@ def test_scholar_aggregators_are_NOT_denied():
     web', only the oracle is withheld. (No network: just the deny check.)"""
     from webaggs.fetch import is_denied
     assert not is_denied("https://www.semanticscholar.org/paper/x")
+    # OpenAlex and Europe PMC are the agent's enumerators (prereg rev 3)
+    assert not is_denied("https://api.openalex.org/works?filter=cites:W1")
+    assert not is_denied("https://www.ebi.ac.uk/europepmc/webservices/rest/search")
     assert not is_denied("https://arxiv.org/abs/1706.03762")
 
 

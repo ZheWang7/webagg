@@ -3,8 +3,9 @@ injected search/fetch/llm (tests only), then replay self-tests over the
 produced ledgers, as replay_exp2c.py runs them."""
 import os
 
-from tests.conftest import (BIG_PAGES, BIG_TRUTH, BIGPAPER, PAGES, TARGET,
-                            TRUTH, FakeSearch, RoutedSearch, fake_fetch,
+from tests.conftest import (BIG_EPS, BIG_N, BIG_PAGE, BIG_PAGES, BIG_TRUTH,
+                            BIGPAPER, PAGES, TARGET, TRUTH, FakeIndex,
+                            FakeSearch, RoutedSearch, big_kwargs, fake_fetch,
                             make_fake_llm, make_fetch)
 from webaggs.pipeline import end_to_end
 from webaggs.replay import recall_at_step, replay_stop
@@ -41,29 +42,97 @@ def test_small_world_dedups_rejects_contamination_ends_honest(tmp_path, gate):
 
 
 def test_statistical_certificate_fires_end_to_end(tmp_path, gate):
-    """THE Exp 2-C path: 400 citers fully double-covered, frontier cold,
-    max_steps=4 -> psi ~= 0.294 < eps 0.30 -> a STATISTICAL stop, labeled
-    as such, with recall 1.0 at the stop."""
+    """THE Exp 2-C path (prereg §6.2): two paginated indexes walked one
+    page per capture occasion, cursor-style; every record doubly covered;
+    psi ~= 0.49 < eps 0.5 once both walks finish -> a STATISTICAL stop,
+    labeled as such, with recall 1.0 at the stop."""
+    kw = big_kwargs()
     ledger, ans = _run(tmp_path, gate, paper=BIGPAPER, pages=BIG_PAGES,
-                       run_id="big", max_steps=4)
+                       run_id="big", budget_usd=50.0, **kw)
     assert ans.stop_reason == "certified"
     assert ans.certificate == "statistical"        # not checksum: claims off
-    assert ans.n_records == 400 and ans.total == 400
-    live = ledger.stop("big")
+    assert ans.n_records == BIG_N and ans.total == BIG_N
+    # one occasion per page: no step ever credited more than the page size
     ms = ledger.measurements("big", metric="U_hat")
-    rr = replay_stop(ms, 0.30)                     # S1: replay reproduces it
+    assert max(e["new"] for *_x, e in ms) <= BIG_PAGE
+    assert not ledger.measurements("big", metric="intake_truncated")
+    # each index was walked exactly once, page by page
+    assert [ix.calls for ix in kw["indexes"]] == [BIG_N // BIG_PAGE] * 2
+    live = ledger.stop("big")
+    rr = replay_stop(ms, BIG_EPS)                  # S1: replay reproduces it
     assert rr.stop_step == live[0]
-    truth_keys = {f"{k.lower() and _norm(BIGPAPER)}|{k}" for k in BIG_TRUTH}
+    truth_keys = {f"{_norm(BIGPAPER)}|{k}" for k in BIG_TRUTH}
     assert recall_at_step(ledger.coverage("big"), truth_keys,
                           rr.stop_step) == 1.0
+    # the certificate could NOT have fired before the walks finished:
+    # the frontier stays hot while a next page is pending (conjunct ii)
+    assert live[0] > 2 * (BIG_N // BIG_PAGE)
     # S2: monotone in eps over the same ledger
     prev = None
-    for eps in (0.30, 0.40, 0.50):
+    for eps in (0.5, 0.7, 0.9):
         r = replay_stop(ms, eps)
         if prev is not None:
             assert r.stop_step is not None and r.stop_step <= prev
         prev = r.stop_step if r.stop_step is not None else prev
+    # the index pages are ordinary ledger sources of class citation_index
+    n_idx = ledger.conn.execute(
+        "SELECT COUNT(*) FROM sources WHERE source_class='citation_index' "
+        "AND status='ok'").fetchone()[0]
+    assert n_idx == 2 * (BIG_N // BIG_PAGE)
     ledger.close()
+
+
+def test_partial_overlap_keeps_singletons_and_refuses_to_certify(tmp_path, gate):
+    """Honesty check: if index B misses 30% of index A, those records stay
+    singletons, U_hat ~= 0.3, and U_hat + psi > eps — the run must END
+    WITHOUT a certificate even though every truth record was found."""
+    ledger, ans = _run(tmp_path, gate, paper=BIGPAPER, pages=BIG_PAGES,
+                       run_id="part", budget_usd=50.0, **big_kwargs(overlap=0.7))
+    assert ans.n_records == BIG_N                  # all found ...
+    assert ans.certificate == "abandoned"          # ... but not certifiable
+    last = ledger.measurements("part", metric="U_hat")[-1]
+    assert 0.25 < last[3] < 0.35                   # U_hat = singleton share
+    ledger.close()
+
+
+def test_failed_index_page_is_retried_not_silently_skipped(tmp_path, gate):
+    """A 503 on one page must not end that index's walk: the page is
+    re-enqueued (bounded) and the certificate still fires."""
+    kw = big_kwargs()
+    kw["indexes"][0].fail_once = {100}             # cursor offset 100 fails once
+    ledger, ans = _run(tmp_path, gate, paper=BIGPAPER, pages=BIG_PAGES,
+                       run_id="retry", budget_usd=50.0, **kw)
+    assert ans.n_records == BIG_N and ans.certificate == "statistical"
+    errs = ledger.conn.execute("SELECT COUNT(*) FROM fetch_outcomes "
+                               "WHERE status='error'").fetchone()[0]
+    assert errs == 1
+    ledger.close()
+
+
+def test_oracle_can_never_be_walked_as_an_index(tmp_path, gate):
+    """Even if someone wires the oracle's domain in as an 'index', every
+    page comes back DENIED and contributes nothing."""
+    kw = big_kwargs()
+    kw["indexes"] = [FakeIndex("oracle-as-index",
+                               [v["doi"] for v in BIG_TRUTH.values()],
+                               domain="api.opencitations.net")]
+    ledger, ans = _run(tmp_path, gate, paper=BIGPAPER, pages={},
+                       run_id="deny", budget_usd=50.0, **kw)
+    assert kw["indexes"][0].calls == 0             # never even requested
+    denied = ledger.conn.execute("SELECT COUNT(*) FROM fetch_outcomes "
+                                 "WHERE status='denied'").fetchone()[0]
+    assert denied >= 1 and ans.certificate == "abandoned"
+    ledger.close()
+
+
+def test_index_walk_guards(tmp_path, gate):
+    import pytest
+    with pytest.raises(ValueError, match="exceeds Y_CAP"):
+        _run(tmp_path, gate, paper=BIGPAPER, pages=BIG_PAGES, run_id="g1",
+             **big_kwargs(page_size=50, y_cap=10))
+    with pytest.raises(ValueError, match="target and a cutoff"):
+        _run(tmp_path, gate, paper=BIGPAPER, pages=BIG_PAGES, run_id="g2",
+             **big_kwargs(cutoff=None))
 
 
 def _norm(p):
@@ -95,5 +164,5 @@ def test_prompts_load_from_foreign_cwd(tmp_path, gate, monkeypatch):
 
 def test_fakes_route_like_the_real_thing(tmp_path, gate):
     assert FakeSearch().search("anything")          # back-compat shims work
-    src = fake_fetch("https://api.openalex.org/works", "f")
+    src = fake_fetch("https://api.opencitations.net/index/v2/citations/doi:10.1/x", "f")
     assert src.status == "denied"                   # fake honors REAL deny list
