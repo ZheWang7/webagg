@@ -62,6 +62,11 @@ REPO = Path(__file__).resolve().parents[1]
 OVERHEAD = 20                                    # non-index search occasions
 
 
+class EnumeratorRefused(RuntimeError):
+    """An index refused access (missing/exhausted key or quota). Nothing
+    can be measured, so the selection must stop — not skip every paper."""
+
+
 def fits(n, u, eps, tau_max, page_size, pad):
     """The certificate's precondition for a paper with N=n distinct records
     and singleton share u, robust to an error of +-pad in u:
@@ -92,6 +97,11 @@ def measure(oa, ep, cand, cutoff, sample):
         got, cur = [], ix.first_cursor
         while cur and len(got) < sample:
             src, page = ix.fetch_page(tgt, h, cur, 50, cutoff, "select")
+            if page is None and src.status == "paywall":
+                raise EnumeratorRefused(
+                    f"{ix.name} refused access (HTTP 401/402/403). For "
+                    "OpenAlex: set OPENALEX_API_KEY in .env, or the key's "
+                    "daily free usage is spent — re-run tomorrow.")
             if page is None:
                 return f"{ix.name} page failed ({src.status})"
             totals.setdefault(ix.name, page.total)
@@ -251,7 +261,12 @@ def main() -> None:
             break
         row = dict(c, openalex_total="", europepmc_total="", a="", b="",
                    n_est="", u_est="", truth="", decision="", why="")
-        m = measure(oa, ep, c, args.cutoff, args.sample)
+        try:
+            m = measure(oa, ep, c, args.cutoff, args.sample)
+        except EnumeratorRefused as e:
+            # stop here: papers.txt is NOT rewritten with a partial cohort
+            raise SystemExit(f"STOPPED after {len(report)} candidates, "
+                             f"{len(accepted)} accepted so far: {e}")
         if isinstance(m, str):
             row.update(decision="skip", why=m)
         else:
