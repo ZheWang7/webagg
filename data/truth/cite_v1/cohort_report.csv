@@ -1,0 +1,6 @@
+paper,doi,pmid,raw_rows,no_doi,no_date,after_cutoff,duplicate,multi_doi,truth_rows
+KEGG: Kyoto Encyclopedia of Genes and Genomes,10.1093/nar/28.1.27,10592173,34006,766,564,9863,0,197,22813
+PLINK: A Tool Set for Whole-Genome Association and Population-Based Linkage Analyses,10.1086/519795,17701901,31726,552,279,6380,0,411,24515
+Standards and guidelines for the interpretation of sequence variants: a joint consensus recommendation of the American College of Medical Genetics and Genomics and the Association for Molecular Pathology,10.1038/gim.2015.30,25741868,29146,863,336,9090,0,100,18857
+edgeR : a Bioconductor package for differential expression analysis of digital gene expression data,10.1093/bioinformatics/btp616,19910308,39956,831,489,9772,0,368,28864
+"Clinical course and risk factors for mortality of adult inpatients with COVID-19 in Wuhan, China: a retrospective cohort study",10.1016/s0140-6736(20)30566-3,32171076,23895,445,177,2103,0,57,21170
