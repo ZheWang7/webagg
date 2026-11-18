@@ -116,3 +116,27 @@ def test_truth_build_rejects_bad_paper_lines():
     for bad in ("Title Only", "Title | not-a-doi", "T | 10.1234/x.1 | abc"):
         with pytest.raises(SystemExit):
             build.parse_paper_line(bad)
+
+
+def test_cohort_band_is_robust_to_the_singleton_share():
+    """select_cohort.truth_band: the window must let the certificate fire
+    for EVERY u in [u_lo, u_hi] — psi cleared at the worst u, both walks
+    fitting inside tau_max at the most page-hungry u."""
+    sys.path.insert(0, str(REPO / "scripts"))
+    import importlib
+
+    import pytest
+
+    from webaggs import design
+    sc = importlib.import_module("select_cohort")
+    t_lo, t_hi, n_lo, n_hi = sc.truth_band(0.7, 1000, 50, 0.20, 0.36,
+                                           1.08, 0.02)
+    assert t_lo < t_hi and n_lo < n_hi
+    for u in (0.20, 0.28, 0.36):
+        lo, hi = design.feasible_band(0.7, 50, 1000, u=u)
+        assert lo <= n_lo and n_hi <= hi          # inside every u's band
+    # truth window = N window scaled by N/truth, shrunk by the margin
+    assert t_lo == pytest.approx(n_lo / 1.08 * 1.02)
+    assert t_hi == pytest.approx(n_hi / 1.08 * 0.98)
+    with pytest.raises(SystemExit):                # no robust band: say so
+        sc.truth_band(0.7, 300, 50, 0.20, 0.36, 1.08, 0.02)
