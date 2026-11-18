@@ -140,3 +140,24 @@ def test_cohort_band_is_robust_to_the_singleton_share():
     assert t_hi == pytest.approx(n_hi / 1.08 * 0.98)
     with pytest.raises(SystemExit):                # no robust band: say so
         sc.truth_band(0.7, 300, 50, 0.20, 0.36, 1.08, 0.02)
+
+
+def test_cohort_rule_accepts_exactly_when_the_certificate_can_fire():
+    """select_cohort.fits is the certificate's own precondition with a pad
+    on u: psi small enough at u+pad, both walks inside tau_max at u-pad."""
+    sys.path.insert(0, str(REPO / "scripts"))
+    import importlib
+
+    from webaggs import design
+    sc = importlib.import_module("select_cohort")
+    eps, tau, page, pad = 0.6, 1150, 50, 0.03
+    ok, _ = sc.fits(29000, 0.25, eps, tau, page, pad)
+    assert ok
+    # consistent with the stop-test formula: u + pad + psi < eps
+    assert 0.25 + pad + design.psi_at(29000, page, tau) < eps
+    ok, why = sc.fits(20000, 0.25, eps, tau, page, pad)   # too few records
+    assert not ok and "psi" in why
+    ok, why = sc.fits(29000, 0.31, eps, tau, page, pad)   # too many singletons
+    assert not ok and "psi" in why
+    ok, why = sc.fits(36000, 0.10, eps, tau, page, pad)   # walks do not fit
+    assert not ok and "tau_max" in why

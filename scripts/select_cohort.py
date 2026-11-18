@@ -2,27 +2,30 @@
 
 The rule, applied mechanically (no hand picking):
   1. CANDIDATE POOL: OpenAlex works that are research articles, published
-     <= 2021, in the life/health sciences, with a DOI and a PMID, and a
-     lifetime citation count in a wide window around the band.
-     To spend oracle calls only where they can matter, the pool keeps a
-     work only if OpenAlex's own year-by-year counts put its citations at
-     the cutoff within a GENEROUS window around the band (0.8x to 1.25x).
-     This is a speed filter: the oracle measurement in step 3 decides.
+     <= 2021, in the life/health sciences, with a DOI and a PMID, whose
+     citation count at the cutoff (lifetime minus OpenAlex's own counts
+     for later years) is near the band.
   2. Shuffle the pool with a FIXED seed (reproducible, order-independent
      of anything we know about the papers).
-  3. Walk the shuffled list; for each candidate measure
-       - its ORACLE truth size at the cutoff (OpenCitations, DOI-registered
-         citers created <= cutoff — the same function the truth build uses),
-       - how many of those citers each enumerator lists (index totals).
-     ACCEPT when the truth size is inside the band AND Europe PMC lists at
-     least --min-coverage of what OpenAlex lists (otherwise most records
-     would be singletons and the certificate could never fire).
+  3. Walk the shuffled list. For each candidate MEASURE, from the two
+     enumerators only:
+       - how many citers <= cutoff each index lists (n_OA, n_EP),
+       - their overlap, from a sample of each index looked up in the other,
+     giving the number of distinct records the agent will find (N) and
+     the share only one index lists (the singleton share u).
+     ACCEPT when the certificate's own precondition holds with a pad:
+       (u + pad) + psi(N) < eps          psi small enough
+       pages for both walks + overhead <= tau_max   (at u - pad)
+     and the oracle really has the paper (truth size at the cutoff is at
+     least --min-oracle-ratio of what OpenAlex lists).
   4. Stop at --n accepted papers. The pilot paper is excluded.
 
-The band comes from webaggs/design.py for the chosen eps and tau_max,
-made robust to the uncertainty in the singleton share u (the probe's
-estimate is rough), and converted from N (distinct records the agent
-finds) to truth size with the probe's measured N/truth ratio.
+Why N and u, not the truth size: the band of webaggs/design.py is about
+what the AGENT finds. The oracle's list is usually smaller than
+OpenAlex's (median 17% in the first selection run), so a truth-size
+window rejected papers the agent could certify. The oracle is used here
+only as a sanity check and to record the truth size; no recall against
+the oracle is computed at selection time.
 
 Writes cohort/papers.txt ('Title | DOI | PMID', the truth-build input)
 and cohort/selection_report.csv (EVERY candidate examined, accepted or
@@ -30,7 +33,7 @@ not, with the reason — the audit trail for the rule).
 
 Usage:
     $env:RUN_ONLINE="1"
-    python scripts/select_cohort.py --eps 0.7 --tau-max 1000 --cutoff 2023-12-31
+    python scripts/select_cohort.py --eps 0.6 --tau-max 1150 --cutoff 2023-12-31
 """
 from __future__ import annotations
 
@@ -52,7 +55,60 @@ from webaggs.indexes import (EuropePMCIndex, OpenAlexIndex,  # noqa: E402
 from webaggs.oracle_opencitations import (OpenCitationsDriver,  # noqa: E402
                                           OracleError)
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import probe_enumerators as probe                # noqa: E402  (membership helpers)
+
 REPO = Path(__file__).resolve().parents[1]
+OVERHEAD = 20                                    # non-index search occasions
+
+
+def fits(n, u, eps, tau_max, page_size, pad):
+    """The certificate's precondition for a paper with N=n distinct records
+    and singleton share u, robust to an error of +-pad in u:
+    -> (ok, why). Uses the same formulas as the live stop test."""
+    psi = design.psi_at(int(n), page_size, tau_max, config.BETA,
+                        config.DELTA_M)
+    if (u + pad) + psi >= eps:
+        return False, f"u+pad+psi = {u + pad + psi:.2f} >= eps"
+    pages = design.pages_for(n, page_size, max(u - pad, 0.0)) + OVERHEAD
+    if pages > tau_max:
+        return False, f"walks need {pages:.0f} occasions > tau_max"
+    return True, ""
+
+
+def measure(oa, ep, cand, cutoff, sample):
+    """-> dict(n_oa, n_ep, a, b, n, u) from the two enumerators, or a
+    string saying which one failed. a = share of OpenAlex's citers that
+    Europe PMC also lists; b = the reverse."""
+    tgt = Target(title=cand["title"], doi=cand["doi"], pmid=cand["pmid"])
+    try:
+        # the pool already carries the OpenAlex id; Europe PMC uses the PMID
+        h_oa = cand.get("oa_id") or oa.resolve(tgt)
+        h_ep = ep.resolve(tgt)
+    except Exception as e:
+        return f"cannot resolve: {str(e)[:60]}"
+    samples, totals = {}, {}
+    for ix, h in ((oa, h_oa), (ep, h_ep)):
+        got, cur = [], ix.first_cursor
+        while cur and len(got) < sample:
+            src, page = ix.fetch_page(tgt, h, cur, 50, cutoff, "select")
+            if page is None:
+                return f"{ix.name} page failed ({src.status})"
+            totals.setdefault(ix.name, page.total)
+            got += probe.page_dois(page)
+            cur = page.next_cursor
+        samples[ix.name] = got[:sample]
+    n_oa, n_ep = totals.get("openalex"), totals.get("europepmc")
+    if not n_oa or not n_ep or not samples["openalex"] \
+            or not samples["europepmc"]:
+        return "an enumerator lists nothing"
+    a = len(probe.in_europepmc(ep, h_ep, samples["openalex"])) \
+        / len(samples["openalex"])
+    b = len(probe.in_openalex(oa, h_oa, samples["europepmc"])) \
+        / len(samples["europepmc"])
+    inter = (a * n_oa + b * n_ep) / 2            # two estimates, averaged
+    n = n_oa + n_ep - inter
+    return dict(n_oa=n_oa, n_ep=n_ep, a=a, b=b, n=n, u=(n - inter) / n)
 PILOT_DOIS = {"10.1038/s41586-021-03819-2"}      # AlphaFold 2: never in cohort
 SEED = 20261117
 
@@ -111,6 +167,8 @@ def candidate_pool(oa, year_max, c_lo, c_hi, max_pool, cutoff_year):
                     life = int(w.get("cited_by_count") or 0)
                     out.append({"title": " ".join(title.split()),
                                 "doi": doi, "pmid": pmid,
+                                "oa_id": str(w.get("id") or "").rsplit(
+                                    "/", 1)[-1],
                                 "year": w.get("publication_year"),
                                 "lifetime": life,
                                 "est_at_cutoff": life - after})
@@ -142,13 +200,12 @@ def main() -> None:
     ap.add_argument("--cutoff", required=True, help="YYYY-12-31")
     ap.add_argument("--n", type=int, default=5)
     ap.add_argument("--page-size", type=int, default=config.INDEX_PAGE_SIZE)
-    ap.add_argument("--u-lo", type=float, default=0.20)
-    ap.add_argument("--u-hi", type=float, default=0.36)
-    ap.add_argument("--n-over-truth", type=float, default=1.08,
-                    help="distinct records found / truth size (probe: 1.08)")
-    ap.add_argument("--margin", type=float, default=0.02)
-    ap.add_argument("--min-coverage", type=float, default=0.75,
-                    help="Europe PMC total / OpenAlex total, at the cutoff")
+    ap.add_argument("--pad", type=float, default=0.03,
+                    help="safety pad on the measured singleton share u")
+    ap.add_argument("--sample", type=int, default=100,
+                    help="citers sampled from each index for the overlap")
+    ap.add_argument("--min-oracle-ratio", type=float, default=0.6,
+                    help="oracle truth size / OpenAlex total, at the cutoff")
     ap.add_argument("--year-max", type=int, default=2021)
     ap.add_argument("--max-checked", type=int, default=150)
     ap.add_argument("--time-budget", type=float, default=780.0,
@@ -159,30 +216,30 @@ def main() -> None:
         raise SystemExit("RUN_ONLINE != 1 — network access is a deliberate "
                          "per-session decision.")
 
-    t_lo, t_hi, n_lo, n_hi = truth_band(
-        args.eps, args.tau_max, args.page_size, args.u_lo, args.u_hi,
-        args.n_over_truth, args.margin)
-    print(f"band: eps={args.eps}, tau_max={args.tau_max}, robust to u in "
-          f"[{args.u_lo}, {args.u_hi}] -> N in [{n_lo:,.0f}, {n_hi:,.0f}] "
-          f"-> truth size in [{t_lo:,.0f}, {t_hi:,.0f}]")
+    # a generous N window (u from 0.20 to 0.45): it only sizes the pool —
+    # below it psi cannot clear at any plausible u, above it the walks
+    # cannot fit; `fits` decides each candidate on its own measurements
+    n_lo = design.n_needed(args.eps, args.page_size, args.tau_max,
+                           config.BETA, config.DELTA_M, u=0.20 + args.pad)
+    n_hi = args.page_size * (args.tau_max - OVERHEAD) / (2 - 0.45)
+    print(f"rule: eps={args.eps}, tau_max={args.tau_max}, pad={args.pad}; "
+          f"pool sized for N in [{n_lo:,.0f}, {n_hi:,.0f}]")
 
     oa, ep, oracle = OpenAlexIndex(), EuropePMCIndex(), OpenCitationsDriver()
-    # lifetime counts run ahead of the count at the cutoff, so the pool
-    # window is wide; the ORACLE measurement below is what decides
     cutoff_year = int(args.cutoff[:4])
-    pool, note = candidate_pool(oa, args.year_max, int(t_lo * 0.8),
-                                int(t_hi * 3.0), max_pool=4000,
+    pool, note = candidate_pool(oa, args.year_max, int(n_lo * 0.9),
+                                int(n_hi * 3.0), max_pool=4000,
                                 cutoff_year=cutoff_year)
     n_pool = len(pool)
-    # speed filter on OpenAlex's own yearly counts (the oracle decides)
+    # N is a little above OpenAlex's own total, so keep works whose
+    # OpenAlex count at the cutoff could give an N inside the window
     pool = [c for c in pool
-            if 0.8 * t_lo <= c["est_at_cutoff"] <= 1.25 * t_hi]
-    print(f"pool: {n_pool} works in the lifetime window, {len(pool)} with "
-          f"an estimated count at the cutoff near the band")
-    pool = [c for c in pool if c["doi"] not in PILOT_DOIS]
+            if 0.9 * n_lo <= c["est_at_cutoff"] <= 1.0 * n_hi
+            and c["doi"] not in PILOT_DOIS]
     pool.sort(key=lambda c: c["doi"])              # order-independent start
     random.Random(SEED).shuffle(pool)
-    print(f"candidate pool: {len(pool)} works ({note}); seed {SEED}")
+    print(f"candidate pool: {n_pool} works in the lifetime window, "
+          f"{len(pool)} near the band ({note}); seed {SEED}")
 
     report, accepted = [], []
     t_start = time.time()
@@ -192,37 +249,37 @@ def main() -> None:
         if time.time() - t_start > args.time_budget:
             print("  time budget reached — writing what was examined")
             break
-        row = dict(c, truth="", openalex_total="", europepmc_total="",
-                   coverage="", decision="", why="")
-        try:
-            rows, _rep = oracle.citers(c["doi"], args.cutoff)
-        except OracleError as e:
-            row.update(decision="skip", why=f"oracle: {str(e)[:80]}")
-            report.append(row)
-            continue
-        row["truth"] = len(rows)
-        if not (t_lo <= len(rows) <= t_hi):
-            row.update(decision="reject", why="truth size outside the band")
-            report.append(row)
-            continue
-        tgt = Target(title=c["title"], doi=c["doi"], pmid=c["pmid"])
-        n_oa = index_total(oa, tgt, args.cutoff)
-        n_ep = index_total(ep, tgt, args.cutoff)
-        row.update(openalex_total=n_oa, europepmc_total=n_ep)
-        if not n_oa or not n_ep:
-            row.update(decision="reject", why="an enumerator cannot list it")
+        row = dict(c, openalex_total="", europepmc_total="", a="", b="",
+                   n_est="", u_est="", truth="", decision="", why="")
+        m = measure(oa, ep, c, args.cutoff, args.sample)
+        if isinstance(m, str):
+            row.update(decision="skip", why=m)
         else:
-            cov = n_ep / n_oa
-            row["coverage"] = f"{cov:.2f}"
-            if cov < args.min_coverage:
-                row.update(decision="reject",
-                           why=f"Europe PMC coverage < {args.min_coverage}")
+            row.update(openalex_total=m["n_oa"], europepmc_total=m["n_ep"],
+                       a=f"{m['a']:.2f}", b=f"{m['b']:.2f}",
+                       n_est=f"{m['n']:.0f}", u_est=f"{m['u']:.3f}")
+            ok, why = fits(m["n"], m["u"], args.eps, args.tau_max,
+                           args.page_size, args.pad)
+            if not ok:
+                row.update(decision="reject", why=why)
             else:
-                row.update(decision="ACCEPT", why="")
-                accepted.append(c)
+                # the oracle is consulted only now, as a sanity check
+                try:
+                    rows, _rep = oracle.citers(c["doi"], args.cutoff)
+                except OracleError as e:
+                    row.update(decision="skip", why=f"oracle: {str(e)[:70]}")
+                else:
+                    row["truth"] = len(rows)
+                    if len(rows) < args.min_oracle_ratio * m["n_oa"]:
+                        row.update(decision="reject",
+                                   why="oracle lists too few of its citers")
+                    else:
+                        row.update(decision="ACCEPT", why="")
+                        accepted.append(c)
         report.append(row)
-        print(f"  {row['decision']:6s} truth={row['truth']:>6} "
-              f"cov={row['coverage'] or '-':>4}  {c['title'][:60]}")
+        print(f"  {row['decision']:6s} N={row['n_est'] or '-':>6} "
+              f"u={row['u_est'] or '-':>5} truth={row['truth'] or '-':>6}  "
+              f"{c['title'][:50]}  {row['why']}")
 
     out_dir = REPO / "cohort"
     out_dir.mkdir(exist_ok=True)
@@ -237,9 +294,9 @@ def main() -> None:
     lines = [
         "# Exp 2-C cohort papers — selected BY RULE by scripts/select_cohort.py",
         f"# rule: eps={args.eps}, tau_max={args.tau_max}, cutoff={args.cutoff}, "
-        f"truth size in [{t_lo:,.0f}, {t_hi:,.0f}] (robust to u in "
-        f"[{args.u_lo}, {args.u_hi}]), Europe PMC coverage >= "
-        f"{args.min_coverage}, year <= {args.year_max}, seed {SEED}",
+        f"accept iff (u + {args.pad}) + psi(N) < eps and both walks fit "
+        f"in tau_max, with N and u measured from the two enumerators; "
+        f"year <= {args.year_max}, seed {SEED}",
         "# audit trail (every candidate examined): cohort/selection_report.csv",
         "# STAGED, not frozen: frozen only by build_citation_truth.py after "
         "the supervisor signs.",
