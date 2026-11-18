@@ -9,7 +9,7 @@ pre-registration, not an addendum.
 Date drafted: 2026-11-03 · rev 2 2026-11-04 after PILOT 1 (§6.1) ·
 rev 3 2026-11-17: oracle changed to OpenCitations, enumerators fixed as
 OpenAlex + Europe PMC, plug-in implemented (§3, §6.2; change log §11)
-Supervisor sign-off: ______________________  (name / date)
+Supervisor sign-off: Nick Koudas
 
 ## 1. Purpose and claim scope
 
@@ -61,7 +61,7 @@ The agent's enumerators apply the same cutoff through their own date
 filters; the indexes date a work slightly differently at year
 boundaries, which is part of the measured shortfall, not corrected.
 
-## 4. Cohort rule  *(supervisor signs)*
+## 4. Cohort rule  *Nick*
 
 Papers are selected BY RULE by `scripts/select_cohort.py`, not by hand:
 
@@ -276,7 +276,7 @@ this file finalized → cohort selected by §4 rule → truth frozen (cutoff
 fixed) → supervisor signs → live runs → replay/grade/notebook →
 write-up.
 
-## 10. Consistency of the §6.2 design with Theorem 1  *(supervisor signs)*
+## 10. Consistency of the §6.2 design with Theorem 1  *(Nick)*
 
 The revised design is an instantiation of the paper's abstractions, not a
 modification of Assumption 1 or Theorem 1. Checked clause by clause:
