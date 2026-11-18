@@ -1,0 +1,45 @@
+title,doi,pmid,year,lifetime,est_at_cutoff,truth,openalex_total,europepmc_total,coverage,decision,why
+A new mathematical model for relative quantification in real-time RT-PCR,10.1093/nar/29.9.e45,11328886,2001,38298,33485,27119,29823,23561,0.79,reject,Europe PMC coverage < 0.8
+edgeR : a Bioconductor package for differential expression analysis of digital gene expression data,10.1093/bioinformatics/btp616,19910308,2009,46481,32862,28864,,,,reject,truth size outside the band
+The Protein Data Bank,10.1093/nar/28.1.235,10592235,2000,44752,35431,29836,,,,reject,truth size outside the band
+A quantitative description of membrane current and its application to conduction and excitation in nerve,10.1113/jphysiol.1952.sp004764,12991237,1952,26358,22982,17397,,,,reject,truth size outside the band
+COPPER ENZYMES IN ISOLATED CHLOROPLASTS. POLYPHENOLOXIDASE IN BETA VULGARIS,10.1104/pp.24.1.1,16654194,1949,26359,22023,16934,,,,reject,truth size outside the band
+clusterProfiler: an R Package for Comparing Biological Themes Among Gene Clusters,10.1089/omi.2011.0118,22455463,2012,40930,22333,17986,,,,reject,truth size outside the band
+"Magnesium Replacement Improves the Metabolic Profile in Obese and Pre-Diabetic Patients with Mild-to-Moderate Chronic Kidney Disease: A 3-Month, Randomised, Double-Blind, Placebo-Controlled Study",10.1159/000468530,28297698,2017,29781,26486,24,,,,reject,truth size outside the band
+Systematic and integrative analysis of large gene lists using DAVID bioinformatics resources,10.1038/nprot.2008.211,19131956,2008,38870,33764,28898,,,,reject,truth size outside the band
+MAFFT Multiple Sequence Alignment Software Version 7: Improvements in Performance and Usability,10.1093/molbev/mst010,23329690,2013,50149,31402,28703,28384,21785,0.77,reject,Europe PMC coverage < 0.8
+STAR: ultrafast universal RNA-seq aligner,10.1093/bioinformatics/bts635,23104886,2012,55546,32623,31387,,,,reject,truth size outside the band
+Isolation of biologically active ribonucleic acid from sources enriched in ribonuclease,10.1021/bi00591a005,518835,1979,22092,22052,20813,,,,reject,truth size outside the band
+The Effect of Intensive Treatment of Diabetes on the Development and Progression of Long-Term Complications in Insulin-Dependent Diabetes Mellitus,10.1056/nejm199309303291401,8366922,1993,27612,25886,18630,,,,reject,truth size outside the band
+QIIME allows analysis of high-throughput community sequencing data,10.1038/nmeth.f.303,20383131,2010,37594,32763,27624,29676,21741,0.73,reject,Europe PMC coverage < 0.8
+"Global cancer statistics, 2012",10.3322/caac.21262,25651787,2015,29981,28084,23205,,,,reject,truth size outside the band
+"Global Cancer Statistics, 2002",10.3322/canjclin.55.2.74,15761078,2005,21509,21013,15827,,,,reject,truth size outside the band
+MrBayes 3: Bayesian phylogenetic inference under mixed models,10.1093/bioinformatics/btg180,12912839,2003,31098,28541,24086,,,,reject,truth size outside the band
+Clinical Characteristics of Coronavirus Disease 2019 in China,10.1056/nejmoa2002032,32109013,2020,33526,30220,22840,,,,reject,truth size outside the band
+Classification of Surgical Complications: A New Proposal With Evaluation in a Cohort of 6336 Patients and Results of a Survey,10.1097/01.sla.0000133083.54934.ae,15273542,2004,34524,26111,22844,,,,reject,truth size outside the band
+Detection of specific sequences among DNA fragments separated by gel electrophoresis,10.1016/s0022-2836(75)80083-0,1195397,1975,34139,33975,29990,,,,reject,truth size outside the band
+Assay for lipid peroxides in animal tissues by thiobarbituric acid reaction,10.1016/0003-2697(79)90738-3,36810,1979,31892,27240,21086,,,,reject,truth size outside the band
+limma powers differential expression analyses for RNA-sequencing and microarray studies,10.1093/nar/gkv007,25605792,2015,45482,26957,22739,,,,reject,truth size outside the band
+KEGG: Kyoto Encyclopedia of Genes and Genomes,10.1093/nar/27.1.29,9847135,1999,31828,26509,3850,,,,reject,truth size outside the band
+"Cancer incidence and mortality worldwide: Sources, methods and major patterns in GLOBOCAN 2012",10.1002/ijc.29210,25220842,2014,32465,29725,22609,,,,reject,truth size outside the band
+New response evaluation criteria in solid tumours: Revised RECIST guideline (version 1.1),10.1016/j.ejca.2008.10.026,19097774,2008,31616,23478,20223,,,,reject,truth size outside the band
+MEGA X: Molecular Evolutionary Genetics Analysis across Computing Platforms,10.1093/molbev/msy096,29722887,2018,41436,28176,23762,,,,reject,truth size outside the band
+Coot : model-building tools for molecular graphics,10.1107/s0907444904019158,15572765,2004,32508,27653,26365,27386,23839,0.87,ACCEPT,
+"A Novel Coronavirus from Patients with Pneumonia in China, 2019",10.1056/nejmoa2001017,31978945,2020,31498,27379,21506,,,,reject,truth size outside the band
+Features and development of Coot,10.1107/s0907444910007493,20383002,2010,29553,21840,21764,,,,reject,truth size outside the band
+Inference of Population Structure Using Multilocus Genotype Data,10.1093/genetics/155.2.945,10835412,2000,37648,32948,25315,,,,reject,truth size outside the band
+"Executive Summary of the Third Report of the National Cholesterol Education Program (NCEP) Expert Panel on Detection, Evaluation, and Treatment of High Blood Cholesterol in Adults (Adult Treatment Panel III)",10.1001/jama.285.19.2486,11368702,2001,30496,28123,22020,,,,reject,truth size outside the band
+Estimates of worldwide burden of cancer in 2008: GLOBOCAN 2008,10.1002/ijc.25516,21351269,2010,23050,22276,13390,,,,reject,truth size outside the band
+"AutoDock Vina: Improving the speed and accuracy of docking with a new scoring function, efficient optimization, and multithreading",10.1002/jcc.21334,19499576,2009,42490,24761,21117,,,,reject,truth size outside the band
+Clinical diagnosis of Alzheimer's disease: Report of the NINCDS‐ADRDA Work Group* under the auspices of Department of Health and Human Services Task Force on Alzheimer's Disease,10.1212/wnl.34.7.939,6610841,1984,30071,28531,25540,,,,reject,truth size outside the band
+A technique for radiolabeling DNA restriction endonuclease fragments to high specific activity,10.1016/0003-2697(83)90418-9,6312838,1983,25847,25824,19846,,,,reject,truth size outside the band
+Induction of Pluripotent Stem Cells from Mouse Embryonic and Adult Fibroblast Cultures by Defined Factors,10.1016/j.cell.2006.07.024,16904174,2006,30070,26236,20948,,,,reject,truth size outside the band
+MEGA4: Molecular Evolutionary Genetics Analysis (MEGA) Software Version 4.0,10.1093/molbev/msm092,17488738,2007,30424,29822,24476,,,,reject,truth size outside the band
+"Estimation of the Concentration of Low-Density Lipoprotein Cholesterol in Plasma, Without Use of the Preparative Ultracentrifuge",10.1093/clinchem/18.6.499,4337382,1972,35357,32376,21831,,,,reject,truth size outside the band
+RAxML version 8: a tool for phylogenetic analysis and post-analysis of large phylogenies,10.1093/bioinformatics/btu033,24451623,2014,34453,26270,24051,,,,reject,truth size outside the band
+Clustal W and Clustal X version 2.0,10.1093/bioinformatics/btm404,17846036,2007,31568,28590,23573,,,,reject,truth size outside the band
+Multilineage Potential of Adult Human Mesenchymal Stem Cells,10.1126/science.284.5411.143,10102814,1999,23072,21664,17506,,,,reject,truth size outside the band
+A simple method for estimating evolutionary rates of base substitutions through comparative studies of nucleotide sequences,10.1007/bf01731581,7463489,1980,32475,28339,23528,,,,reject,truth size outside the band
+Tissue sulfhydryl groups,10.1016/0003-9861(59)90090-6,13650640,1959,28883,25729,21684,,,,reject,truth size outside the band
+The Genome Analysis Toolkit: A MapReduce framework for analyzing next-generation DNA sequencing data,10.1101/gr.107524.110,20644199,2010,30593,22214,19479,,,,reject,truth size outside the band
+Analyzing real-time PCR data by the comparative CT method,10.1038/nprot.2008.73,18546601,2008,28105,22389,19325,,,,reject,truth size outside the band
