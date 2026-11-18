@@ -49,6 +49,10 @@ def main() -> None:
     ap.add_argument("--max-steps", type=int, required=True,
                     help="pre-registered tau_max (capture occasions)")
     ap.add_argument("--budget", type=float, default=25.0)
+    ap.add_argument("--max-papers", type=int, default=None,
+                    help="run at most this many NOT-yet-run papers, then "
+                         "stop cleanly (e.g. 1 to check the first run "
+                         "before the rest); order is alphabetical, fixed")
     ap.add_argument("--indexes", default="openalex,europepmc",
                     help="comma-separated enumerators (pre-registered)")
     ap.add_argument("--page-size", type=int, default=config.INDEX_PAGE_SIZE)
@@ -77,10 +81,16 @@ def main() -> None:
           f"Y_CAP={args.page_size} -> N must exceed {need:,.0f} "
           "(more if the indexes overlap imperfectly)")
 
+    ran = 0
     for key in sorted(truth):
         if idx.get(key, {}).get("done"):
             print(f"[skip] {key[:50]} already run")
             continue
+        if args.max_papers is not None and ran >= args.max_papers:
+            print(f"[stop] --max-papers {args.max_papers} reached; "
+                  "re-run the same command to continue")
+            break
+        ran += 1
         if key not in targets:
             raise SystemExit(f"{key!r} is in truth but not in targets.json")
         tgt = targets[key]
