@@ -4,6 +4,10 @@ The rule, applied mechanically (no hand picking):
   1. CANDIDATE POOL: OpenAlex works that are research articles, published
      <= 2021, in the life/health sciences, with a DOI and a PMID, and a
      lifetime citation count in a wide window around the band.
+     To spend oracle calls only where they can matter, the pool keeps a
+     work only if OpenAlex's own year-by-year counts put its citations at
+     the cutoff within a GENEROUS window around the band (0.8x to 1.25x).
+     This is a speed filter: the oracle measurement in step 3 decides.
   2. Shuffle the pool with a FIXED seed (reproducible, order-independent
      of anything we know about the papers).
   3. Walk the shuffled list; for each candidate measure
@@ -36,6 +40,7 @@ import os
 import random
 import re
 import sys
+import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -70,8 +75,10 @@ def truth_band(eps, tau_max, page_size, u_lo, u_hi, n_over_truth, margin):
             n_hi / n_over_truth * (1 - margin), n_lo, n_hi)
 
 
-def candidate_pool(oa, year_max, c_lo, c_hi, max_pool):
-    """OpenAlex works matching the pool rule, as dicts. Cursor-paged."""
+def candidate_pool(oa, year_max, c_lo, c_hi, max_pool, cutoff_year):
+    """OpenAlex works matching the pool rule, as dicts. Cursor-paged.
+    Each carries `est_at_cutoff`: lifetime citations minus the citations
+    OpenAlex attributes to years after the cutoff."""
     base = ["type:article", f"publication_year:<{year_max + 1}",
             "has_doi:true", "has_pmid:true",
             f"cited_by_count:>{c_lo}", f"cited_by_count:<{c_hi}"]
@@ -84,7 +91,7 @@ def candidate_pool(oa, year_max, c_lo, c_hi, max_pool):
             status, data = oa._get(oa.BASE, {
                 "filter": ",".join(base + extra),
                 "select": "id,doi,display_name,publication_year,"
-                          "cited_by_count,ids",
+                          "cited_by_count,counts_by_year,ids",
                 "per-page": 200, "cursor": cursor,
                 **oa._key()})
             if status != 200 or data is None:
@@ -98,10 +105,15 @@ def candidate_pool(oa, year_max, c_lo, c_hi, max_pool):
                     # plain-text title: drop markup like <i>...</i>
                     title = re.sub(r"<[^>]+>", "", str(
                         w.get("display_name") or ""))
+                    after = sum(int(y.get("cited_by_count") or 0)
+                                for y in w.get("counts_by_year") or []
+                                if int(y.get("year") or 0) > cutoff_year)
+                    life = int(w.get("cited_by_count") or 0)
                     out.append({"title": " ".join(title.split()),
                                 "doi": doi, "pmid": pmid,
                                 "year": w.get("publication_year"),
-                                "lifetime": w.get("cited_by_count")})
+                                "lifetime": life,
+                                "est_at_cutoff": life - after})
             cursor = (data.get("meta") or {}).get("next_cursor") \
                 if data.get("results") else None
         if out:
@@ -139,6 +151,9 @@ def main() -> None:
                     help="Europe PMC total / OpenAlex total, at the cutoff")
     ap.add_argument("--year-max", type=int, default=2021)
     ap.add_argument("--max-checked", type=int, default=150)
+    ap.add_argument("--time-budget", type=float, default=780.0,
+                    help="seconds; stop examining and write what exists "
+                         "(keeps a CI run inside its time limit)")
     args = ap.parse_args()
     if os.environ.get("RUN_ONLINE") != "1":
         raise SystemExit("RUN_ONLINE != 1 — network access is a deliberate "
@@ -154,16 +169,28 @@ def main() -> None:
     oa, ep, oracle = OpenAlexIndex(), EuropePMCIndex(), OpenCitationsDriver()
     # lifetime counts run ahead of the count at the cutoff, so the pool
     # window is wide; the ORACLE measurement below is what decides
-    pool, note = candidate_pool(oa, args.year_max, int(t_lo * 0.95),
-                                int(t_hi * 2.0), max_pool=2000)
+    cutoff_year = int(args.cutoff[:4])
+    pool, note = candidate_pool(oa, args.year_max, int(t_lo * 0.8),
+                                int(t_hi * 3.0), max_pool=4000,
+                                cutoff_year=cutoff_year)
+    n_pool = len(pool)
+    # speed filter on OpenAlex's own yearly counts (the oracle decides)
+    pool = [c for c in pool
+            if 0.8 * t_lo <= c["est_at_cutoff"] <= 1.25 * t_hi]
+    print(f"pool: {n_pool} works in the lifetime window, {len(pool)} with "
+          f"an estimated count at the cutoff near the band")
     pool = [c for c in pool if c["doi"] not in PILOT_DOIS]
     pool.sort(key=lambda c: c["doi"])              # order-independent start
     random.Random(SEED).shuffle(pool)
     print(f"candidate pool: {len(pool)} works ({note}); seed {SEED}")
 
     report, accepted = [], []
+    t_start = time.time()
     for c in pool:
         if len(accepted) >= args.n or len(report) >= args.max_checked:
+            break
+        if time.time() - t_start > args.time_budget:
+            print("  time budget reached — writing what was examined")
             break
         row = dict(c, truth="", openalex_total="", europepmc_total="",
                    coverage="", decision="", why="")
@@ -199,6 +226,9 @@ def main() -> None:
 
     out_dir = REPO / "cohort"
     out_dir.mkdir(exist_ok=True)
+    if not report:
+        raise SystemExit("No candidate was examined — the pool is empty "
+                         "near this band; widen the band or tau_max.")
     with open(out_dir / "selection_report.csv", "w", newline="",
               encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=list(report[0].keys()))
@@ -207,7 +237,8 @@ def main() -> None:
     lines = [
         "# Exp 2-C cohort papers — selected BY RULE by scripts/select_cohort.py",
         f"# rule: eps={args.eps}, tau_max={args.tau_max}, cutoff={args.cutoff}, "
-        f"truth size in [{t_lo:,.0f}, {t_hi:,.0f}], Europe PMC coverage >= "
+        f"truth size in [{t_lo:,.0f}, {t_hi:,.0f}] (robust to u in "
+        f"[{args.u_lo}, {args.u_hi}]), Europe PMC coverage >= "
         f"{args.min_coverage}, year <= {args.year_max}, seed {SEED}",
         "# audit trail (every candidate examined): cohort/selection_report.csv",
         "# STAGED, not frozen: frozen only by build_citation_truth.py after "
