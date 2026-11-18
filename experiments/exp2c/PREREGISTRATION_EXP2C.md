@@ -1,9 +1,9 @@
 # PREREGISTRATION — Experiment 2-C: The Statistical Stopping Guarantee (citations)
 
-**Status: DRAFT (rev 3) — in force only after (1) the enumerator probe
-fixes ε, τ_max and the cohort band (§6.3), (2) PILOT 2 passes (§6.4),
-(3) the supervisor signs §4, §6 and §10, and (4) this file is committed
-BEFORE the first cohort run.** New domain, new oracle, new grading key: a fresh
+**Status: DRAFT (rev 4) — in force only after (1) truth is frozen for
+the §4 cohort, (2) the supervisor signs §4, §6 and §10, and (3) this
+file is committed BEFORE the first cohort run. Done: probe (§6.3.1),
+PILOT 2, ε and τ_max, cohort selection.** New domain, new oracle, new grading key: a fresh
 pre-registration, not an addendum.
 
 Date drafted: 2026-11-03 · rev 2 2026-11-04 after PILOT 1 (§6.1) ·
@@ -63,14 +63,52 @@ boundaries, which is part of the measured shortfall, not corrected.
 
 ## 4. Cohort rule  *(supervisor signs)*
 
-Papers selected BY RULE, not by hand: biomedical research articles
-(both enumerators must cover them: the paper has a PMID), publication
-year ≤ 2021 (settled citation flow), whose oracle truth size at the
-cutoff lies inside the feasible band of §6.3; ~5 papers. Optionally ONE deliberately adversarial giant,
-pre-registered as a stress probe of Assumption 1(a): on it the
-certificate may fire at low true recall — an informative falsification
-test, never counted in the headline C2 rate. The PILOT papers are never
-in the cohort.
+Papers are selected BY RULE by `scripts/select_cohort.py`, not by hand:
+
+1. **Pool**: OpenAlex research articles in the life/health sciences,
+   published ≤ 2021 (settled citation flow), with a DOI and a PMID, whose
+   citation count at the cutoff is near the band (71 works).
+2. **Order**: shuffled with a fixed seed (20261117).
+3. **Test**, in that order, on measurements from the two enumerators
+   only: N (distinct records the agent will find, from the two index
+   totals and their overlap) and u (the share only one index lists, from
+   100 citers of each index looked up in the other). ACCEPT iff the
+   certificate's own precondition holds with a pad of 0.03 on u:
+   (u + 0.03) + ψ(N) < ε, and both walks plus 20 search occasions fit
+   inside τ_max.
+4. **Oracle sanity check** on accepted papers only: the oracle's truth
+   size is at least 60% of OpenAlex's total. No recall against the oracle
+   is computed at selection time.
+5. Stop at 5 accepted. The pilot paper (AlphaFold 2) is excluded.
+
+The rule conditions the cohort on the certificate being REACHABLE. That
+does not touch the claim under test (C2: recall ≥ 1 − ε when a
+certificate fires), but it means "certificates fired on k of 5" is not
+evidence about how often a certificate is reachable in general.
+
+**Selected cohort (2026-11-17, ε = 0.6, τ_max = 1,150, cutoff
+2023-12-31; 11 candidates examined; audit trail:
+cohort/selection_report.csv):**
+
+| Paper | N (est.) | u (est.) | oracle truth | ψ at N | certificate fires if u stays below |
+|---|---|---|---|---|---|
+| KEGG: Kyoto Encyclopedia of Genes and Genomes | 22,905 | 0.107 | 22,813 | 0.362 | 0.238 |
+| PLINK: A Tool Set for Whole-Genome Association… | 26,178 | 0.237 | 24,515 | 0.317 | 0.283 |
+| Standards and guidelines for the interpretation of sequence variants… | 19,425 | 0.110 | 18,857 | 0.427 | 0.173 |
+| edgeR: a Bioconductor package for differential expression… | 29,795 | 0.201 | 28,864 | 0.279 | 0.321 |
+| Clinical course and risk factors for mortality of… COVID-19… | 21,692 | 0.077 | 21,170 | 0.383 | 0.217 |
+
+(Exact titles, DOIs and PMIDs: cohort/papers.txt.) Of the six not
+accepted: four failed the test (three on u + pad + ψ ≥ ε, one of them
+with u = 0.98 because Europe PMC lists almost none of its citers; one
+because its walks need 1,154 occasions), and one was skipped on a
+transient Europe PMC error — recorded as examined, not retried. u is
+estimated from samples of 100 (standard error about 0.03–0.04); the
+thinnest margins are PLINK (0.046) and the sequence-variant guidelines
+(0.063), so a run ending "abandoned" on one of them is a pre-registered
+possibility, not a defect.
+
+An adversarial stress paper is NOT included in this cohort.
 
 ## 5. Pre-registered domain rules
 
@@ -188,13 +226,13 @@ Full report: data/ci/exp2c_probe.md. All three APIs behaved as coded.
 - **Band at u = 0.28**: ε 0.5 → τ 2,340, N 54k–67k · ε 0.6 → τ 1,130,
   N 26k–32k · ε 0.7 → τ 670, N 15k–19k.
 
-**To be decided and written here before the freeze (supervisor):** the
-live ε. Candidates: ε = 0.7 with τ_max ≈ 700 and a cohort band of
-15k–19k truth-sized papers (cheapest; this pilot paper itself would
-fit), or ε = 0.6 with τ_max ≈ 1,150 and 26k–32k. Part of u is DOI
-aliasing between the indexes, not missing coverage; resolving aliases in
-ER, or naming a third enumerator, would lower u and tighten ε — either is
-a design change that must be made and re-probed BEFORE the freeze.
+**Decided (2026-11-17): live ε = 0.6, τ_max = 1,150**, page size
+(= Y_CAP) 50, β = 1, δ_M = 0.05, enumerators OpenAlex + Europe PMC,
+cutoff 2023-12-31. The certificate, when it fires, asserts recall ≥ 0.4
+against the oracle at confidence 0.95. Offline arms: ε = 0.9, 0.8, 0.7,
+0.6. Part of u is DOI aliasing between the indexes, not missing
+coverage; resolving aliases in ER or naming a third enumerator would
+lower u and allow a tighter ε, but neither is part of this experiment.
 
 ### 6.4 PILOT 2 (scripts/pilot_walk.py, after the probe)
 
@@ -307,6 +345,13 @@ V_max, not the argument).
 
 - **rev 2 (2026-11-04)** — PILOT 1 recorded; index-pagination design;
   §10 consistency argument.
+- **rev 4 (2026-11-17)** — ε = 0.6 and τ_max = 1,150 fixed (§6.3.1);
+  PILOT 2 passed (40 occasions, all index pages ok, max novelty 50 = page
+  size, gate fitted on 200 auto-labeled rows); §4 rewritten to the rule
+  as implemented — it tests each candidate's measured N and u rather
+  than the oracle's truth size, because the oracle lists a median 17%
+  fewer citers than OpenAlex and a truth-size window rejected papers the
+  agent could certify; cohort of 5 selected.
 - **rev 3 (2026-11-17)** — (a) oracle OpenAlex → OpenCitations (supervisor
   asked for an open alternative; Google Scholar has no API); OpenAlex
   becomes an enumerator, so the Semantic Scholar key is no longer needed;
