@@ -1,45 +1,72 @@
-title,doi,pmid,year,lifetime,est_at_cutoff,truth,openalex_total,europepmc_total,coverage,decision,why
-A new mathematical model for relative quantification in real-time RT-PCR,10.1093/nar/29.9.e45,11328886,2001,38298,33485,27119,29823,23561,0.79,reject,Europe PMC coverage < 0.8
-edgeR : a Bioconductor package for differential expression analysis of digital gene expression data,10.1093/bioinformatics/btp616,19910308,2009,46481,32862,28864,,,,reject,truth size outside the band
-The Protein Data Bank,10.1093/nar/28.1.235,10592235,2000,44752,35431,29836,,,,reject,truth size outside the band
-A quantitative description of membrane current and its application to conduction and excitation in nerve,10.1113/jphysiol.1952.sp004764,12991237,1952,26358,22982,17397,,,,reject,truth size outside the band
-COPPER ENZYMES IN ISOLATED CHLOROPLASTS. POLYPHENOLOXIDASE IN BETA VULGARIS,10.1104/pp.24.1.1,16654194,1949,26359,22023,16934,,,,reject,truth size outside the band
-clusterProfiler: an R Package for Comparing Biological Themes Among Gene Clusters,10.1089/omi.2011.0118,22455463,2012,40930,22333,17986,,,,reject,truth size outside the band
-"Magnesium Replacement Improves the Metabolic Profile in Obese and Pre-Diabetic Patients with Mild-to-Moderate Chronic Kidney Disease: A 3-Month, Randomised, Double-Blind, Placebo-Controlled Study",10.1159/000468530,28297698,2017,29781,26486,24,,,,reject,truth size outside the band
-Systematic and integrative analysis of large gene lists using DAVID bioinformatics resources,10.1038/nprot.2008.211,19131956,2008,38870,33764,28898,,,,reject,truth size outside the band
-MAFFT Multiple Sequence Alignment Software Version 7: Improvements in Performance and Usability,10.1093/molbev/mst010,23329690,2013,50149,31402,28703,28384,21785,0.77,reject,Europe PMC coverage < 0.8
-STAR: ultrafast universal RNA-seq aligner,10.1093/bioinformatics/bts635,23104886,2012,55546,32623,31387,,,,reject,truth size outside the band
-Isolation of biologically active ribonucleic acid from sources enriched in ribonuclease,10.1021/bi00591a005,518835,1979,22092,22052,20813,,,,reject,truth size outside the band
-The Effect of Intensive Treatment of Diabetes on the Development and Progression of Long-Term Complications in Insulin-Dependent Diabetes Mellitus,10.1056/nejm199309303291401,8366922,1993,27612,25886,18630,,,,reject,truth size outside the band
-QIIME allows analysis of high-throughput community sequencing data,10.1038/nmeth.f.303,20383131,2010,37594,32763,27624,29676,21741,0.73,reject,Europe PMC coverage < 0.8
-"Global cancer statistics, 2012",10.3322/caac.21262,25651787,2015,29981,28084,23205,,,,reject,truth size outside the band
-"Global Cancer Statistics, 2002",10.3322/canjclin.55.2.74,15761078,2005,21509,21013,15827,,,,reject,truth size outside the band
-MrBayes 3: Bayesian phylogenetic inference under mixed models,10.1093/bioinformatics/btg180,12912839,2003,31098,28541,24086,,,,reject,truth size outside the band
-Clinical Characteristics of Coronavirus Disease 2019 in China,10.1056/nejmoa2002032,32109013,2020,33526,30220,22840,,,,reject,truth size outside the band
-Classification of Surgical Complications: A New Proposal With Evaluation in a Cohort of 6336 Patients and Results of a Survey,10.1097/01.sla.0000133083.54934.ae,15273542,2004,34524,26111,22844,,,,reject,truth size outside the band
-Detection of specific sequences among DNA fragments separated by gel electrophoresis,10.1016/s0022-2836(75)80083-0,1195397,1975,34139,33975,29990,,,,reject,truth size outside the band
-Assay for lipid peroxides in animal tissues by thiobarbituric acid reaction,10.1016/0003-2697(79)90738-3,36810,1979,31892,27240,21086,,,,reject,truth size outside the band
-limma powers differential expression analyses for RNA-sequencing and microarray studies,10.1093/nar/gkv007,25605792,2015,45482,26957,22739,,,,reject,truth size outside the band
-KEGG: Kyoto Encyclopedia of Genes and Genomes,10.1093/nar/27.1.29,9847135,1999,31828,26509,3850,,,,reject,truth size outside the band
-"Cancer incidence and mortality worldwide: Sources, methods and major patterns in GLOBOCAN 2012",10.1002/ijc.29210,25220842,2014,32465,29725,22609,,,,reject,truth size outside the band
-New response evaluation criteria in solid tumours: Revised RECIST guideline (version 1.1),10.1016/j.ejca.2008.10.026,19097774,2008,31616,23478,20223,,,,reject,truth size outside the band
-MEGA X: Molecular Evolutionary Genetics Analysis across Computing Platforms,10.1093/molbev/msy096,29722887,2018,41436,28176,23762,,,,reject,truth size outside the band
-Coot : model-building tools for molecular graphics,10.1107/s0907444904019158,15572765,2004,32508,27653,26365,27386,23839,0.87,ACCEPT,
-"A Novel Coronavirus from Patients with Pneumonia in China, 2019",10.1056/nejmoa2001017,31978945,2020,31498,27379,21506,,,,reject,truth size outside the band
-Features and development of Coot,10.1107/s0907444910007493,20383002,2010,29553,21840,21764,,,,reject,truth size outside the band
-Inference of Population Structure Using Multilocus Genotype Data,10.1093/genetics/155.2.945,10835412,2000,37648,32948,25315,,,,reject,truth size outside the band
-"Executive Summary of the Third Report of the National Cholesterol Education Program (NCEP) Expert Panel on Detection, Evaluation, and Treatment of High Blood Cholesterol in Adults (Adult Treatment Panel III)",10.1001/jama.285.19.2486,11368702,2001,30496,28123,22020,,,,reject,truth size outside the band
-Estimates of worldwide burden of cancer in 2008: GLOBOCAN 2008,10.1002/ijc.25516,21351269,2010,23050,22276,13390,,,,reject,truth size outside the band
-"AutoDock Vina: Improving the speed and accuracy of docking with a new scoring function, efficient optimization, and multithreading",10.1002/jcc.21334,19499576,2009,42490,24761,21117,,,,reject,truth size outside the band
-Clinical diagnosis of Alzheimer's disease: Report of the NINCDS‐ADRDA Work Group* under the auspices of Department of Health and Human Services Task Force on Alzheimer's Disease,10.1212/wnl.34.7.939,6610841,1984,30071,28531,25540,,,,reject,truth size outside the band
-A technique for radiolabeling DNA restriction endonuclease fragments to high specific activity,10.1016/0003-2697(83)90418-9,6312838,1983,25847,25824,19846,,,,reject,truth size outside the band
-Induction of Pluripotent Stem Cells from Mouse Embryonic and Adult Fibroblast Cultures by Defined Factors,10.1016/j.cell.2006.07.024,16904174,2006,30070,26236,20948,,,,reject,truth size outside the band
-MEGA4: Molecular Evolutionary Genetics Analysis (MEGA) Software Version 4.0,10.1093/molbev/msm092,17488738,2007,30424,29822,24476,,,,reject,truth size outside the band
-"Estimation of the Concentration of Low-Density Lipoprotein Cholesterol in Plasma, Without Use of the Preparative Ultracentrifuge",10.1093/clinchem/18.6.499,4337382,1972,35357,32376,21831,,,,reject,truth size outside the band
-RAxML version 8: a tool for phylogenetic analysis and post-analysis of large phylogenies,10.1093/bioinformatics/btu033,24451623,2014,34453,26270,24051,,,,reject,truth size outside the band
-Clustal W and Clustal X version 2.0,10.1093/bioinformatics/btm404,17846036,2007,31568,28590,23573,,,,reject,truth size outside the band
-Multilineage Potential of Adult Human Mesenchymal Stem Cells,10.1126/science.284.5411.143,10102814,1999,23072,21664,17506,,,,reject,truth size outside the band
-A simple method for estimating evolutionary rates of base substitutions through comparative studies of nucleotide sequences,10.1007/bf01731581,7463489,1980,32475,28339,23528,,,,reject,truth size outside the band
-Tissue sulfhydryl groups,10.1016/0003-9861(59)90090-6,13650640,1959,28883,25729,21684,,,,reject,truth size outside the band
-The Genome Analysis Toolkit: A MapReduce framework for analyzing next-generation DNA sequencing data,10.1101/gr.107524.110,20644199,2010,30593,22214,19479,,,,reject,truth size outside the band
-Analyzing real-time PCR data by the comparative CT method,10.1038/nprot.2008.73,18546601,2008,28105,22389,19325,,,,reject,truth size outside the band
+title,doi,pmid,oa_id,year,lifetime,est_at_cutoff,openalex_total,europepmc_total,a,b,n_est,u_est,truth,decision,why
+A new mathematical model for relative quantification in real-time RT-PCR,10.1093/nar/29.9.e45,11328886,W2108244474,2001,38298,33485,,,,,,,,skip,openalex page failed (paywall)
+KEGG: Kyoto Encyclopedia of Genes and Genomes,10.1093/nar/28.1.27,10592173,W4294216483,2000,44600,29017,,,,,,,,skip,openalex page failed (paywall)
+A simple method for displaying the hydropathic character of a protein,10.1016/0022-2836(82)90515-0,7108955,W1975304761,1982,24602,22938,,,,,,,,skip,openalex page failed (paywall)
+"Summary of the Second Report of the National Cholesterol Education Program (NCEP) Expert Panel on Detection, Evaluation, and Treatment of High Blood Cholesterol in Adults (Adult Treatment Panel II)",10.1001/jama.1993.03500230097036,8501844,W4249825849,1993,28141,28093,,,,,,,,skip,openalex page failed (paywall)
+PHENIX : a comprehensive Python-based system for macromolecular structure solution,10.1107/s0907444909052925,20124702,W2180229411,2010,24893,20314,,,,,,,,skip,openalex page failed (paywall)
+PLINK: A Tool Set for Whole-Genome Association and Population-Based Linkage Analyses,10.1086/519795,17701901,W2161633633,2007,37633,28104,,,,,,,,skip,openalex page failed (paywall)
+Standards and guidelines for the interpretation of sequence variants: a joint consensus recommendation of the American College of Medical Genetics and Genomics and the Association for Molecular Pathology,10.1038/gim.2015.30,25741868,W2051978340,2015,35301,21150,,,,,,,,skip,openalex page failed (paywall)
+Analyzing real-time PCR data by the comparative CT method,10.1038/nprot.2008.73,18546601,W2114570899,2008,28105,22389,,,,,,,,skip,openalex page failed (paywall)
+edgeR : a Bioconductor package for differential expression analysis of digital gene expression data,10.1093/bioinformatics/btp616,19910308,W2114104545,2009,46481,32862,,,,,,,,skip,openalex page failed (paywall)
+The Protein Data Bank,10.1093/nar/28.1.235,10592235,W2130479394,2000,44752,35431,,,,,,,,skip,openalex page failed (paywall)
+"Clinical course and risk factors for mortality of adult inpatients with COVID-19 in Wuhan, China: a retrospective cohort study",10.1016/s0140-6736(20)30566-3,32171076,W3009885589,2020,30012,26504,,,,,,,,skip,openalex page failed (paywall)
+Coot : model-building tools for molecular graphics,10.1107/s0907444904019158,15572765,W2144081223,2004,32508,27653,,,,,,,,skip,openalex page failed (paywall)
+STAR: ultrafast universal RNA-seq aligner,10.1093/bioinformatics/bts635,23104886,W2169456326,2012,55546,32623,,,,,,,,skip,openalex page failed (paywall)
+A new and rapid colorimetric determination of acetylcholinesterase activity,10.1016/0006-2952(61)90145-9,13726518,W1971048984,1961,29305,25073,,,,,,,,skip,openalex page failed (paywall)
+The Genome Analysis Toolkit: A MapReduce framework for analyzing next-generation DNA sequencing data,10.1101/gr.107524.110,20644199,W2119180969,2010,30593,22214,,,,,,,,skip,openalex page failed (paywall)
+KEGG: Kyoto Encyclopedia of Genes and Genomes,10.1093/nar/27.1.29,9847135,W2159482845,1999,31828,26509,,,,,,,,skip,openalex page failed (paywall)
+Floral dip: a simplified method for Agrobacterium ‐mediated transformation of Arabidopsis thaliana,10.1046/j.1365-313x.1998.00343.x,10069079,W2116122104,1998,23929,20275,,,,,,,,skip,openalex page failed (paywall)
+MRBAYES: Bayesian inference of phylogenetic trees,10.1093/bioinformatics/17.8.754,11524383,W2161444534,2001,24891,23061,,,,,,,,skip,openalex page failed (paywall)
+Isolation of biologically active ribonucleic acid from sources enriched in ribonuclease,10.1021/bi00591a005,518835,W2060333964,1979,22092,22052,,,,,,,,skip,openalex page failed (paywall)
+QIIME allows analysis of high-throughput community sequencing data,10.1038/nmeth.f.303,20383131,W2072970694,2010,37594,32763,,,,,,,,skip,openalex page failed (paywall)
+New response evaluation criteria in solid tumours: Revised RECIST guideline (version 1.1),10.1016/j.ejca.2008.10.026,19097774,W2019607817,2008,31616,23478,,,,,,,,skip,openalex page failed (paywall)
+A simple method for estimating evolutionary rates of base substitutions through comparative studies of nucleotide sequences,10.1007/bf01731581,7463489,W2065461553,1980,32475,28339,,,,,,,,skip,openalex page failed (paywall)
+MrBayes 3.2: Efficient Bayesian Phylogenetic Inference and Model Choice Across a Large Model Space,10.1093/sysbio/sys029,22357727,W2148698435,2012,30512,21823,,,,,,,,skip,openalex page failed (paywall)
+Multilineage Potential of Adult Human Mesenchymal Stem Cells,10.1126/science.284.5411.143,10102814,W2159999899,1999,23072,21664,,,,,,,,skip,openalex page failed (paywall)
+Estimates of worldwide burden of cancer in 2008: GLOBOCAN 2008,10.1002/ijc.25516,21351269,W1981989535,2010,23050,22276,,,,,,,,skip,openalex page failed (paywall)
+Induction of Pluripotent Stem Cells from Mouse Embryonic and Adult Fibroblast Cultures by Defined Factors,10.1016/j.cell.2006.07.024,16904174,W2125987139,2006,30070,26236,,,,,,,,skip,openalex page failed (paywall)
+Clinical Characteristics of Coronavirus Disease 2019 in China,10.1056/nejmoa2002032,32109013,W3008827533,2020,33526,30220,,,,,,,,skip,openalex page failed (paywall)
+Features and development of Coot,10.1107/s0907444910007493,20383002,W2124026197,2010,29553,21840,,,,,,,,skip,openalex page failed (paywall)
+Detecting the number of clusters of individuals using the software structure : a simulation study,10.1111/j.1365-294x.2005.02553.x,15969739,W2161339576,2005,24895,21237,,,,,,,,skip,openalex page failed (paywall)
+"Clinical Characteristics of 138 Hospitalized Patients With 2019 Novel Coronavirus–Infected Pneumonia in Wuhan, China",10.1001/jama.2020.1585,32031570,W3005079553,2020,24766,22447,,,,,,,,skip,openalex page failed (paywall)
+MEGA4: Molecular Evolutionary Genetics Analysis (MEGA) Software Version 4.0,10.1093/molbev/msm092,17488738,W2125121305,2007,30424,29822,,,,,,,,skip,openalex page failed (paywall)
+"The Seventh Report of the Joint National Committee on Prevention, Detection, Evaluation, and Treatment of High Blood Pressure The JNC 7 Report",10.1001/jama.289.19.2560,12748199,W2156121263,2003,27713,26574,,,,,,,,skip,openalex page failed (paywall)
+"Magnesium Replacement Improves the Metabolic Profile in Obese and Pre-Diabetic Patients with Mild-to-Moderate Chronic Kidney Disease: A 3-Month, Randomised, Double-Blind, Placebo-Controlled Study",10.1159/000468530,28297698,W2607031541,2017,29781,26486,,,,,,,,skip,openalex page failed (paywall)
+"Cancer incidence and mortality worldwide: Sources, methods and major patterns in GLOBOCAN 2012",10.1002/ijc.29210,25220842,W1757407923,2014,32465,29725,,,,,,,,skip,openalex page failed (paywall)
+Tissue sulfhydryl groups,10.1016/0003-9861(59)90090-6,13650640,W2006370393,1959,28883,25729,,,,,,,,skip,openalex page failed (paywall)
+Assay for lipid peroxides in animal tissues by thiobarbituric acid reaction,10.1016/0003-2697(79)90738-3,36810,W1983310681,1979,31892,27240,,,,,,,,skip,openalex page failed (paywall)
+MODELTEST: testing the model of DNA substitution.,10.1093/bioinformatics/14.9.817,9918953,W2082928585,1998,20713,20265,,,,,,,,skip,openalex page failed (paywall)
+The assessment and analysis of handedness: The Edinburgh inventory,10.1016/0028-3932(71)90067-4,5146491,W2136022845,1971,39038,35013,,,,,,,,skip,openalex page failed (paywall)
+The SILVA ribosomal RNA gene database project: improved data processing and web-based tools,10.1093/nar/gks1219,23193283,W2034285706,2012,36328,22285,,,,,,,,skip,openalex page failed (paywall)
+RAxML version 8: a tool for phylogenetic analysis and post-analysis of large phylogenies,10.1093/bioinformatics/btu033,24451623,W2141052558,2014,34453,26270,,,,,,,,skip,openalex page failed (paywall)
+MrBayes 3: Bayesian phylogenetic inference under mixed models,10.1093/bioinformatics/btg180,12912839,W2146058063,2003,31098,28541,,,,,,,,skip,openalex page failed (paywall)
+clusterProfiler: an R Package for Comparing Biological Themes Among Gene Clusters,10.1089/omi.2011.0118,22455463,W2035618305,2012,40930,22333,,,,,,,,skip,openalex page failed (paywall)
+Ultrafast and memory-efficient alignment of short DNA sequences to the human genome,10.1186/gb-2009-10-3-r25,19261174,W2124985265,2009,24250,21046,,,,,,,,skip,openalex page failed (paywall)
+"Estimation of the Concentration of Low-Density Lipoprotein Cholesterol in Plasma, Without Use of the Preparative Ultracentrifuge",10.1093/clinchem/18.6.499,4337382,W2116404316,1972,35357,32376,,,,,,,,skip,openalex page failed (paywall)
+"Epidemiological and clinical characteristics of 99 cases of 2019 novel coronavirus pneumonia in Wuhan, China: a descriptive study",10.1016/s0140-6736(20)30211-7,32007143,W3002108456,2020,23674,21228,,,,,,,,skip,openalex page failed (paywall)
+Homeostasis model assessment: insulin resistance and ?-cell function from fasting plasma glucose and insulin concentrations in man,10.1007/bf00280883,3899825,W2160234571,1985,34869,30855,,,,,,,,skip,openalex page failed (paywall)
+A technique for radiolabeling DNA restriction endonuclease fragments to high specific activity,10.1016/0003-2697(83)90418-9,6312838,W2014669590,1983,25847,25824,,,,,,,,skip,openalex page failed (paywall)
+limma powers differential expression analyses for RNA-sequencing and microarray studies,10.1093/nar/gkv007,25605792,W2146512944,2015,45482,26957,,,,,,,,skip,openalex page failed (paywall)
+"Global cancer statistics, 2012",10.3322/caac.21262,25651787,W2917837889,2015,29981,28084,,,,,,,,skip,openalex page failed (paywall)
+MEGA X: Molecular Evolutionary Genetics Analysis across Computing Platforms,10.1093/molbev/msy096,29722887,W2799524357,2018,41436,28176,,,,,,,,skip,openalex page failed (paywall)
+THE USE OF LEAD CITRATE AT HIGH pH AS AN ELECTRON-OPAQUE STAIN IN ELECTRON MICROSCOPY,10.1083/jcb.17.1.208,13986422,W2127911529,1963,26193,25544,,,,,,,,skip,openalex page failed (paywall)
+"AutoDock Vina: Improving the speed and accuracy of docking with a new scoring function, efficient optimization, and multithreading",10.1002/jcc.21334,19499576,W2134967712,2009,42490,24761,,,,,,,,skip,openalex page failed (paywall)
+MAFFT Multiple Sequence Alignment Software Version 7: Improvements in Performance and Usability,10.1093/molbev/mst010,23329690,W2160378127,2013,50149,31402,,,,,,,,skip,openalex page failed (paywall)
+"A Novel Coronavirus from Patients with Pneumonia in China, 2019",10.1056/nejmoa2001017,31978945,W3001897055,2020,31498,27379,,,,,,,,skip,openalex page failed (paywall)
+Classification of Surgical Complications: A New Proposal With Evaluation in a Cohort of 6336 Patients and Results of a Survey,10.1097/01.sla.0000133083.54934.ae,15273542,W2096998881,2004,34524,26111,,,,,,,,skip,openalex page failed (paywall)
+A New Equation to Estimate Glomerular Filtration Rate,10.7326/0003-4819-150-9-200905050-00006,19414839,W2155965977,2009,27538,21000,,,,,,,,skip,openalex page failed (paywall)
+A quantitative description of membrane current and its application to conduction and excitation in nerve,10.1113/jphysiol.1952.sp004764,12991237,W1985940938,1952,26358,22982,,,,,,,,skip,openalex page failed (paywall)
+A simple salting out procedure for extracting DNA from human nucleated cells,10.1093/nar/16.3.1215,3344216,W2118094114,1988,21739,20656,,,,,,,,skip,openalex page failed (paywall)
+COPPER ENZYMES IN ISOLATED CHLOROPLASTS. POLYPHENOLOXIDASE IN BETA VULGARIS,10.1104/pp.24.1.1,16654194,W1974907033,1949,26359,22023,,,,,,,,skip,openalex page failed (paywall)
+Lifetime Prevalence and Age-of-Onset Distributions of DSM-IV Disorders in the National Comorbidity Survey Replication,10.1001/archpsyc.62.6.593,15939837,W2118826874,2005,24149,20275,,,,,,,,skip,openalex page failed (paywall)
+"Global Cancer Statistics, 2002",10.3322/canjclin.55.2.74,15761078,W2020830322,2005,21509,21013,,,,,,,,skip,openalex page failed (paywall)
+"Cancer statistics, 2019",10.3322/caac.21551,30620402,W2911188335,2019,23301,20205,,,,,,,,skip,openalex page failed (paywall)
+Initial sequencing and analysis of the human genome,10.1038/35057062,11237011,W2168909179,2001,28079,25648,,,,,,,,skip,openalex page failed (paywall)
+Clinical diagnosis of Alzheimer's disease: Report of the NINCDS‐ADRDA Work Group* under the auspices of Department of Health and Human Services Task Force on Alzheimer's Disease,10.1212/wnl.34.7.939,6610841,W2156220037,1984,30071,28531,,,,,,,,skip,openalex page failed (paywall)
+Clustal W and Clustal X version 2.0,10.1093/bioinformatics/btm404,17846036,W2137015675,2007,31568,28590,,,,,,,,skip,openalex page failed (paywall)
+Inference of Population Structure Using Multilocus Genotype Data,10.1093/genetics/155.2.945,10835412,W2098126593,2000,37648,32948,,,,,,,,skip,openalex page failed (paywall)
+A pneumonia outbreak associated with a new coronavirus of probable bat origin,10.1038/s41586-020-2012-7,32015507,W3004280078,2020,23899,20654,,,,,,,,skip,openalex page failed (paywall)
+Systematic and integrative analysis of large gene lists using DAVID bioinformatics resources,10.1038/nprot.2008.211,19131956,W2158217645,2008,38870,33764,,,,,,,,skip,openalex page failed (paywall)
+The Effect of Intensive Treatment of Diabetes on the Development and Progression of Long-Term Complications in Insulin-Dependent Diabetes Mellitus,10.1056/nejm199309303291401,8366922,W2769264260,1993,27612,25886,,,,,,,,skip,openalex page failed (paywall)
+"Executive Summary of the Third Report of the National Cholesterol Education Program (NCEP) Expert Panel on Detection, Evaluation, and Treatment of High Blood Cholesterol in Adults (Adult Treatment Panel III)",10.1001/jama.285.19.2486,11368702,W4238251256,2001,30496,28123,,,,,,,,skip,openalex page failed (paywall)
+Detection of specific sequences among DNA fragments separated by gel electrophoresis,10.1016/s0022-2836(75)80083-0,1195397,W2063450941,1975,34139,33975,,,,,,,,skip,openalex page failed (paywall)

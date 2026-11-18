@@ -1,6 +1,5 @@
 # Exp 2-C cohort papers — selected BY RULE by scripts/select_cohort.py
-# rule: eps=0.6, tau_max=1150, cutoff=2023-12-31, truth size in [26,132, 28,803] (robust to u in [0.22, 0.3]), Europe PMC coverage >= 0.8, year <= 2021, seed 20261117
+# rule: eps=0.6, tau_max=1150, cutoff=2023-12-31, accept iff (u + 0.03) + psi(N) < eps and both walks fit in tau_max, with N and u measured from the two enumerators; year <= 2021, seed 20261117
 # audit trail (every candidate examined): cohort/selection_report.csv
 # STAGED, not frozen: frozen only by build_citation_truth.py after the supervisor signs.
 # Title | DOI | PMID
-Coot : model-building tools for molecular graphics | 10.1107/s0907444904019158 | 15572765
