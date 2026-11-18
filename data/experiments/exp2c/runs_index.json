@@ -1,0 +1,97 @@
+{
+  "clinical course and risk factors for mortality of adult inpatients with covid 19 in wuhan china a retrospective cohort study": {
+    "done": true,
+    "run_id": "exp2c_cite_v1_clinical_course_and_risk_factors_for_mortality_of_adult_inpa",
+    "stop_reason": "frontier_exhausted",
+    "certificate": "abandoned",
+    "total": 25618,
+    "n_records": 25618,
+    "params": {
+      "eps": 0.6,
+      "max_steps": 1150,
+      "page_size": 50,
+      "indexes": [
+        "openalex",
+        "europepmc"
+      ],
+      "cutoff": "2023-12-31",
+      "index_reader": "structured"
+    }
+  },
+  "edger a bioconductor package for differential expression analysis of digital gene expression data": {
+    "done": true,
+    "run_id": "exp2c_cite_v1_edger_a_bioconductor_package_for_differential_expression_ana",
+    "stop_reason": "certified",
+    "certificate": "statistical",
+    "total": 30369,
+    "n_records": 30369,
+    "params": {
+      "eps": 0.6,
+      "max_steps": 1150,
+      "page_size": 50,
+      "indexes": [
+        "openalex",
+        "europepmc"
+      ],
+      "cutoff": "2023-12-31",
+      "index_reader": "structured"
+    }
+  },
+  "kegg kyoto encyclopedia of genes and genomes": {
+    "done": true,
+    "run_id": "exp2c_cite_v1_kegg_kyoto_encyclopedia_of_genes_and_genomes",
+    "stop_reason": "certified",
+    "certificate": "statistical",
+    "total": 24667,
+    "n_records": 24667,
+    "params": {
+      "eps": 0.6,
+      "max_steps": 1150,
+      "page_size": 50,
+      "indexes": [
+        "openalex",
+        "europepmc"
+      ],
+      "cutoff": "2023-12-31",
+      "index_reader": "structured"
+    }
+  },
+  "plink a tool set for whole genome association and population based linkage analyses": {
+    "done": true,
+    "run_id": "exp2c_cite_v1_plink_a_tool_set_for_whole_genome_association_and_population",
+    "stop_reason": "certified",
+    "certificate": "statistical",
+    "total": 25734,
+    "n_records": 25734,
+    "params": {
+      "eps": 0.6,
+      "max_steps": 1150,
+      "page_size": 50,
+      "indexes": [
+        "openalex",
+        "europepmc"
+      ],
+      "cutoff": "2023-12-31",
+      "index_reader": "structured"
+    }
+  },
+  "standards and guidelines for the interpretation of sequence variants a joint consensus recommendation of the american college of medical genetics and genomics and the association for molecular pathology": {
+    "done": true,
+    "run_id": "exp2c_cite_v1_standards_and_guidelines_for_the_interpretation_of_sequence_",
+    "stop_reason": "frontier_exhausted",
+    "certificate": "abandoned",
+    "total": 20260,
+    "n_records": 20260,
+    "params": {
+      "eps": 0.6,
+      "max_steps": 1150,
+      "page_size": 50,
+      "indexes": [
+        "openalex",
+        "europepmc"
+      ],
+      "cutoff": "2023-12-31",
+      "index_reader": "structured"
+    }
+  }
+}

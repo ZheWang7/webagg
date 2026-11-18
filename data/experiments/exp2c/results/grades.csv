@@ -1,0 +1,6 @@
+player,certificate,stop_reason,n_truth,n_asserted,record_recall,exact_recall,n_spurious,true_total,asserted_total,rel_agg_error
+clinical course and risk factors for mortality of adult inpatients with covid 19 in wuhan china a retrospective cohort study,abandoned,frontier_exhausted,21170,25618,0.9573,0.9573,5353,21170,25618,0.2101
+edger a bioconductor package for differential expression analysis of digital gene expression data,statistical,certified,28864,30369,0.9306,0.9306,3509,28864,30369,0.0521
+kegg kyoto encyclopedia of genes and genomes,statistical,certified,22813,24667,0.9507,0.9507,2978,22813,24667,0.0813
+plink a tool set for whole genome association and population based linkage analyses,statistical,certified,24515,25734,0.9426,0.9426,2627,24515,25734,0.0497
+standards and guidelines for the interpretation of sequence variants a joint consensus recommendation of the american college of medical genetics and genomics and the association for molecular pathology,abandoned,frontier_exhausted,18857,20260,0.9699,0.9699,1970,18857,20260,0.0744
