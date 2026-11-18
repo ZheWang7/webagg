@@ -1,5 +1,10 @@
-# Exp 2-C cohort papers — NOT SELECTED YET.
-# Fill by rule with (needs OPENALEX_API_KEY in .env; about 20 minutes, $0):
-#   $env:RUN_ONLINE="1"
-#   python scripts/select_cohort.py --eps 0.6 --tau-max 1150 --cutoff 2023-12-31 --time-budget 3600
-# Lines: Title | DOI | PMID
+# Exp 2-C cohort papers — selected BY RULE by scripts/select_cohort.py
+# rule: eps=0.6, tau_max=1150, cutoff=2023-12-31, accept iff (u + 0.03) + psi(N) < eps and both walks fit in tau_max, with N and u measured from the two enumerators; year <= 2021, seed 20261117
+# audit trail (every candidate examined): cohort/selection_report.csv
+# STAGED, not frozen: frozen only by build_citation_truth.py after the supervisor signs.
+# Title | DOI | PMID
+KEGG: Kyoto Encyclopedia of Genes and Genomes | 10.1093/nar/28.1.27 | 10592173
+PLINK: A Tool Set for Whole-Genome Association and Population-Based Linkage Analyses | 10.1086/519795 | 17701901
+Standards and guidelines for the interpretation of sequence variants: a joint consensus recommendation of the American College of Medical Genetics and Genomics and the Association for Molecular Pathology | 10.1038/gim.2015.30 | 25741868
+edgeR : a Bioconductor package for differential expression analysis of digital gene expression data | 10.1093/bioinformatics/btp616 | 19910308
+Clinical course and risk factors for mortality of adult inpatients with COVID-19 in Wuhan, China: a retrospective cohort study | 10.1016/s0140-6736(20)30566-3 | 32171076
