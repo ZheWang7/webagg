@@ -25,10 +25,18 @@ def test_replay_and_grade_scripts_end_to_end(tmp_path):
     r = _run("replay_exp2c.py", "--cohort", cohort, "--live-eps", "0.5",
              "--arms", "0.9,0.7,0.5", data_dir=tmp_path)
     assert r.returncode == 0, r.stdout + r.stderr
-    assert "Self-tests S1/S2 passed" in r.stdout
+    assert "Self-tests S1/S2/S3 passed" in r.stdout
     res = tmp_path / "experiments" / "exp2c" / "results"
     stops = list(csv.DictReader(open(res / "stops.csv")))
-    assert len(stops) == 2 * 3                     # 2 papers x 3 arms
+    assert len(stops) == 3 * 3                     # 3 papers x 3 arms
+    # regression (Exp 2-C, 2026-11-18): a paper whose normalized title is
+    # longer than 160 characters must still join the truth table — recall
+    # was reported as 0 because full record keys were compared
+    longp = [row for row in stops if row["player"].startswith("standards")]
+    assert longp and all(float(row["recall_at_stop"]) == 1.0 for row in longp)
+    short = list(csv.DictReader(open(res / "shortfall.csv")))
+    assert all(row["never_discovered"] == "0" for row in short
+               if row["player"].startswith("standards"))
     kinds = {(row["player"][:20], row["eps"]): row["stop_kind"]
              for row in stops}
     big = [v for (p, _e), v in kinds.items() if p.startswith("big sample")]

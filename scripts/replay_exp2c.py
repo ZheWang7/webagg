@@ -5,6 +5,9 @@ Self-tests (run before any table is written; a failure aborts loudly):
   S1  replay at the LIVE epsilon reproduces the live certified stop step
       for every run that stopped 'certified';
   S2  replayed stop steps are monotone non-increasing as epsilon loosens.
+  S3  the ledger's records JOIN the truth table: a run that found records
+      must match at least one truth record. (A key mismatch would
+      otherwise read as recall 0 and as a false guarantee violation.)
 
 Outputs (data/experiments/exp2c/results/):
   stops.csv        one row per (player, eps): stop step, stop kind
@@ -74,7 +77,19 @@ def main() -> None:
         cov = ledger.coverage(run_id)
         live_stop = ledger.stop(run_id)
         ledger.close()
-        truth_keys = {f"{player}|{season}" for season in truth[player]}
+        # Join on the record SUB-key (the citing work's DOI key). A ledger
+        # holds one target paper, so the entity prefix of its record keys
+        # carries no information — and it is built by a different
+        # normalizer than the truth table's paper key (it truncates long
+        # titles), so comparing full keys silently fails for long titles.
+        cov = [(s, rk.split("|", 1)[1]) for s, rk in cov]
+        truth_keys = set(truth[player])
+
+        # ---- self-test S3: the keys must join ------------------------------
+        assert not cov or any(rk in truth_keys for _s, rk in cov), (
+            f"S3 FAILED for {player}: the ledger holds {len(cov)} records "
+            "and NONE joins the truth table — a key mismatch, not a result. "
+            "Do not report recall for this run until it is diagnosed.")
 
         # ---- self-test S1: replay at live eps reproduces the live stop ----
         if live_stop and live_stop[1] == "certified":
@@ -145,7 +160,7 @@ def main() -> None:
 
     above = sum(1 for r in cal_rows
                 if r["claimed_unseen"] < r["realized_unseen"])
-    print(f"Self-tests S1/S2 passed over {len(idx)} runs.")
+    print(f"Self-tests S1/S2/S3 passed over {len(idx)} runs.")
     print(f"C1: {above}/{len(cal_rows)} certificate points above the diagonal "
           "(claimed < realized) — any such point falsifies Assumption 1(a).")
     print(f"C2 (statistical path only, eps={live_eps}): {stat_stops} certified "

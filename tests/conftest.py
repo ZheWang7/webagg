@@ -142,6 +142,21 @@ def big_kwargs(overlap: float = 1.0, **over):
     return kw
 
 
+# --- a paper whose normalized title exceeds 160 characters ----------------
+# Regression for the Exp 2-C replay bug: record keys in the ledger carry a
+# title prefix truncated at 160 characters, the truth table's paper key is
+# not truncated, so joining on full keys gave recall 0 for long titles.
+LONGPAPER = ("Standards And Guidelines For The Interpretation Of Testo "
+             "Variants A Joint Consensus Recommendation Of The Sample College "
+             "Of Testing Genetics And Genomics And The Association For "
+             "Synthetic Pathology And Fixtures")
+LONG_TRUTH = dict(TRUTH)
+LONG_PAGES = {url: {"citations": [dict(row, cited_paper=LONGPAPER)
+                                  if row.get("cited_paper") == TARGET else row
+                                  for row in page["citations"]]}
+              for url, page in PAGES.items()}
+
+
 class RoutedSearch:
     """Query-routed fake search: first matching keyword wins, else default."""
 
@@ -233,7 +248,8 @@ def seed_selftest_cohort(data_dir) -> str:
     cohort = "cite_selftest"
     rows = []
     for pid, (paper, truth) in enumerate(((TARGET, TRUTH),
-                                          (BIGPAPER, BIG_TRUTH)), start=1):
+                                          (BIGPAPER, BIG_TRUTH),
+                                          (LONGPAPER, LONG_TRUTH)), start=1):
         for key in truth:
             rows.append({"player": paper, "player_id": pid,
                          "season": key, "pts": 1, "gp": 2020})
@@ -250,6 +266,7 @@ def seed_selftest_cohort(data_dir) -> str:
     idx = {}
     for paper, pages, kw in (
             (TARGET, PAGES, dict(eps_g=BIG_EPS, max_steps=30)),
+            (LONGPAPER, LONG_PAGES, dict(eps_g=BIG_EPS, max_steps=30)),
             (BIGPAPER, BIG_PAGES, big_kwargs())):
         rid = f"exp2c_{cohort}_{normalize_name(paper).replace(' ', '_')[:30]}"
         ledger = Ledger(runs_dir / f"{rid}.sqlite")

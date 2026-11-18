@@ -33,7 +33,7 @@ def test_notebook_executes_offline_end_to_end(tmp_path, monkeypatch):
                 if out.get("output_type") == "stream")
         for cell in nb.cells if cell.cell_type == "code")
     assert "live phase skipped" in text          # the gate held
-    assert "Self-tests S1/S2 passed" in text     # replay reproduces the stops
+    assert "Self-tests S1/S2/S3 passed" in text     # replay reproduces the stops
     assert "HEADLINE (statistical path" in text  # C2 table printed
     res = tmp_path / "experiments" / "exp2c" / "results"
     for f in ("stops.csv", "calibration.csv", "shortfall.csv", "grades.csv"):
