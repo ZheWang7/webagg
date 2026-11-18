@@ -15,7 +15,7 @@ Outputs (data/experiments/exp2c/results/):
                    realized record recall at stop   -> C2 / Plot 2
   calibration.csv  one row per (player, step): claimed unseen (U_hat + psi)
                    vs realized unseen (1 - recall)  -> C1 / Plot 1; points
-                   ABOVE the diagonal falsify Assumption 1(a)
+                   BELOW the diagonal (claimed < realized) count against Assumption 1(a)
   shortfall.csv    per (player, eps): truth seasons missed, split into
                    lost-to-stopping-early (found later in the recorded
                    trajectory) vs never-discovered  -> the Fig-5 analogue
@@ -161,7 +161,7 @@ def main() -> None:
     above = sum(1 for r in cal_rows
                 if r["claimed_unseen"] < r["realized_unseen"])
     print(f"Self-tests S1/S2/S3 passed over {len(idx)} runs.")
-    print(f"C1: {above}/{len(cal_rows)} certificate points above the diagonal "
+    print(f"C1: {above}/{len(cal_rows)} certificate points below the diagonal "
           "(claimed < realized) — any such point falsifies Assumption 1(a).")
     print(f"C2 (statistical path only, eps={live_eps}): {stat_stops} certified "
           f"stops, {stat_violations} recall violations "

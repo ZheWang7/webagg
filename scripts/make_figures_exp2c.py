@@ -13,6 +13,9 @@ grades}.csv -> fig_c1_calibration, fig_c2_coverage, fig_shortfall
   Fig S   truth citers never found, per paper (none was lost by stopping
           early in this experiment).
 
+The notebook imports these same functions, so the figures it shows are
+the paper figures.
+
 Usage:
     python scripts/make_figures_exp2c.py
 """
@@ -23,10 +26,7 @@ import sys
 from collections import defaultdict
 from pathlib import Path
 
-import matplotlib
-
-matplotlib.use("Agg")                            # files only, no window
-import matplotlib.pyplot as plt                  # noqa: E402
+import matplotlib.pyplot as plt
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
@@ -72,14 +72,19 @@ def style() -> None:
         "legend.frameon": False})
 
 
-def save(fig, stem: str) -> None:
+def save(fig, stem: str, close: bool = True) -> None:
+    """Write PDF + PNG. close=False leaves the figure open so a notebook
+    can display it after saving."""
+    RES.mkdir(parents=True, exist_ok=True)
     for ext in ("pdf", "png"):
-        fig.savefig(RES / f"{stem}.{ext}", dpi=300, bbox_inches="tight")
-    plt.close(fig)
+        fig.savefig(RES / f"{stem}.{ext}", dpi=300, bbox_inches="tight",
+                    facecolor="white")
+    if close:
+        plt.close(fig)
     print(f"  wrote {stem}.pdf / .png")
 
 
-def fig_c1(cal: list[dict], live_eps: float) -> None:
+def fig_c1(cal: list[dict], live_eps: float):
     runs = defaultdict(list)
     for r in cal:
         runs[r["player"]].append((int(r["step"]), float(r["realized_unseen"]),
@@ -111,10 +116,10 @@ def fig_c1(cal: list[dict], live_eps: float) -> None:
     ax.set_xlabel("share of true citers actually unseen (1 − recall)")
     ax.set_ylabel("claimed share unseen")
     ax.legend(loc="lower right", fontsize=8.5)
-    save(fig, "fig_c1_calibration")
+    return fig
 
 
-def fig_c2(stops: list[dict]) -> None:
+def fig_c2(stops: list[dict]):
     # tightest pre-registered arm at which each paper's certificate fires
     best = {}
     for r in stops:
@@ -144,12 +149,16 @@ def fig_c2(stops: list[dict]) -> None:
     ax.set_xticks([0, 0.2, 0.4, 0.6, 0.8, 1.0])
     ax.set_xlabel("recall")
     ax.grid(axis="y", visible=False)
-    ax.legend(loc="lower center", bbox_to_anchor=(0.45, 1.0), ncol=2,
-              fontsize=8.5)
-    save(fig, "fig_c2_coverage")
+    if names:
+        ax.legend(loc="lower center", bbox_to_anchor=(0.45, 1.0), ncol=2,
+                  fontsize=8.5)
+    else:
+        ax.text(0.5, 0.5, "no certificate fired at any arm", ha="center",
+                va="center", transform=ax.transAxes, color=MUTED)
+    return fig
 
 
-def fig_shortfall(short_rows: list[dict], live_eps: float) -> None:
+def fig_shortfall(short_rows: list[dict], live_eps: float):
     rows = [r for r in short_rows if abs(float(r["eps"]) - live_eps) < 1e-9]
     lost = sum(int(r["lost_to_stopping"]) for r in rows)
     rows.sort(key=lambda r: int(r["never_discovered"]) / int(r["n_truth"]))
@@ -161,24 +170,26 @@ def fig_shortfall(short_rows: list[dict], live_eps: float) -> None:
                 va="center", fontsize=8.5, color=INK)
     ax.set_yticks(range(len(rows)))
     ax.set_yticklabels([short(r["player"]) for r in rows], color=INK)
-    ax.set_xlim(0, max(100 * int(r["never_discovered"]) / int(r["n_truth"])
-                       for r in rows) * 1.55)
+    top = max((100 * int(r["never_discovered"]) / int(r["n_truth"])
+               for r in rows), default=0.0)
+    ax.set_xlim(0, max(top * 1.55, 1.0))
     ax.set_xlabel("true citers never found (% of the oracle's list)")
     ax.grid(axis="y", visible=False)
     if lost:
         ax.set_title(f"{lost:,} further citers were found only after the stop",
                      fontsize=9, loc="left")
-    save(fig, "fig_shortfall")
+    return fig
 
 
 def main() -> None:
+    plt.switch_backend("Agg")                    # files only, no window
     style()
     stops = read("stops.csv")
     live_eps = min(float(r["eps"]) for r in stops)   # the strictest arm
     print(f"figures from {RES} (live eps = {live_eps})")
-    fig_c1(read("calibration.csv"), live_eps)
-    fig_c2(stops)
-    fig_shortfall(read("shortfall.csv"), live_eps)
+    save(fig_c1(read("calibration.csv"), live_eps), "fig_c1_calibration")
+    save(fig_c2(stops), "fig_c2_coverage")
+    save(fig_shortfall(read("shortfall.csv"), live_eps), "fig_shortfall")
 
 
 if __name__ == "__main__":

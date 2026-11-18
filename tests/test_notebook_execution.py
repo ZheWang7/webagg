@@ -38,3 +38,8 @@ def test_notebook_executes_offline_end_to_end(tmp_path, monkeypatch):
     res = tmp_path / "experiments" / "exp2c" / "results"
     for f in ("stops.csv", "calibration.csv", "shortfall.csv", "grades.csv"):
         assert (res / f).exists(), f"notebook did not write {f}"
+    # the notebook draws and saves the three PAPER figures itself (the
+    # same functions as scripts/make_figures_exp2c.py)
+    for stem in ("fig_c1_calibration", "fig_c2_coverage", "fig_shortfall"):
+        for ext in ("pdf", "png"):
+            assert (res / f"{stem}.{ext}").stat().st_size > 1000, stem
